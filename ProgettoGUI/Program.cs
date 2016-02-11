@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace ProgettoGUI {
 	static class Program {
@@ -16,7 +17,8 @@ namespace ProgettoGUI {
 		static void Main() {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new Form1());
+			var form = new Form1();
+			Application.Run(form);
 		}
 	}
 
@@ -27,6 +29,9 @@ namespace ProgettoGUI {
 		TcpListener server;
 		IPAddress localAddr;
 		int port;
+		printToConsole printToServerConsole;
+
+
 
 		public TcpListener Server {
 			get {
@@ -57,15 +62,24 @@ namespace ProgettoGUI {
 				port = value;
 			}
 		}
+		
 
-		public Parser() {
-			StartServer();
-		}
+		//public Parser() {
+		//	StartServer();
+		//}
 
-		public Parser(int p, string ip) {
+		//~Parser() {
+
+		//}
+
+		public delegate void printToConsole(string s);
+
+		public Parser(int p, string ip, printToConsole del) {
 			port = p;
 			localAddr = IPAddress.Parse(ip);
 			server = new TcpListener(localAddr, port);
+			printToServerConsole = del;
+			StartServer();
 		}
 
 		public void StartServer() {
@@ -73,28 +87,30 @@ namespace ProgettoGUI {
 			////////SOCKET//////////
 			////////////////////////
 
-			
-			try {				
+			try {
 				// Start listening for client requests.
 				server.Start();
+				printToServerConsole(String.Format("Server Started on port {0} at IP {1}\n", port, localAddr));
 
 				// Buffer for reading data
 				Byte[] bytes = new Byte[256]; //(!) Dubbia utilità di questa variabile
 
 				// Enter the listening loop.
 				while (true) {
-					Console.Write("Waiting for a connection... ");
+					printToServerConsole("Waiting for a connection...\n");
+					//Console.Write("Waiting for a connection... ");
 
 					// Perform a blocking call to accept requests.
 					TcpClient client = server.AcceptTcpClient();
-					Console.WriteLine("Connected!");
+					printToServerConsole("Connected!\n");
+					//Console.WriteLine("Connected!");
 
 					// Get a stream object for reading and writing
 					NetworkStream stream = client.GetStream();
-					Console.WriteLine("Stream obtained.");
+					//Console.WriteLine("Stream obtained.");
 
 					BinaryReader reader = new BinaryReader(stream);
-					Console.WriteLine("Reading stream.");
+					//Console.WriteLine("Reading stream.");
 					int _c = 0;
 					// Loop to receive all the data sent by the client.
 					try {
@@ -105,11 +121,13 @@ namespace ProgettoGUI {
 						//FIRST PACKAGE
 						//10 byte per il client ID
 						byte[] client_id = reader.ReadBytes(10);
-						Console.WriteLine("CLIENT ID : {0}", System.Text.Encoding.UTF8.GetString(client_id));
+						printToServerConsole(String.Format("CLIENT ID : {0}\n", System.Text.Encoding.UTF8.GetString(client_id)));
+						//Console.WriteLine("CLIENT ID : {0}", System.Text.Encoding.UTF8.GetString(client_id));
 
 						//4 byte per la frequenza 
 						byte[] frequency = reader.ReadBytes(4);
-						Console.WriteLine("Sending at {0}MHz", BitConverter.ToInt32(frequency, 0));
+						printToServerConsole(String.Format("Sending at {0}MHz\n", BitConverter.ToInt32(frequency, 0)));
+						//Console.WriteLine("Sending at {0}MHz", BitConverter.ToInt32(frequency, 0));
 
 
 						//SENSORS PACKAGEs
@@ -121,7 +139,7 @@ namespace ProgettoGUI {
 							temp[0] = temp[1];
 							temp[1] = reader.ReadBytes(1)[0];
 						}
-						Console.WriteLine("Pacchetto {0} Identificato:", ++_c);
+						//Console.WriteLine("Pacchetto {0} Identificato:", ++_c);
 						byte bid = temp[0];
 						byte mid = temp[1]; //0x32
 						byte len = reader.ReadBytes(1)[0];
@@ -166,10 +184,12 @@ namespace ProgettoGUI {
 							package[3] = ext_len_mul;
 							package[4] = ext_len_add;
 							data.CopyTo(package, 5);
-							Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}\nEXT_LEN_MUL : {3}\nEXT_LEN_ADD : {4}", package[0], package[1], package[2], package[3], package[4]);
+							printToServerConsole(String.Format("BID : {0}\nMID : {1}\nLEN : {2}\nEXT_LEN_MUL : {3}\nEXT_LEN_ADD : {4}\n", package[0], package[1], package[2], package[3], package[4]));
+							//Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}\nEXT_LEN_MUL : {3}\nEXT_LEN_ADD : {4}", package[0], package[1], package[2], package[3], package[4]);
 						} else {
 							data.CopyTo(package, 3);
-							Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}", package[0], package[1], package[2]);
+							printToServerConsole(String.Format("BID : {0}\nMID : {1}\nLEN : {2}\n", package[0], package[1], package[2]));
+							//Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}", package[0], package[1], package[2]);
 						}
 
 
@@ -213,10 +233,10 @@ namespace ProgettoGUI {
 										package[i * 52 + j * 4 + beg + 1],
 										package[i * 52 + j * 4 + beg]
 									}, 0);
-									Console.Write("{0}; ", field);
+									//Console.Write("{0}; ", field);
 									arr[i, j] = field;
 								}
-								Console.WriteLine();
+								//Console.WriteLine();
 							}
 							sampwin.Add(arr);
 
@@ -226,8 +246,8 @@ namespace ProgettoGUI {
 								package = reader.ReadBytes(byteToRead + 6);
 							}
 
-							Console.WriteLine("-----------------------------------------");
-							Console.WriteLine("Lettura Nuovo Pacchetto...ENTER per continuare");
+							//Console.WriteLine("-----------------------------------------");
+							//Console.WriteLine("Lettura Nuovo Pacchetto...ENTER per continuare");
 							//Console.Read();
 
 						}
@@ -237,12 +257,13 @@ namespace ProgettoGUI {
 						//Quando le stream è esaurito dovrebbe automaticamente generare questa eccezione
 					} finally {
 						client.Close();
-						Console.WriteLine("Client Disconnected.\n");
-						Console.WriteLine("-------------------------------------------");
+						printToServerConsole("Client Disconnected.\n");
+						//Console.WriteLine("Client Disconnected.\n");
+						//Console.WriteLine("-------------------------------------------");
 					}
 				}
 			} catch (SocketException e) {
-				Console.WriteLine("SocketException: {0}", e);
+				//Console.WriteLine("SocketException: {0}", e);
 			} finally {
 				// Stop listening for new clients.
 				server.Stop();
