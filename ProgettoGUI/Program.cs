@@ -211,9 +211,7 @@ namespace ProgettoGUI {
 									printToServerConsole(String.Format("BID : {0}\nMID : {1}\nLEN : {2}\n", package[0], package[1], package[2]));
 									//Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}", package[0], package[1], package[2]);
 								}
-
-
-
+								
 								/*
 								Stato Array Package[]
 								package[0] : bid
@@ -269,13 +267,13 @@ namespace ProgettoGUI {
 									//Console.WriteLine("-----------------------------------------");
 									//Console.WriteLine("Lettura Nuovo Pacchetto...ENTER per continuare");
 									//Console.Read();
-
 								}
-							} catch {// (IndexOutOfRangeException e) {
-
+							} catch (IndexOutOfRangeException ex) {
 								//Console.WriteLine("client.Connected = {0}", client.Connected);
 								//Console.WriteLine(e);
 								//Quando le stream è esaurito dovrebbe automaticamente generare questa eccezione
+							} catch (Exception ex){
+								MessageBox.Show("Errore!\n" + ex.Message);
 							} finally {
 								client.Close();
 								printToServerConsole("Client Disconnected.\n");
@@ -285,6 +283,8 @@ namespace ProgettoGUI {
 						}
 					} catch (SocketException e) {
 						//Console.WriteLine("SocketException: {0}", e);
+					} catch (Exception ex) {
+						MessageBox.Show("Errore!\n" + ex.Message);
 					} finally {
 						// Stop listening for new clients.
 						server.Stop();

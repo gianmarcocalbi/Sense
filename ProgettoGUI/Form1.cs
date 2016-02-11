@@ -43,6 +43,7 @@ namespace ProgettoGUI {
 				//STOPPING SERVER
 				//bisogna fermare il server
 				//parser.Server.Close();
+
 				parser.DeactivateServer();
 				buttonServerStart.Text = "START";
 			} else {
