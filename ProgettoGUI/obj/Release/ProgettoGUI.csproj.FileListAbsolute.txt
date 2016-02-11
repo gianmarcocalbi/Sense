@@ -6,3 +6,4 @@ C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\R
 C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.csproj.GenerateResource.Cache
 C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.exe
 C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.pdb
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.csprojResolveAssemblyReference.cache
