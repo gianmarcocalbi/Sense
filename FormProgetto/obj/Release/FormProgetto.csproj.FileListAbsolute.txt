@@ -1,0 +1,4 @@
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\FormProgetto\bin\Release\FormProgetto.exe.config
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\FormProgetto\obj\Release\FormProgetto.csprojResolveAssemblyReference.cache
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\FormProgetto\obj\Release\FormProgetto.Properties.Resources.resources
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\FormProgetto\obj\Release\FormProgetto.csproj.GenerateResource.Cache

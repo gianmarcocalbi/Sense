@@ -1,0 +1,8 @@
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\bin\Release\ProgettoGUI.exe.config
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\bin\Release\ProgettoGUI.exe
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\bin\Release\ProgettoGUI.pdb
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.Form1.resources
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.Properties.Resources.resources
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.csproj.GenerateResource.Cache
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.exe
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.pdb
