@@ -1,0 +1,8 @@
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\bin\Debug\ProgettoGUI.exe.config
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\bin\Debug\ProgettoGUI.exe
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\bin\Debug\ProgettoGUI.pdb
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Debug\ProgettoGUI.Form1.resources
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Debug\ProgettoGUI.Properties.Resources.resources
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Debug\ProgettoGUI.csproj.GenerateResource.Cache
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Debug\ProgettoGUI.exe
+C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Debug\ProgettoGUI.pdb

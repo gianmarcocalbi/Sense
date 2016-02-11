@@ -17,7 +17,9 @@ namespace ProgettoGUI {
 
 		public Form1() {
 			InitializeComponent();
-			threadParser = new Thread(threadParserFunction);
+			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), printToServerConsoleProtected);
+			threadParser = new Thread(parser.StartServer);
+			threadParser.Start();
 		}
 
 		private void threadParserFunction() {
@@ -37,16 +39,18 @@ namespace ProgettoGUI {
 		}
 
 		private void buttonServerStartClick(object sender, EventArgs e) {
-			if (threadParser.ThreadState == ThreadState.Running) {
+			if (parser.serverIsActive) {
 				//STOPPING SERVER
 				//bisogna fermare il server
 				//parser.Server.Close();
+				parser.DeactivateServer();
 				buttonServerStart.Text = "START";
 			} else {
 				//STARTING SERVER
 				try {
 					//richTextConsole.AppendText(String.Format("Server Started on port {0} at IP {1}\n", parser.Port, parser.LocalAddr));		
-					threadParser.Start();
+					//Invoke(/*delegato*/);
+					parser.ActivateServer();
 					buttonServerStart.Text = "STOP";
 				} catch (SocketException exc) {
 					richTextConsole.AppendText(String.Format("{0}\n", exc));
@@ -61,10 +65,13 @@ namespace ProgettoGUI {
 		public delegate void printToServerConsoleDelegate(string s);
 
 		public void printToServerConsoleProtected(string s) {
-			if (this.richTextConsole.InvokeRequired)
+			if (this.richTextConsole.InvokeRequired) {
 				Invoke(new printToServerConsoleDelegate(printToServerConsoleProtected), new object[] { s });
-			else
+			} else {
 				richTextConsole.AppendText(s);
+				richTextConsole.SelectionStart = richTextConsole.Text.Length;
+				richTextConsole.ScrollToCaret();
+			}
 		}
 	}
 }
