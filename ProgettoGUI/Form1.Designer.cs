@@ -24,7 +24,14 @@
 		/// </summary>
 		private void InitializeComponent() {
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.checkBoxConsoleAutoFlow = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
+			this.label9 = new System.Windows.Forms.Label();
+			this.textBoxFinestra = new System.Windows.Forms.TextBox();
+			this.label8 = new System.Windows.Forms.Label();
+			this.label7 = new System.Windows.Forms.Label();
+			this.comboBoxFrequenza = new System.Windows.Forms.ComboBox();
+			this.labelServerSide = new System.Windows.Forms.Label();
 			this.buttonServerStart = new System.Windows.Forms.Button();
 			this.textBoxIP4 = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
@@ -50,12 +57,20 @@
 			// splitContainer1
 			// 
 			this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.splitContainer1.IsSplitterFixed = true;
 			this.splitContainer1.Location = new System.Drawing.Point(0, 0);
 			this.splitContainer1.Name = "splitContainer1";
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add(this.checkBoxConsoleAutoFlow);
 			this.splitContainer1.Panel1.Controls.Add(this.label6);
+			this.splitContainer1.Panel1.Controls.Add(this.label9);
+			this.splitContainer1.Panel1.Controls.Add(this.textBoxFinestra);
+			this.splitContainer1.Panel1.Controls.Add(this.label8);
+			this.splitContainer1.Panel1.Controls.Add(this.label7);
+			this.splitContainer1.Panel1.Controls.Add(this.comboBoxFrequenza);
+			this.splitContainer1.Panel1.Controls.Add(this.labelServerSide);
 			this.splitContainer1.Panel1.Controls.Add(this.buttonServerStart);
 			this.splitContainer1.Panel1.Controls.Add(this.textBoxIP4);
 			this.splitContainer1.Panel1.Controls.Add(this.label5);
@@ -73,23 +88,91 @@
 			// 
 			this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
 			this.splitContainer1.Size = new System.Drawing.Size(1006, 564);
-			this.splitContainer1.SplitterDistance = 264;
+			this.splitContainer1.SplitterDistance = 263;
 			this.splitContainer1.TabIndex = 0;
+			// 
+			// checkBoxConsoleAutoFlow
+			// 
+			this.checkBoxConsoleAutoFlow.AutoSize = true;
+			this.checkBoxConsoleAutoFlow.Checked = true;
+			this.checkBoxConsoleAutoFlow.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkBoxConsoleAutoFlow.Location = new System.Drawing.Point(63, 540);
+			this.checkBoxConsoleAutoFlow.Name = "checkBoxConsoleAutoFlow";
+			this.checkBoxConsoleAutoFlow.Size = new System.Drawing.Size(114, 17);
+			this.checkBoxConsoleAutoFlow.TabIndex = 20;
+			this.checkBoxConsoleAutoFlow.Text = "Console Auto Flow";
+			this.checkBoxConsoleAutoFlow.UseVisualStyleBackColor = true;
 			// 
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label6.Location = new System.Drawing.Point(65, 9);
+			this.label6.Location = new System.Drawing.Point(122, 106);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(135, 25);
-			this.label6.TabIndex = 13;
-			this.label6.Text = "Server Side";
+			this.label6.Size = new System.Drawing.Size(20, 13);
+			this.label6.TabIndex = 19;
+			this.label6.Text = "Hz";
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point(123, 134);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(44, 13);
+			this.label9.TabIndex = 18;
+			this.label9.Text = "secondi";
+			// 
+			// textBoxFinestra
+			// 
+			this.textBoxFinestra.Location = new System.Drawing.Point(75, 131);
+			this.textBoxFinestra.Name = "textBoxFinestra";
+			this.textBoxFinestra.Size = new System.Drawing.Size(41, 20);
+			this.textBoxFinestra.TabIndex = 17;
+			this.textBoxFinestra.Text = "10";
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(13, 134);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(44, 13);
+			this.label8.TabIndex = 16;
+			this.label8.Text = "Finestra";
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(13, 106);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(57, 13);
+			this.label7.TabIndex = 15;
+			this.label7.Text = "Frequenza";
+			// 
+			// comboBoxFrequenza
+			// 
+			this.comboBoxFrequenza.FormattingEnabled = true;
+			this.comboBoxFrequenza.Items.AddRange(new object[] {
+            "50",
+            "100",
+            "200"});
+			this.comboBoxFrequenza.Location = new System.Drawing.Point(75, 103);
+			this.comboBoxFrequenza.Name = "comboBoxFrequenza";
+			this.comboBoxFrequenza.Size = new System.Drawing.Size(41, 21);
+			this.comboBoxFrequenza.TabIndex = 14;
+			// 
+			// labelServerSide
+			// 
+			this.labelServerSide.AutoSize = true;
+			this.labelServerSide.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelServerSide.Location = new System.Drawing.Point(65, 9);
+			this.labelServerSide.Name = "labelServerSide";
+			this.labelServerSide.Size = new System.Drawing.Size(135, 25);
+			this.labelServerSide.TabIndex = 13;
+			this.labelServerSide.Text = "Server Side";
 			// 
 			// buttonServerStart
 			// 
 			this.buttonServerStart.ForeColor = System.Drawing.Color.Black;
-			this.buttonServerStart.Location = new System.Drawing.Point(53, 157);
+			this.buttonServerStart.Location = new System.Drawing.Point(53, 166);
 			this.buttonServerStart.Name = "buttonServerStart";
 			this.buttonServerStart.Size = new System.Drawing.Size(147, 23);
 			this.buttonServerStart.TabIndex = 12;
@@ -99,16 +182,16 @@
 			// 
 			// textBoxIP4
 			// 
-			this.textBoxIP4.Location = new System.Drawing.Point(206, 118);
+			this.textBoxIP4.Location = new System.Drawing.Point(199, 74);
 			this.textBoxIP4.Name = "textBoxIP4";
-			this.textBoxIP4.Size = new System.Drawing.Size(29, 20);
+			this.textBoxIP4.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP4.TabIndex = 11;
 			this.textBoxIP4.Text = "1";
 			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(190, 125);
+			this.label5.Location = new System.Drawing.Point(183, 81);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(10, 13);
 			this.label5.TabIndex = 10;
@@ -116,16 +199,16 @@
 			// 
 			// textBoxIP3
 			// 
-			this.textBoxIP3.Location = new System.Drawing.Point(155, 118);
+			this.textBoxIP3.Location = new System.Drawing.Point(152, 74);
 			this.textBoxIP3.Name = "textBoxIP3";
-			this.textBoxIP3.Size = new System.Drawing.Size(29, 20);
+			this.textBoxIP3.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP3.TabIndex = 9;
 			this.textBoxIP3.Text = "0";
 			// 
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(139, 125);
+			this.label4.Location = new System.Drawing.Point(136, 81);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(10, 13);
 			this.label4.TabIndex = 8;
@@ -134,7 +217,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(84, 125);
+			this.label3.Location = new System.Drawing.Point(89, 81);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(10, 13);
 			this.label3.TabIndex = 7;
@@ -142,17 +225,17 @@
 			// 
 			// textBoxIP2
 			// 
-			this.textBoxIP2.Location = new System.Drawing.Point(100, 118);
+			this.textBoxIP2.Location = new System.Drawing.Point(105, 74);
 			this.textBoxIP2.Name = "textBoxIP2";
-			this.textBoxIP2.Size = new System.Drawing.Size(29, 20);
+			this.textBoxIP2.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP2.TabIndex = 6;
 			this.textBoxIP2.Text = "0";
 			// 
 			// textBoxIP1
 			// 
-			this.textBoxIP1.Location = new System.Drawing.Point(46, 118);
+			this.textBoxIP1.Location = new System.Drawing.Point(58, 74);
 			this.textBoxIP1.Name = "textBoxIP1";
-			this.textBoxIP1.Size = new System.Drawing.Size(32, 20);
+			this.textBoxIP1.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP1.TabIndex = 5;
 			this.textBoxIP1.Text = "127";
 			this.textBoxIP1.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
@@ -160,7 +243,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(12, 121);
+			this.label2.Location = new System.Drawing.Point(17, 77);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(17, 13);
 			this.label2.TabIndex = 4;
@@ -168,7 +251,7 @@
 			// 
 			// textBoxPort
 			// 
-			this.textBoxPort.Location = new System.Drawing.Point(46, 94);
+			this.textBoxPort.Location = new System.Drawing.Point(58, 44);
 			this.textBoxPort.Name = "textBoxPort";
 			this.textBoxPort.Size = new System.Drawing.Size(100, 20);
 			this.textBoxPort.TabIndex = 3;
@@ -178,7 +261,7 @@
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(8, 97);
+			this.label1.Location = new System.Drawing.Point(13, 47);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(32, 13);
 			this.label1.TabIndex = 2;
@@ -190,10 +273,10 @@
 			this.richTextConsole.BackColor = System.Drawing.Color.Black;
 			this.richTextConsole.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.richTextConsole.ForeColor = System.Drawing.Color.Lime;
-			this.richTextConsole.Location = new System.Drawing.Point(3, 238);
+			this.richTextConsole.Location = new System.Drawing.Point(3, 209);
 			this.richTextConsole.Name = "richTextConsole";
 			this.richTextConsole.ReadOnly = true;
-			this.richTextConsole.Size = new System.Drawing.Size(266, 323);
+			this.richTextConsole.Size = new System.Drawing.Size(266, 325);
 			this.richTextConsole.TabIndex = 1;
 			this.richTextConsole.Text = "";
 			// 
@@ -236,7 +319,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MaximizeBox = false;
 			this.Name = "Form1";
-			this.Text = "Form1";
+			this.Text = "Sense";
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.splitContainer1.Panel1.ResumeLayout(false);
 			this.splitContainer1.Panel1.PerformLayout();
@@ -249,6 +332,8 @@
 		}
 
 		#endregion
+
+		
 
 		private System.Windows.Forms.SplitContainer splitContainer1;
 		private System.Windows.Forms.TextBox textBoxPort;
@@ -266,7 +351,14 @@
 		private System.Windows.Forms.TextBox textBoxIP1;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Button buttonServerStart;
+		private System.Windows.Forms.Label labelServerSide;
+		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.ComboBox comboBoxFrequenza;
+		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.TextBox textBoxFinestra;
+		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.CheckBox checkBoxConsoleAutoFlow;
 	}
 }
 

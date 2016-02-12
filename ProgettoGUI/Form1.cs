@@ -17,13 +17,11 @@ namespace ProgettoGUI {
 
 		public Form1() {
 			InitializeComponent();
-			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), printToServerConsoleProtected);
+			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
+			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), printToServerConsoleProtected, setButtonServerStartProtected);
 			threadParser = new Thread(parser.StartServer);
+			threadParser.IsBackground = true;
 			threadParser.Start();
-		}
-
-		private void threadParserFunction() {
-			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), printToServerConsoleProtected);
 		}
 
 		private void label1_Click(object sender, EventArgs e) {
@@ -43,16 +41,16 @@ namespace ProgettoGUI {
 				//STOPPING SERVER
 				//bisogna fermare il server
 				//parser.Server.Close();
-
 				parser.DeactivateServer();
-				buttonServerStart.Text = "START";
+
+				//buttonServerStart.Text = "START";
 			} else {
 				//STARTING SERVER
 				try {
 					//richTextConsole.AppendText(String.Format("Server Started on port {0} at IP {1}\n", parser.Port, parser.LocalAddr));		
 					//Invoke(/*delegato*/);
-					parser.ActivateServer();
-					buttonServerStart.Text = "STOP";
+					parser.ActivateServer(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text));
+					//buttonServerStart.Text = "STOP";
 				} catch (SocketException exc) {
 					richTextConsole.AppendText(String.Format("{0}\n", exc));
 				}
@@ -70,8 +68,25 @@ namespace ProgettoGUI {
 				Invoke(new printToServerConsoleDelegate(printToServerConsoleProtected), new object[] { s });
 			} else {
 				richTextConsole.AppendText(s);
-				richTextConsole.SelectionStart = richTextConsole.Text.Length;
-				richTextConsole.ScrollToCaret();
+				if (checkBoxConsoleAutoFlow.Checked) {
+					richTextConsole.SelectionStart = richTextConsole.Text.Length;
+					richTextConsole.ScrollToCaret();
+				}
+			}
+		}
+
+		public delegate void setButtonServerStartDelegate(bool b);
+
+		public void setButtonServerStartProtected(bool b) {
+			if (this.buttonServerStart.InvokeRequired) {
+				Invoke(new setButtonServerStartDelegate(setButtonServerStartProtected), new object[] { b });
+			} else {
+				if(b) {
+					buttonServerStart.Text = "STOP";
+				} else {
+					buttonServerStart.Text = "START";
+				}
+				
 			}
 		}
 	}

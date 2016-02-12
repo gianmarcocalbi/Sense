@@ -30,6 +30,7 @@ namespace ProgettoGUI {
 		IPAddress localAddr;
 		int port;
 		printToConsole printToServerConsole;
+		setButtonServerStartDel setButtonServerStart;
 		public bool serverIsActive;
 		
 		public TcpListener Server {
@@ -72,13 +73,20 @@ namespace ProgettoGUI {
 		//}
 
 		public delegate void printToConsole(string s);
+		public delegate void setButtonServerStartDel(bool b);
 
-		public Parser(int p, string ip, printToConsole del) {
+		public Parser(int p, string ip, printToConsole del, setButtonServerStartDel fun) {
 			port = p;
-			localAddr = IPAddress.Parse(ip);
-			server = new TcpListener(localAddr, port);
+			try {
+				localAddr = IPAddress.Parse(ip);
+				server = new TcpListener(localAddr, port);
+			} catch (Exception ex) {
+				MessageBox.Show("Errore IP Addressing 00!\n" + ex.Message);
+			}
 			printToServerConsole = del;
+			setButtonServerStart = fun;
 			serverIsActive = false;
+			setButtonServerStart(serverIsActive);
 			//StartServer();
 		}
 
@@ -92,13 +100,26 @@ namespace ProgettoGUI {
 				serverIsActive = true;
 		}*/
 
-		public void ActivateServer() {
-			serverIsActive = true;
+
+		public void ActivateServer(int p, string ip) {
+			port = p;
+			try {
+				localAddr = IPAddress.Parse(ip);
+				server = new TcpListener(localAddr, port);
+				serverIsActive = true;
+			} catch (Exception ex) {
+				MessageBox.Show("Errore IP Addressing 00!\n" + ex.Message);
+				serverIsActive = false;
+			}
+			setButtonServerStart(serverIsActive);
 		}
 
 		public void DeactivateServer() {
 			serverIsActive = false;
+			setButtonServerStart(serverIsActive);
 			server.Stop();
+			//printToServerConsole(server.ToString());
+			//printToServerConsole("Server Stopped.");
 		}
 
 		public void StartServer() {
@@ -211,7 +232,7 @@ namespace ProgettoGUI {
 									printToServerConsole(String.Format("BID : {0}\nMID : {1}\nLEN : {2}\n", package[0], package[1], package[2]));
 									//Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}", package[0], package[1], package[2]);
 								}
-								
+
 								/*
 								Stato Array Package[]
 								package[0] : bid
@@ -253,6 +274,7 @@ namespace ProgettoGUI {
 											}, 0);
 											//Console.Write("{0}; ", field);
 											arr[i, j] = field;
+											//printToServerConsole(String.Format("{0}; ", field));
 										}
 										//Console.WriteLine();
 									}
@@ -269,11 +291,17 @@ namespace ProgettoGUI {
 									//Console.Read();
 								}
 							} catch (IndexOutOfRangeException ex) {
-								//Console.WriteLine("client.Connected = {0}", client.Connected);
-								//Console.WriteLine(e);
+								//Ignore this Exception
 								//Quando le stream è esaurito dovrebbe automaticamente generare questa eccezione
-							} catch (Exception ex){
-								MessageBox.Show("Errore!\n" + ex.Message);
+								printToServerConsole("Stream finished.\n");
+								printToServerConsole("Creating file CSV...\n");
+								if (!writeMatrixToCSV(sampwin, @"C:\Users\Gianmarco\Desktop\sampwin.csv")) {
+									MessageBox.Show("Errore creazione CSV");
+								} else {
+									printToServerConsole("File CSV created in {path}.\n");
+								}
+							} catch (Exception ex) {
+								MessageBox.Show("Errore Connessione 00!\n" + ex.Message);
 							} finally {
 								client.Close();
 								printToServerConsole("Client Disconnected.\n");
@@ -281,17 +309,46 @@ namespace ProgettoGUI {
 								//Console.WriteLine("-------------------------------------------");
 							}
 						}
-					} catch (SocketException e) {
-						//Console.WriteLine("SocketException: {0}", e);
+					} catch (SocketException ex) {
+						//Ignore this Exception
+					} catch (InvalidOperationException ex) {
+						//Ignore this Exception
 					} catch (Exception ex) {
-						MessageBox.Show("Errore!\n" + ex.Message);
+						MessageBox.Show("Errore Connessione 01!\n" + ex.StackTrace);
 					} finally {
 						// Stop listening for new clients.
 						server.Stop();
+						serverIsActive = false;
+						setButtonServerStart(serverIsActive);
 						printToServerConsole("Server Stopped.\n");
 					}
 				}
 			}
+		}
+
+		public static bool writeMatrixToCSV(List<double[,]> matrix, string path) {
+			//List<double[num_sensori, 13]
+			//campione 1 -> accx;accy;..........qua3;qua4;;accx;accy;..........qua3;qua4;;
+			//campione 2 -> accx;accy;..........qua3;qua4;;accx;accy;..........qua3;qua4;;
+			//campione 3 -> accx;accy;..........qua3;qua4;;accx;accy;..........qua3;qua4;;
+			try {
+				string csv = "";
+				foreach (double[,] d in matrix) {
+					for (int i = 0; i < d.GetLength(0); ++i) {
+						for (int j = 0; j < d.GetLength(1); ++j) {
+							csv += d[i, j] + ";";
+						}
+						csv += ";";
+					}
+					csv += "\n";
+				}
+				File.WriteAllText(path, csv.ToString());
+			} catch (Exception ex) {
+				MessageBox.Show(ex.Message);
+				MessageBox.Show(ex.StackTrace);
+				return false;
+			}
+			return true;
 		}
 	}
 }
