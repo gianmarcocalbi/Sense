@@ -23,6 +23,7 @@
 		/// il contenuto del metodo con l'editor di codice.
 		/// </summary>
 		private void InitializeComponent() {
+			this.components = new System.ComponentModel.Container();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.checkBoxConsoleAutoFlow = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
@@ -44,13 +45,18 @@
 			this.textBoxPort = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.richTextConsole = new System.Windows.Forms.RichTextBox();
-			this.tabControl1 = new System.Windows.Forms.TabControl();
-			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.tabControl1 = new System.Windows.Forms.TabControl();
+			this.label10 = new System.Windows.Forms.Label();
+			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.label11 = new System.Windows.Forms.Label();
+			this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
+			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -86,6 +92,7 @@
 			// 
 			// splitContainer1.Panel2
 			// 
+			this.splitContainer1.Panel2.Controls.Add(this.label10);
 			this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
 			this.splitContainer1.Size = new System.Drawing.Size(1006, 564);
 			this.splitContainer1.SplitterDistance = 263;
@@ -161,13 +168,13 @@
 			// 
 			// labelServerSide
 			// 
-			this.labelServerSide.AutoSize = true;
 			this.labelServerSide.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelServerSide.Location = new System.Drawing.Point(65, 9);
+			this.labelServerSide.Location = new System.Drawing.Point(3, 9);
 			this.labelServerSide.Name = "labelServerSide";
-			this.labelServerSide.Size = new System.Drawing.Size(135, 25);
+			this.labelServerSide.Size = new System.Drawing.Size(257, 25);
 			this.labelServerSide.TabIndex = 13;
 			this.labelServerSide.Text = "Server Side";
+			this.labelServerSide.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// buttonServerStart
 			// 
@@ -280,35 +287,87 @@
 			this.richTextConsole.TabIndex = 1;
 			this.richTextConsole.Text = "";
 			// 
-			// tabControl1
-			// 
-			this.tabControl1.Controls.Add(this.tabPage1);
-			this.tabControl1.Controls.Add(this.tabPage2);
-			this.tabControl1.Location = new System.Drawing.Point(3, 3);
-			this.tabControl1.Name = "tabControl1";
-			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(732, 558);
-			this.tabControl1.TabIndex = 0;
-			// 
-			// tabPage1
-			// 
-			this.tabPage1.Location = new System.Drawing.Point(4, 22);
-			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(724, 532);
-			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "tabPage1";
-			this.tabPage1.UseVisualStyleBackColor = true;
-			// 
 			// tabPage2
 			// 
 			this.tabPage2.Location = new System.Drawing.Point(4, 22);
 			this.tabPage2.Name = "tabPage2";
 			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(724, 532);
+			this.tabPage2.Size = new System.Drawing.Size(724, 491);
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "tabPage2";
 			this.tabPage2.UseVisualStyleBackColor = true;
+			// 
+			// tabPage1
+			// 
+			this.tabPage1.Controls.Add(this.zedGraphControl1);
+			this.tabPage1.Controls.Add(this.label11);
+			this.tabPage1.Controls.Add(this.comboBox1);
+			this.tabPage1.Location = new System.Drawing.Point(4, 22);
+			this.tabPage1.Name = "tabPage1";
+			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage1.Size = new System.Drawing.Size(724, 491);
+			this.tabPage1.TabIndex = 0;
+			this.tabPage1.Text = "Chart";
+			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// tabControl1
+			// 
+			this.tabControl1.Controls.Add(this.tabPage1);
+			this.tabControl1.Controls.Add(this.tabPage2);
+			this.tabControl1.Location = new System.Drawing.Point(3, 44);
+			this.tabControl1.Name = "tabControl1";
+			this.tabControl1.SelectedIndex = 0;
+			this.tabControl1.Size = new System.Drawing.Size(732, 517);
+			this.tabControl1.TabIndex = 0;
+			// 
+			// label10
+			// 
+			this.label10.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label10.Location = new System.Drawing.Point(7, 5);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(724, 32);
+			this.label10.TabIndex = 14;
+			this.label10.Text = "Chart";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
+			// comboBox1
+			// 
+			this.comboBox1.FormattingEnabled = true;
+			this.comboBox1.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"});
+			this.comboBox1.Location = new System.Drawing.Point(58, 12);
+			this.comboBox1.Name = "comboBox1";
+			this.comboBox1.Size = new System.Drawing.Size(47, 21);
+			this.comboBox1.TabIndex = 0;
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(20, 15);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(32, 13);
+			this.label11.TabIndex = 1;
+			this.label11.Text = "Chart";
+			// 
+			// zedGraphControl1
+			// 
+			this.zedGraphControl1.Location = new System.Drawing.Point(23, 40);
+			this.zedGraphControl1.Name = "zedGraphControl1";
+			this.zedGraphControl1.ScrollGrace = 0D;
+			this.zedGraphControl1.ScrollMaxX = 0D;
+			this.zedGraphControl1.ScrollMaxY = 0D;
+			this.zedGraphControl1.ScrollMaxY2 = 0D;
+			this.zedGraphControl1.ScrollMinX = 0D;
+			this.zedGraphControl1.ScrollMinY = 0D;
+			this.zedGraphControl1.ScrollMinY2 = 0D;
+			this.zedGraphControl1.Size = new System.Drawing.Size(680, 428);
+			this.zedGraphControl1.TabIndex = 2;
 			// 
 			// Form1
 			// 
@@ -326,6 +385,8 @@
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
 			this.splitContainer1.ResumeLayout(false);
+			this.tabPage1.ResumeLayout(false);
+			this.tabPage1.PerformLayout();
 			this.tabControl1.ResumeLayout(false);
 			this.ResumeLayout(false);
 
@@ -339,9 +400,6 @@
 		private System.Windows.Forms.TextBox textBoxPort;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.RichTextBox richTextConsole;
-		private System.Windows.Forms.TabControl tabControl1;
-		private System.Windows.Forms.TabPage tabPage1;
-		private System.Windows.Forms.TabPage tabPage2;
 		private System.Windows.Forms.TextBox textBoxIP4;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox textBoxIP3;
@@ -359,6 +417,13 @@
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.CheckBox checkBoxConsoleAutoFlow;
+		private System.Windows.Forms.TabControl tabControl1;
+		private System.Windows.Forms.TabPage tabPage1;
+		private System.Windows.Forms.TabPage tabPage2;
+		private System.Windows.Forms.Label label10;
+		private ZedGraph.ZedGraphControl zedGraphControl1;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.ComboBox comboBox1;
 	}
 }
 

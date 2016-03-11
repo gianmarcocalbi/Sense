@@ -1,5 +1,0 @@
-c:\users\gianmarco\documents\visual studio 2015\Projects\Sense\Sense\bin\Debug\Sense.exe.config
-C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\Sense\bin\Debug\Sense.exe
-C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\Sense\bin\Debug\Sense.pdb
-C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\Sense\obj\Debug\Sense.exe
-C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\Sense\obj\Debug\Sense.pdb
