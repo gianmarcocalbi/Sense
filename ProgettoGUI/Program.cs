@@ -293,15 +293,16 @@ namespace ProgettoGUI {
 							} catch (IndexOutOfRangeException ex) {
 								//Ignore this Exception
 								//Quando le stream è esaurito dovrebbe automaticamente generare questa eccezione
+								var path = @"C:\Users\Gianmarco\Desktop\sampwin.csv";
 								printToServerConsole("Stream finished.\n");
 								printToServerConsole("Creating file CSV...\n");
-								if (!writeMatrixToCSV(sampwin, @"C:\Users\Gianmarco\Desktop\sampwin.csv")) {
+								if (!writeMatrixToCSV(sampwin, path)) {
 									MessageBox.Show("Errore creazione CSV");
 								} else {
 									printToServerConsole("File CSV created in {path}.\n");
 								}
 							} catch (Exception ex) {
-								MessageBox.Show("Errore Connessione 00!\n" + ex.Message);
+								MessageBox.Show("Errore Connessione 0x0!\n" + ex.Message);
 							} finally {
 								client.Close();
 								printToServerConsole("Client Disconnected.\n");
@@ -345,7 +346,7 @@ namespace ProgettoGUI {
 				File.WriteAllText(path, csv.ToString());
 			} catch (Exception ex) {
 				MessageBox.Show(ex.Message);
-				MessageBox.Show(ex.StackTrace);
+				//MessageBox.Show(ex.StackTrace);
 				return false;
 			}
 			return true;

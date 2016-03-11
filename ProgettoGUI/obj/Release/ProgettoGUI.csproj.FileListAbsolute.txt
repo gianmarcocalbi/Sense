@@ -7,3 +7,12 @@ C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\R
 C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.exe
 C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.pdb
 C:\Users\Gianmarco\documents\visual studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.csprojResolveAssemblyReference.cache
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\bin\Release\ProgettoGUI.exe.config
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.exe
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.pdb
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\bin\Release\ProgettoGUI.exe
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\bin\Release\ProgettoGUI.pdb
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.csprojResolveAssemblyReference.cache
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.Form1.resources
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.Properties.Resources.resources
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\obj\Release\ProgettoGUI.csproj.GenerateResource.Cache

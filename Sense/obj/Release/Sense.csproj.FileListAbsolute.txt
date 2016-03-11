@@ -4,3 +4,6 @@ c:\users\gianmarco\documents\visual studio 2015\Projects\Sense\Sense\bin\Release
 c:\users\gianmarco\documents\visual studio 2015\Projects\Sense\Sense\obj\Release\Sense.csprojResolveAssemblyReference.cache
 c:\users\gianmarco\documents\visual studio 2015\Projects\Sense\Sense\obj\Release\Sense.exe
 c:\users\gianmarco\documents\visual studio 2015\Projects\Sense\Sense\obj\Release\Sense.pdb
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\Sense\bin\Release\Sense.exe.config
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\Sense\obj\Release\Sense.exe
+C:\Users\Grimidev\Documents\Visual Studio 2015\Projects\Sense\Sense\obj\Release\Sense.pdb
