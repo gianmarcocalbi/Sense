@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -29,11 +30,14 @@ namespace Sense {
 		LineItem rollSmooth;
 		int selectedSensor = 0;
 		int selectedSensorType = 0;
+		string csvPath;
 
 		public Form1() {
 			InitializeComponent();
 			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
-			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), printToServerConsoleProtected, setButtonServerStartProtected, eatSampwinProtected);
+			csvPath = Directory.GetCurrentDirectory();
+			textBoxCSVPath.Text = csvPath;
+			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), csvPath, printToServerConsoleProtected, setButtonServerStartProtected, eatSampwinProtected);
 			threadParser = new Thread(parser.StartServer);
 			threadParser.IsBackground = true;
 			threadParser.Start();
@@ -64,7 +68,7 @@ namespace Sense {
 				try {
 					//richTextConsole.AppendText(String.Format("Server Started on port {0} at IP {1}\n", parser.Port, parser.LocalAddr));		
 					//Invoke(/*delegato*/);
-					parser.ActivateServer(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text));
+					parser.ActivateServer(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), csvPath);
 					//buttonServerStart.Text = "STOP";
 				} catch (SocketException exc) {
 					richTextConsole.AppendText(String.Format("{0}\n", exc));
@@ -335,12 +339,30 @@ namespace Sense {
 			}
 		}
 
+		/*public delegate string getCSVPathDelegate();
+
+		public string getCSVPathProtected() {
+			if (this.textBoxCSVPath.InvokeRequired) {
+				return Invoke(new getCSVPathDelegate(getCSVPathProtected));
+			} else {
+				return textBoxCSVPath
+			}
+		}*/
+
 		private void comboBoxFrequenza_SelectedIndexChanged(object sender, EventArgs e) {
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
 		}
 
 		private void textBoxFinestra_TextChanged(object sender, EventArgs e) {
 			window = Int32.Parse(textBoxFinestra.Text);
+		}
+
+		private void button1_Click(object sender, EventArgs e) {
+			DialogResult result = folderBrowserDialog1.ShowDialog();
+			if (result == DialogResult.OK) {
+				csvPath = folderBrowserDialog1.SelectedPath;
+				textBoxCSVPath.Text = csvPath;
+			}
 		}
 	}
 }

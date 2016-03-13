@@ -33,6 +33,7 @@ namespace Sense {
 		setButtonServerStartDel setButtonServerStart;
 		eatSampwinProtectedDel eatSampwinProtected;
 		public bool serverIsActive;
+		string path;
 		
 		public TcpListener Server {
 			get {
@@ -77,7 +78,7 @@ namespace Sense {
 		public delegate void setButtonServerStartDel(bool b);
 		public delegate void eatSampwinProtectedDel(List<double[,]> matrix);
 
-		public Parser(int p, string ip, printToConsole del, setButtonServerStartDel fun, eatSampwinProtectedDel eatSampFun) {
+		public Parser(int p, string ip, string csvPath, printToConsole del, setButtonServerStartDel fun, eatSampwinProtectedDel eatSampFun) {
 			port = p;
 			try {
 				localAddr = IPAddress.Parse(ip);
@@ -85,6 +86,7 @@ namespace Sense {
 			} catch (Exception ex) {
 				MessageBox.Show("Errore IP Addressing 00!\n" + ex.Message);
 			}
+			path = csvPath;
 			printToServerConsole = del;
 			setButtonServerStart = fun;
 			eatSampwinProtected = eatSampFun;
@@ -104,8 +106,9 @@ namespace Sense {
 		}*/
 
 
-		public void ActivateServer(int p, string ip) {
+		public void ActivateServer(int p, string ip, string csvPath) {
 			port = p;
+			path = csvPath;
 			try {
 				localAddr = IPAddress.Parse(ip);
 				server = new TcpListener(localAddr, port);
@@ -296,14 +299,14 @@ namespace Sense {
 							} catch (IndexOutOfRangeException ex) {
 								//Ignore this Exception
 								//Quando le stream è esaurito dovrebbe automaticamente generare questa eccezione
-								var path = @"C:\Users\Gianmarco\Desktop\sampwin.csv";
+								//var path = @"C:\Users\Gianmarco\Desktop\sampwin.csv";
 								printToServerConsole("Stream finished.\n");
 								eatSampwinProtected(sampwin);
-								printToServerConsole("Creating file CSV...\n");
-								if (!writeMatrixToCSV(sampwin, path)) {
+								printToServerConsole("Creating file CSV in " + path + "...\n");
+								if (!writeMatrixToCSV(sampwin, path + "sampwin.csv")) {
 									MessageBox.Show("Errore creazione CSV");
 								} else {
-									printToServerConsole("File CSV created in {path}.\n");
+									printToServerConsole("File CSV created in " + path + ".\n");
 								}
 							} catch (Exception ex) {
 								MessageBox.Show("Errore Connessione 0x0!\n" + ex.Message);
@@ -331,7 +334,7 @@ namespace Sense {
 			}
 		}
 
-		public static bool writeMatrixToCSV(List<double[,]> matrix, string path) {
+		public static bool writeMatrixToCSV(List<double[,]> matrix, string csvPath) {
 			//List<double[num_sensori, 13]
 			//campione 1 -> accx;accy;..........qua3;qua4;;accx;accy;..........qua3;qua4;;
 			//campione 2 -> accx;accy;..........qua3;qua4;;accx;accy;..........qua3;qua4;;
@@ -347,7 +350,7 @@ namespace Sense {
 					}
 					csv += "\n";
 				}
-				File.WriteAllText(path, csv.ToString());
+				File.WriteAllText(csvPath, csv.ToString());
 			} catch (Exception ex) {
 				MessageBox.Show(ex.Message);
 				//MessageBox.Show(ex.StackTrace);

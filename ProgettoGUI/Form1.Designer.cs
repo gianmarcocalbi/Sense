@@ -56,6 +56,9 @@
 			this.label11 = new System.Windows.Forms.Label();
 			this.comboBox1 = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.textBoxCSVPath = new System.Windows.Forms.TextBox();
+			this.button1 = new System.Windows.Forms.Button();
+			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -73,6 +76,8 @@
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add(this.button1);
+			this.splitContainer1.Panel1.Controls.Add(this.textBoxCSVPath);
 			this.splitContainer1.Panel1.Controls.Add(this.checkBoxConsoleAutoFlow);
 			this.splitContainer1.Panel1.Controls.Add(this.label6);
 			this.splitContainer1.Panel1.Controls.Add(this.label9);
@@ -107,7 +112,7 @@
 			this.checkBoxConsoleAutoFlow.AutoSize = true;
 			this.checkBoxConsoleAutoFlow.Checked = true;
 			this.checkBoxConsoleAutoFlow.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkBoxConsoleAutoFlow.Location = new System.Drawing.Point(63, 540);
+			this.checkBoxConsoleAutoFlow.Location = new System.Drawing.Point(70, 540);
 			this.checkBoxConsoleAutoFlow.Name = "checkBoxConsoleAutoFlow";
 			this.checkBoxConsoleAutoFlow.Size = new System.Drawing.Size(114, 17);
 			this.checkBoxConsoleAutoFlow.TabIndex = 20;
@@ -126,7 +131,7 @@
 			// label9
 			// 
 			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(123, 134);
+			this.label9.Location = new System.Drawing.Point(122, 137);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(44, 13);
 			this.label9.TabIndex = 18;
@@ -134,7 +139,7 @@
 			// 
 			// textBoxFinestra
 			// 
-			this.textBoxFinestra.Location = new System.Drawing.Point(75, 131);
+			this.textBoxFinestra.Location = new System.Drawing.Point(70, 134);
 			this.textBoxFinestra.Name = "textBoxFinestra";
 			this.textBoxFinestra.Size = new System.Drawing.Size(41, 20);
 			this.textBoxFinestra.TabIndex = 17;
@@ -144,7 +149,7 @@
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(13, 134);
+			this.label8.Location = new System.Drawing.Point(10, 137);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(44, 13);
 			this.label8.TabIndex = 16;
@@ -153,7 +158,7 @@
 			// label7
 			// 
 			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(13, 106);
+			this.label7.Location = new System.Drawing.Point(10, 107);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(57, 13);
 			this.label7.TabIndex = 15;
@@ -166,7 +171,7 @@
             "50",
             "100",
             "200"});
-			this.comboBoxFrequenza.Location = new System.Drawing.Point(75, 103);
+			this.comboBoxFrequenza.Location = new System.Drawing.Point(70, 103);
 			this.comboBoxFrequenza.Name = "comboBoxFrequenza";
 			this.comboBoxFrequenza.Size = new System.Drawing.Size(41, 21);
 			this.comboBoxFrequenza.TabIndex = 14;
@@ -185,9 +190,9 @@
 			// buttonServerStart
 			// 
 			this.buttonServerStart.ForeColor = System.Drawing.Color.Black;
-			this.buttonServerStart.Location = new System.Drawing.Point(53, 166);
+			this.buttonServerStart.Location = new System.Drawing.Point(75, 194);
 			this.buttonServerStart.Name = "buttonServerStart";
-			this.buttonServerStart.Size = new System.Drawing.Size(147, 23);
+			this.buttonServerStart.Size = new System.Drawing.Size(114, 23);
 			this.buttonServerStart.TabIndex = 12;
 			this.buttonServerStart.Text = "START";
 			this.buttonServerStart.UseVisualStyleBackColor = true;
@@ -195,7 +200,7 @@
 			// 
 			// textBoxIP4
 			// 
-			this.textBoxIP4.Location = new System.Drawing.Point(199, 74);
+			this.textBoxIP4.Location = new System.Drawing.Point(211, 74);
 			this.textBoxIP4.Name = "textBoxIP4";
 			this.textBoxIP4.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP4.TabIndex = 11;
@@ -204,7 +209,7 @@
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(183, 81);
+			this.label5.Location = new System.Drawing.Point(195, 81);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(10, 13);
 			this.label5.TabIndex = 10;
@@ -212,7 +217,7 @@
 			// 
 			// textBoxIP3
 			// 
-			this.textBoxIP3.Location = new System.Drawing.Point(152, 74);
+			this.textBoxIP3.Location = new System.Drawing.Point(164, 74);
 			this.textBoxIP3.Name = "textBoxIP3";
 			this.textBoxIP3.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP3.TabIndex = 9;
@@ -221,7 +226,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(136, 81);
+			this.label4.Location = new System.Drawing.Point(148, 81);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(10, 13);
 			this.label4.TabIndex = 8;
@@ -230,7 +235,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(89, 81);
+			this.label3.Location = new System.Drawing.Point(101, 81);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(10, 13);
 			this.label3.TabIndex = 7;
@@ -238,7 +243,7 @@
 			// 
 			// textBoxIP2
 			// 
-			this.textBoxIP2.Location = new System.Drawing.Point(105, 74);
+			this.textBoxIP2.Location = new System.Drawing.Point(117, 74);
 			this.textBoxIP2.Name = "textBoxIP2";
 			this.textBoxIP2.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP2.TabIndex = 6;
@@ -246,7 +251,7 @@
 			// 
 			// textBoxIP1
 			// 
-			this.textBoxIP1.Location = new System.Drawing.Point(58, 74);
+			this.textBoxIP1.Location = new System.Drawing.Point(70, 74);
 			this.textBoxIP1.Name = "textBoxIP1";
 			this.textBoxIP1.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP1.TabIndex = 5;
@@ -256,7 +261,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(17, 77);
+			this.label2.Location = new System.Drawing.Point(10, 78);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(17, 13);
 			this.label2.TabIndex = 4;
@@ -264,9 +269,9 @@
 			// 
 			// textBoxPort
 			// 
-			this.textBoxPort.Location = new System.Drawing.Point(58, 44);
+			this.textBoxPort.Location = new System.Drawing.Point(70, 44);
 			this.textBoxPort.Name = "textBoxPort";
-			this.textBoxPort.Size = new System.Drawing.Size(100, 20);
+			this.textBoxPort.Size = new System.Drawing.Size(41, 20);
 			this.textBoxPort.TabIndex = 3;
 			this.textBoxPort.Text = "45555";
 			this.textBoxPort.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
@@ -274,7 +279,7 @@
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(13, 47);
+			this.label1.Location = new System.Drawing.Point(10, 47);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(32, 13);
 			this.label1.TabIndex = 2;
@@ -286,10 +291,10 @@
 			this.richTextConsole.BackColor = System.Drawing.Color.Black;
 			this.richTextConsole.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.richTextConsole.ForeColor = System.Drawing.Color.Lime;
-			this.richTextConsole.Location = new System.Drawing.Point(3, 209);
+			this.richTextConsole.Location = new System.Drawing.Point(3, 224);
 			this.richTextConsole.Name = "richTextConsole";
 			this.richTextConsole.ReadOnly = true;
-			this.richTextConsole.Size = new System.Drawing.Size(266, 325);
+			this.richTextConsole.Size = new System.Drawing.Size(266, 310);
 			this.richTextConsole.TabIndex = 1;
 			this.richTextConsole.Text = "";
 			// 
@@ -424,6 +429,24 @@
 			this.tabPage2.Text = "tabPage2";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
+			// textBoxCSVPath
+			// 
+			this.textBoxCSVPath.Location = new System.Drawing.Point(13, 164);
+			this.textBoxCSVPath.Name = "textBoxCSVPath";
+			this.textBoxCSVPath.Size = new System.Drawing.Size(223, 20);
+			this.textBoxCSVPath.TabIndex = 21;
+			this.textBoxCSVPath.Text = "CSV Location";
+			// 
+			// button1
+			// 
+			this.button1.Location = new System.Drawing.Point(236, 163);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(24, 22);
+			this.button1.TabIndex = 22;
+			this.button1.Text = "...";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -483,6 +506,9 @@
 		private System.Windows.Forms.ComboBox comboBox2;
 		private System.Windows.Forms.Label label13;
 		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Button button1;
+		private System.Windows.Forms.TextBox textBoxCSVPath;
+		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
 	}
 }
 
