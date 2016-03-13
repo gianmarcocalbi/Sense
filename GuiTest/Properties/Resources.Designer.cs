@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Sense.Properties {
+namespace GuiTest.Properties {
 
 
 	/// <summary>
@@ -38,7 +38,7 @@ namespace Sense.Properties {
 		internal static global::System.Resources.ResourceManager ResourceManager {
 			get {
 				if ((resourceMan == null)) {
-					global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Sense.Properties.Resources", typeof(Resources).Assembly);
+					global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GuiTest.Properties.Resources", typeof(Resources).Assembly);
 					resourceMan = temp;
 				}
 				return resourceMan;

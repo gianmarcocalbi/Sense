@@ -1,4 +1,4 @@
-﻿namespace ProgettoGUI {
+﻿namespace Sense {
 	partial class Form1 {
 		/// <summary>
 		/// Variabile di progettazione necessaria.
@@ -45,19 +45,23 @@
 			this.textBoxPort = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.richTextConsole = new System.Windows.Forms.RichTextBox();
-			this.tabPage2 = new System.Windows.Forms.TabPage();
-			this.tabPage1 = new System.Windows.Forms.TabPage();
-			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.label10 = new System.Windows.Forms.Label();
-			this.comboBox1 = new System.Windows.Forms.ComboBox();
-			this.label11 = new System.Windows.Forms.Label();
+			this.tabControl1 = new System.Windows.Forms.TabControl();
+			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.comboBox3 = new System.Windows.Forms.ComboBox();
+			this.comboBox2 = new System.Windows.Forms.ComboBox();
+			this.label13 = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
 			this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
+			this.label11 = new System.Windows.Forms.Label();
+			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.tabPage2 = new System.Windows.Forms.TabPage();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
-			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
+			this.tabPage1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// splitContainer1
@@ -135,6 +139,7 @@
 			this.textBoxFinestra.Size = new System.Drawing.Size(41, 20);
 			this.textBoxFinestra.TabIndex = 17;
 			this.textBoxFinestra.Text = "10";
+			this.textBoxFinestra.TextChanged += new System.EventHandler(this.textBoxFinestra_TextChanged);
 			// 
 			// label8
 			// 
@@ -165,6 +170,7 @@
 			this.comboBoxFrequenza.Name = "comboBoxFrequenza";
 			this.comboBoxFrequenza.Size = new System.Drawing.Size(41, 21);
 			this.comboBoxFrequenza.TabIndex = 14;
+			this.comboBoxFrequenza.SelectedIndexChanged += new System.EventHandler(this.comboBoxFrequenza_SelectedIndexChanged);
 			// 
 			// labelServerSide
 			// 
@@ -287,28 +293,16 @@
 			this.richTextConsole.TabIndex = 1;
 			this.richTextConsole.Text = "";
 			// 
-			// tabPage2
+			// label10
 			// 
-			this.tabPage2.Location = new System.Drawing.Point(4, 22);
-			this.tabPage2.Name = "tabPage2";
-			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(724, 491);
-			this.tabPage2.TabIndex = 1;
-			this.tabPage2.Text = "tabPage2";
-			this.tabPage2.UseVisualStyleBackColor = true;
-			// 
-			// tabPage1
-			// 
-			this.tabPage1.Controls.Add(this.zedGraphControl1);
-			this.tabPage1.Controls.Add(this.label11);
-			this.tabPage1.Controls.Add(this.comboBox1);
-			this.tabPage1.Location = new System.Drawing.Point(4, 22);
-			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(724, 491);
-			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "Chart";
-			this.tabPage1.UseVisualStyleBackColor = true;
+			this.label10.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label10.Location = new System.Drawing.Point(7, 5);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(724, 32);
+			this.label10.TabIndex = 14;
+			this.label10.Text = "Chart";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// tabControl1
 			// 
@@ -320,16 +314,90 @@
 			this.tabControl1.Size = new System.Drawing.Size(732, 517);
 			this.tabControl1.TabIndex = 0;
 			// 
-			// label10
+			// tabPage1
 			// 
-			this.label10.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label10.Location = new System.Drawing.Point(7, 5);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(724, 32);
-			this.label10.TabIndex = 14;
-			this.label10.Text = "Chart";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.tabPage1.Controls.Add(this.comboBox3);
+			this.tabPage1.Controls.Add(this.comboBox2);
+			this.tabPage1.Controls.Add(this.label13);
+			this.tabPage1.Controls.Add(this.label12);
+			this.tabPage1.Controls.Add(this.zedGraphControl1);
+			this.tabPage1.Controls.Add(this.label11);
+			this.tabPage1.Controls.Add(this.comboBox1);
+			this.tabPage1.Location = new System.Drawing.Point(4, 22);
+			this.tabPage1.Name = "tabPage1";
+			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage1.Size = new System.Drawing.Size(724, 491);
+			this.tabPage1.TabIndex = 0;
+			this.tabPage1.Text = "Chart";
+			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// comboBox3
+			// 
+			this.comboBox3.FormattingEnabled = true;
+			this.comboBox3.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"});
+			this.comboBox3.Location = new System.Drawing.Point(326, 10);
+			this.comboBox3.Name = "comboBox3";
+			this.comboBox3.Size = new System.Drawing.Size(31, 21);
+			this.comboBox3.TabIndex = 6;
+			// 
+			// comboBox2
+			// 
+			this.comboBox2.FormattingEnabled = true;
+			this.comboBox2.Items.AddRange(new object[] {
+            "Acc",
+            "Gyr",
+            "Mag",
+            "Qua"});
+			this.comboBox2.Location = new System.Drawing.Point(178, 11);
+			this.comboBox2.Name = "comboBox2";
+			this.comboBox2.Size = new System.Drawing.Size(48, 21);
+			this.comboBox2.TabIndex = 5;
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Location = new System.Drawing.Point(249, 14);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(71, 13);
+			this.label13.TabIndex = 4;
+			this.label13.Text = "Num Sensore";
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.Location = new System.Drawing.Point(126, 15);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(46, 13);
+			this.label12.TabIndex = 3;
+			this.label12.Text = "Sensore";
+			// 
+			// zedGraphControl1
+			// 
+			this.zedGraphControl1.Location = new System.Drawing.Point(6, 40);
+			this.zedGraphControl1.Name = "zedGraphControl1";
+			this.zedGraphControl1.ScrollGrace = 0D;
+			this.zedGraphControl1.ScrollMaxX = 0D;
+			this.zedGraphControl1.ScrollMaxY = 0D;
+			this.zedGraphControl1.ScrollMaxY2 = 0D;
+			this.zedGraphControl1.ScrollMinX = 0D;
+			this.zedGraphControl1.ScrollMinY = 0D;
+			this.zedGraphControl1.ScrollMinY2 = 0D;
+			this.zedGraphControl1.Size = new System.Drawing.Size(712, 445);
+			this.zedGraphControl1.TabIndex = 2;
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(20, 15);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(32, 13);
+			this.label11.TabIndex = 1;
+			this.label11.Text = "Chart";
 			// 
 			// comboBox1
 			// 
@@ -346,28 +414,15 @@
 			this.comboBox1.Size = new System.Drawing.Size(47, 21);
 			this.comboBox1.TabIndex = 0;
 			// 
-			// label11
+			// tabPage2
 			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(20, 15);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(32, 13);
-			this.label11.TabIndex = 1;
-			this.label11.Text = "Chart";
-			// 
-			// zedGraphControl1
-			// 
-			this.zedGraphControl1.Location = new System.Drawing.Point(23, 40);
-			this.zedGraphControl1.Name = "zedGraphControl1";
-			this.zedGraphControl1.ScrollGrace = 0D;
-			this.zedGraphControl1.ScrollMaxX = 0D;
-			this.zedGraphControl1.ScrollMaxY = 0D;
-			this.zedGraphControl1.ScrollMaxY2 = 0D;
-			this.zedGraphControl1.ScrollMinX = 0D;
-			this.zedGraphControl1.ScrollMinY = 0D;
-			this.zedGraphControl1.ScrollMinY2 = 0D;
-			this.zedGraphControl1.Size = new System.Drawing.Size(680, 428);
-			this.zedGraphControl1.TabIndex = 2;
+			this.tabPage2.Location = new System.Drawing.Point(4, 22);
+			this.tabPage2.Name = "tabPage2";
+			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage2.Size = new System.Drawing.Size(724, 491);
+			this.tabPage2.TabIndex = 1;
+			this.tabPage2.Text = "tabPage2";
+			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
@@ -385,9 +440,9 @@
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
 			this.splitContainer1.ResumeLayout(false);
+			this.tabControl1.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
-			this.tabControl1.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -424,6 +479,10 @@
 		private ZedGraph.ZedGraphControl zedGraphControl1;
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.ComboBox comboBox1;
+		private System.Windows.Forms.ComboBox comboBox3;
+		private System.Windows.Forms.ComboBox comboBox2;
+		private System.Windows.Forms.Label label13;
+		private System.Windows.Forms.Label label12;
 	}
 }
 

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sense", "ProgettoGUI\Sense.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZedGraph BackEnd", "ZedGraph BackEnd\ZedGraph BackEnd.csproj", "{CA60B913-299C-4CF4-A815-F9F83C3A39A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuiTest", "GuiTest\GuiTest.csproj", "{D975456D-87B8-4847-81E1-49BE4721F0EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{CA60B913-299C-4CF4-A815-F9F83C3A39A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA60B913-299C-4CF4-A815-F9F83C3A39A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA60B913-299C-4CF4-A815-F9F83C3A39A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D975456D-87B8-4847-81E1-49BE4721F0EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D975456D-87B8-4847-81E1-49BE4721F0EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D975456D-87B8-4847-81E1-49BE4721F0EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D975456D-87B8-4847-81E1-49BE4721F0EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

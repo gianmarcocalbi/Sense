@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZedGraph;
 
-namespace ProgettoGUI {
+namespace Sense {
 	public partial class Form1 : Form {
 		private Parser parser;
 		Thread threadParser;
@@ -27,11 +27,13 @@ namespace ProgettoGUI {
 		double[,] sampwin;
 		LineItem rollLine;
 		LineItem rollSmooth;
+		int selectedSensor = 0;
+		int selectedSensorType = 0;
 
 		public Form1() {
 			InitializeComponent();
 			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
-			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), printToServerConsoleProtected, setButtonServerStartProtected);
+			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), printToServerConsoleProtected, setButtonServerStartProtected, eatSampwinProtected);
 			threadParser = new Thread(parser.StartServer);
 			threadParser.IsBackground = true;
 			threadParser.Start();
@@ -74,37 +76,64 @@ namespace ProgettoGUI {
 			//SAMPWIN ARRAY TRIDIMENSIONALE, SCRITTO CHIARAMENTE NELLA CONSEGNA, LA POSSIAMO SCRIVERE COME double[, ,] ANZICHE double[][][] SCRITTURA VAGAMENTE PIU BARBARICA
 			//SI FA RIFERIMENTO A DUE SAMPWIN UNA CON LE INIZIALI MAIUSCOLE TRIDIMENSIONALE ED UNA TUTTA IN MINUSCOLO CON 
 
-			this.Text = "GimmyCuloDoIt4All";
+			this.Text = "Sense";
 			this.Opacity = 1; //assolutamente inutile, ma in se l'istruzione mi piaceva, magari riesco a fare i grafici meno trasparenti
 			//this.Size = new Size(1280, 960); //non può essere utilizzato come una normale chiamata a metodo this.Size(x,y), verificato con errore a compilazione
 			this.CenterToScreen();
-
-
-			sampwin = generateSampwin();
-
-			double[] arrayDiProva = multiToSingleArray(sampwin, 0);
-			double[] arrayDiProva2 = smoothing(arrayDiProva, 10);
-
-			//zoom da risistemare come opzioni nel designer o qui
-
-			double[] rI = rapportoIncrementale(sampwin, 0);
-			double[] sampwinSingleDim = multiToSingleArray(sampwin, 0);
-			double[] dS = deviazioneStandard(sampwinSingleDim, 3);
-			LineItem rILine = zedGraphControl1.GraphPane.AddCurve("SampwinSingleDim", populate(sampwinSingleDim), Color.Cyan, SymbolType.None);
-			LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
-			//verificare con gimmy che effettivamente la divisione con la frequenza sia la cosa migliore da fare, fare ovviamente test con valori adatti può cambiare tutto
-			zedGraphControl1.AxisChange();
 		}
 
+		public double[] module(List<double[,]> sampwin) {
+			return module(sampwin, 1, 1, 1);
+		}
 
-		public double[] module(double[,] sampwin) //PRIMA OPERAZIONE: MODULO
+		public double[] module(List<double[,]> sampwin, int x, int y, int z) //PRIMA OPERAZIONE: MODULO
 		{
-			double[] arrayModulo = new double[frequence * window];
-			for (int i = 0; i < frequence * window; ++i)
-				arrayModulo[i] = Math.Sqrt(Math.Pow(sampwin[0, i], 2) + Math.Pow(sampwin[1, i], 2) + Math.Pow(sampwin[2, i], 2));
+			int dim = sampwin.Count();
+			double[] arrayModulo = new double[dim];
+			for (int i = 0; i < dim; ++i) {
+				double[,] instant = sampwin[i];
+				arrayModulo[i] = Math.Sqrt(Math.Pow(instant[selectedSensor, selectedSensorType*3+0], 2)*x + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 1], 2)*y + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 2], 2)*z);
+				//printToServerConsoleProtected(arrayModulo[i] + "\n");
+			}
+			printToServerConsoleProtected("Dimensione sampwin: " + dim + "\n");
 			return arrayModulo;
 		}
-		//
+
+		public double[] rapportoIncrementale(double[,] sampwin, int firstDimension)//TERZA OPERAZIONE: DERIVATA
+		{
+			int dim = sampwin.GetLength(1);
+			double[] rapportoIncrementale = new double[dim];
+			for (int i = 0; i < dim - 1; i++) //ci vorra di sicuro dim-1
+			{
+				rapportoIncrementale[i] = (sampwin[firstDimension, i + 1] - sampwin[firstDimension, i]) / ((double)1 / frequence);
+			}
+			return rapportoIncrementale;
+		}
+
+		//notare quale delle due sia effettivamente la migliore, questa seconda rende piu facile la lettura e la manutenzione
+		public double[] smoothing(double[] popolazione, int range)//SECONDA OPERAZIONE: SMOOTHING
+		{
+			int size = popolazione.GetLength(0);
+			double[] smooth = new double[size];
+			int finestra = 0, dx = 0, sx = 0;
+			double media = 0;
+			for (int i = 0; i < size; ++i) {
+				if (i < range) { sx = i; } else
+					sx = range;
+				if (size - range > i) { dx = range; } else
+					dx = size - i - 1;
+				finestra = dx + sx + 1;
+				for (int j = i - sx; j <= i + dx; ++j)
+					media += popolazione[j];
+				media /= finestra;
+				smooth[i] = media;
+				finestra = 0;
+				dx = 0;
+				sx = 0;
+			}
+			return smooth;
+		}
+
 		public double[] smoothing2(double[] popolazione, int range) //SECONDA OPERAZIONE: SMOOTHING
 		{
 			//la finestra (!= da window) <= 2*range+1 
@@ -155,41 +184,6 @@ namespace ProgettoGUI {
 				}
 			}
 			return popolazione2;
-		}
-
-		public double[] rapportoIncrementale(double[,] sampwin, int firstDimension)//TERZA OPERAZIONE: DERIVATA
-		{
-			int dim = sampwin.GetLength(1);
-			double[] rapportoIncrementale = new double[dim];
-			for (int i = 0; i < dim - 1; i++) //ci vorra di sicuro dim-1
-			{
-				rapportoIncrementale[i] = (sampwin[firstDimension, i + 1] - sampwin[firstDimension, i]) / ((double)1 / frequence);
-			}
-			return rapportoIncrementale;
-		}
-
-		//notare quale delle due sia effettivamente la migliore, questa seconda rende piu facile la lettura e la manutenzione
-		public double[] smoothing(double[] popolazione, int range)//SECONDA OPERAZIONE: SMOOTHING
-		{
-			int size = popolazione.GetLength(0);
-			double[] smooth = new double[size];
-			int finestra = 0, dx = 0, sx = 0;
-			double media = 0;
-			for (int i = 0; i < size; ++i) {
-				if (i < range) { sx = i; } else
-					sx = range;
-				if (size - range > i) { dx = range; } else
-					dx = size - i - 1;
-				finestra = dx + sx + 1;
-				for (int j = i - sx; j <= i + dx; ++j)
-					media += popolazione[j];
-				media /= finestra;
-				smooth[i] = media;
-				finestra = 0;
-				dx = 0;
-				sx = 0;
-			}
-			return smooth;
 		}
 
 		public double[] deviazioneStandard(double[] popolazione, int range)//QUARTA OPERAZIONE: DEVIAZIONE STANDARD
@@ -309,6 +303,44 @@ namespace ProgettoGUI {
 					buttonServerStart.Text = "START";
 				}
 			}
+		}
+
+		public delegate void eatSampwinDelegate(List<double[,]> sampwin);
+
+		public void eatSampwinProtected(List<double[,]> sampwin) {
+			if(this.zedGraphControl1.InvokeRequired) {
+				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin });
+			} else {
+				//double[] arrayDiProva = multiToSingleArray(sampwin, 0);
+				//double[] arrayDiProva2 = smoothing(arrayDiProva, 10);
+				/*
+					sampwin:
+					lista di double[,] arr = new double[num_sensori, 13];
+				*/
+				//zoom da risistemare come opzioni nel designer o qui
+
+				//double[] rI = rapportoIncrementale(sampwin, 0);
+				//double[] sampwinSingleDim = multiToSingleArray(sampwin, 0);
+				//double[] dS = deviazioneStandard(sampwinSingleDim, 3);
+				LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing(module(sampwin,1,1,1), 3)), Color.Cyan, SymbolType.None);
+				LineItem rILine2 = zedGraphControl1.GraphPane.AddCurve("Module", populate(module(sampwin,1,1,1)), Color.Magenta, SymbolType.None);
+				LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin,1,0,0)), Color.Red, SymbolType.None);
+				LineItem rILineY = zedGraphControl1.GraphPane.AddCurve("Acc Y", populate(module(sampwin, 0, 1, 0)), Color.Green, SymbolType.None);
+				LineItem rILineZ = zedGraphControl1.GraphPane.AddCurve("Acc Z", populate(module(sampwin, 0, 0, 1)), Color.Blue, SymbolType.None);
+				//LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
+				//verificare con gimmy che effettivamente la divisione con la frequenza sia la cosa migliore da fare, fare ovviamente test con valori adatti può cambiare tutto
+
+				zedGraphControl1.AxisChange();
+				zedGraphControl1.Refresh();
+			}
+		}
+
+		private void comboBoxFrequenza_SelectedIndexChanged(object sender, EventArgs e) {
+			frequence = Int32.Parse(comboBoxFrequenza.Text);
+		}
+
+		private void textBoxFinestra_TextChanged(object sender, EventArgs e) {
+			window = Int32.Parse(textBoxFinestra.Text);
 		}
 	}
 }

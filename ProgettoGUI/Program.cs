@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 
-namespace ProgettoGUI {
+namespace Sense {
 	static class Program {
 		/// <summary>
 		/// Punto di ingresso principale dell'applicazione.
@@ -31,6 +31,7 @@ namespace ProgettoGUI {
 		int port;
 		printToConsole printToServerConsole;
 		setButtonServerStartDel setButtonServerStart;
+		eatSampwinProtectedDel eatSampwinProtected;
 		public bool serverIsActive;
 		
 		public TcpListener Server {
@@ -74,8 +75,9 @@ namespace ProgettoGUI {
 
 		public delegate void printToConsole(string s);
 		public delegate void setButtonServerStartDel(bool b);
+		public delegate void eatSampwinProtectedDel(List<double[,]> matrix);
 
-		public Parser(int p, string ip, printToConsole del, setButtonServerStartDel fun) {
+		public Parser(int p, string ip, printToConsole del, setButtonServerStartDel fun, eatSampwinProtectedDel eatSampFun) {
 			port = p;
 			try {
 				localAddr = IPAddress.Parse(ip);
@@ -85,6 +87,7 @@ namespace ProgettoGUI {
 			}
 			printToServerConsole = del;
 			setButtonServerStart = fun;
+			eatSampwinProtected = eatSampFun;
 			serverIsActive = false;
 			setButtonServerStart(serverIsActive);
 			//StartServer();
@@ -295,6 +298,7 @@ namespace ProgettoGUI {
 								//Quando le stream è esaurito dovrebbe automaticamente generare questa eccezione
 								var path = @"C:\Users\Gianmarco\Desktop\sampwin.csv";
 								printToServerConsole("Stream finished.\n");
+								eatSampwinProtected(sampwin);
 								printToServerConsole("Creating file CSV...\n");
 								if (!writeMatrixToCSV(sampwin, path)) {
 									MessageBox.Show("Errore creazione CSV");
