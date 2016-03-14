@@ -88,7 +88,7 @@ namespace Sense {
 				localAddr = IPAddress.Parse(ip);
 				server = new TcpListener(localAddr, port);
 			} catch (Exception ex) {
-				MessageBox.Show("Errore IP Addressing 00!\n" + ex.Message);
+				MessageBox.Show("IP Addressing Error!\n" + ex.Message);
 			}
 			//Salviamo in locale le funzioni passate al Parser
 			printToServerConsole = printToConsoleFunc;
@@ -111,7 +111,7 @@ namespace Sense {
 				server = new TcpListener(localAddr, port);
 				serverIsActive = true;
 			} catch (Exception ex) {
-				MessageBox.Show("Errore IP Addressing 00!\n" + ex.Message);
+				MessageBox.Show("IP Addressing Error!\n" + ex.Message);
 				serverIsActive = false;
 			}
 			setButtonServerStart(serverIsActive);
@@ -135,7 +135,12 @@ namespace Sense {
 				if (serverIsActive) {
 					try {
 						///Server Start: comincia ad ascoltare sulla socket.
-						server.Start();
+						try {
+							server.Start();
+						} catch (SocketException ex) {
+							throw new SocketException();
+						}
+
 						printToServerConsole(String.Format("Server Started on port {0} at IP {1}\n", port, localAddr));
 
 						///Finchè il server è attivo inizia il loop:
@@ -147,18 +152,37 @@ namespace Sense {
 							printToServerConsole("Waiting for a connection...\n");
 
 							///Lancia una chiamata bloccante (blocca il thread) aspettando la connessione di un Client.
-							TcpClient client = server.AcceptTcpClient();
+							TcpClient client = null;
+							try {
+								client = server.AcceptTcpClient();
+							} catch (InvalidOperationException ex) {
+								///Il listener non è stato avviato con una chiamata a Start.
+								throw new InvalidOperationException("Client connection error.\n" + ex.Message);
+							} catch (SocketException ex) {
+								throw new SocketException();
+							}
+
 							///Se supera la chiamata vuol dire che è avvenuta la connessione col Client.
 							printToServerConsole("Connected!\n");
 
 							///Ottiene lo stream dal Client per leggere i dati inviati dallo stesso.
-							NetworkStream stream = client.GetStream();
+							NetworkStream stream = null;
+							try {
+								stream = client.GetStream();
+							} catch (ObjectDisposedException ex) {
+								///The TcpClient has been closed.
+								throw new ObjectDisposedException("client");
+							} catch (InvalidOperationException ex) {
+								///The TcpClient is not connected to a remote host.
+								throw new InvalidOperationException("Error while getting client stream.\n" + ex.Message);
+							}
 							//Console.WriteLine("Stream obtained.");
 
 							BinaryReader reader = new BinaryReader(stream);
 							//Console.WriteLine("Reading stream.");
 
 							///Comincia la lettura del pacchetto.
+							
 							try {
 
 								///Lettura primo pacchetto "da scartare" perché sono solo dati di connessione.
@@ -170,8 +194,8 @@ namespace Sense {
 								//4 byte per la frequenza 
 								byte[] frequency = reader.ReadBytes(4);
 								printToServerConsole(String.Format("Sending at {0}MHz\n", BitConverter.ToInt32(frequency, 0)));
-								//Console.WriteLine("Sending at {0}MHz", BitConverter.ToInt32(frequency, 0));
 
+								//Console.WriteLine("Sending at {0}MHz", BitConverter.ToInt32(frequency, 0));
 
 								///Lettura del campo DATA e dei suoi parametri ovvero i dati che arrivano dai Sensori (dati clue dello streaming).
 								byte[] temp = reader.ReadBytes(2);
@@ -230,14 +254,14 @@ namespace Sense {
 									package[3] = ext_len_mul;
 									package[4] = ext_len_add;
 									data.CopyTo(package, 5);
-									printToServerConsole(String.Format("- BID : {0}\n- MID : {1}\n- LEN : {2} bytes\n- EXT_LEN_MUL : {3}\n- EXT_LEN_ADD : {4} bytes\n", package[0], package[1], package[2], package[3], package[4]));
+									printToServerConsole(String.Format("- BID : {0}\n- MID : {1}\n- LEN : {2}\n- EXT_LEN_MUL : {3}\n- EXT_LEN_ADD : {4}\n", package[0], package[1], package[2], package[3], package[4]));
 									//Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}\nEXT_LEN_MUL : {3}\nEXT_LEN_ADD : {4}", package[0], package[1], package[2], package[3], package[4]);
 								} else {
 									data.CopyTo(package, 3);
-									printToServerConsole(String.Format("- BID : {0}\n- MID : {1}\n- LEN : {2} bytes\n", package[0], package[1], package[2]));
+									printToServerConsole(String.Format("- BID : {0}\n- MID : {1}\n- LEN : {2}\n", package[0], package[1], package[2]));
 									//Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}", package[0], package[1], package[2]);
 								}
-								
+
 								///Stato Array Package[]
 								///package[0] : bid
 								///package[1] : mid
@@ -259,8 +283,8 @@ namespace Sense {
 
 								///Una volta chiaro il numero di sensori (solitamente sono sempre 5) possiamo istanziare e trattare la sampwin.
 								sampwin = new List<double[,]>();
-								
-								while (serverIsActive) {
+
+								while (serverIsActive && package.Length > 0) {
 									///Creazione sampwin.
 									///Ogni ciclo di questo loop identifica un campione, ovvero un istante catturato dai vari sensori e inviato simultaneamente.
 									double[,] arr = new double[num_sensori, 13];
@@ -280,45 +304,54 @@ namespace Sense {
 									}
 									sampwin.Add(arr);
 
-									///Quando lo stream da leggere è terminato questa operazione genera un errore IndexOutOfRangeException.
-									///Pertanto l'errore IndexOutOfRangeException è voluto e cercato per capire quando terminare la lettura dello stream dal Client e chiudere la connessione.
+									///Quando lo stream da leggere è terminato l'operazione ReadBytes ritornerà un array vuoto e quindi la lettura terminerà.
 									if (num_sensori < 5) {
 										package = reader.ReadBytes(byteToRead + 4);
 									} else {
 										package = reader.ReadBytes(byteToRead + 6);
 									}
 								}
-							} catch (IndexOutOfRangeException ex) {
-								//Ignore this Exception
-								///Quando le stream è esaurito dovrebbe automaticamente generare questa eccezione.
-								printToServerConsole("Stream finished.\n");
 
-								///Funzione che triggera la lettura della sampwin per la creazione dei grafici.
-								eatSampwinProtected(sampwin);
+								///Se effettivamente è stato letto tutto lo stream allora procedo.
+								///Altrimenti vuol dire che il processo è stato interrotto con un richiesta bloccante (e.g. stop manuale del server da parte dell'utente).
+								if (package.Length == 0) {
+									///Lettura dati terminata, tutti i dati in arrivo dal Client sono stati ricevuti, parsati e inseriti nella lista sampwin.
+									printToServerConsole("Stream finished.\n");
 
-								printToServerConsole("Creating file CSV in " + path + "...\n");
+									///Funzione che triggera la lettura della sampwin per la creazione dei grafici.
+									eatSampwinProtected(sampwin); //(!)Valutare gli errori generati da questo metodo
 
-								///Creazione CSV.
-								if (!writeMatrixToCSV(sampwin, path + "sampwin.csv")) {
-									MessageBox.Show("Errore creazione CSV");
-								} else {
-									printToServerConsole("File CSV created in " + path + ".\n");
+									printToServerConsole("Creating file CSV in " + path + "...\n");
+
+									///Creazione CSV.
+									if (!writeMatrixToCSV(sampwin, path + @"\sampwin.csv")) {
+										printToServerConsole("Csv File creation Error.\n");
+									} else {
+										printToServerConsole("File CSV created in " + path + ".\n");
+									}
 								}
-								//(!) aggiungere throw!
+							} catch (IndexOutOfRangeException ex) {
+								printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");
+								///Eccezione che si verifica in seguito ad un'interruzione precoce della comunicazione Server-Client che causa un utilizzo scorretto di array all'interno del codice.
+								///La gestiamo consideranso la comunicazione interrotta e pertanto ignoriamo e stoppiamo la comunicazione col Client. 
 							} catch (Exception ex) {
 								throw new Exception(ex.Message); //(!)codice di cui verificare il corretto funzionamento
-								//MessageBox.Show("Errore Connessione 0x00!\n" + ex.Message);
 							} finally {
 								client.Close();
 								printToServerConsole("Client Disconnected.\n");
-							}
+							}  
 						}
-					} catch (SocketException ex) {
-						//(!)Ignore this Exception
+					} catch (ObjectDisposedException ex) {
+						MessageBox.Show(ex.Message);
 					} catch (InvalidOperationException ex) {
-						//(!)Ignore this Exception
+						MessageBox.Show(ex.Message);
+					} catch (SocketException ex) {
+						///Ingora questa eccezione: vuol dire che è stata effettuata una chiamata bloccante da parte dell'utente.
 					} catch (Exception ex) {
-						MessageBox.Show("Errore Connessione 0x01!\n" + ex.Message);
+						MessageBox.Show("Generic error caught! (This error shouldn't occur)\n"
+							+ "Exception thrown in " + ex.TargetSite + "\n"
+							+ "\n\n" + ex.ToString()
+						);
 					} finally {
 						///Stop listening for new clients.
 						///Server Stop.
