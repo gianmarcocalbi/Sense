@@ -37,23 +37,18 @@ namespace Sense {
 			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
 			csvPath = Directory.GetCurrentDirectory();
 			textBoxCSVPath.Text = csvPath;
-			parser = new Parser(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), csvPath, printToServerConsoleProtected, setButtonServerStartProtected, eatSampwinProtected);
+			parser = new Parser(
+				Int32.Parse(textBoxPort.Text),
+				String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
+				csvPath, printToServerConsoleProtected,
+				setButtonServerStartProtected,
+				eatSampwinProtected
+			);
 			threadParser = new Thread(parser.StartServer);
 			threadParser.IsBackground = true;
 			threadParser.Start();
 		}
 
-		private void label1_Click(object sender, EventArgs e) {
-
-		}
-
-		private void textBox1_TextChanged(object sender, EventArgs e) {
-
-		}
-
-		private void textBox2_TextChanged(object sender, EventArgs e) {
-
-		}
 
 		private void buttonServerStartClick(object sender, EventArgs e) {
 			if (parser.serverIsActive) {
@@ -82,7 +77,7 @@ namespace Sense {
 
 			this.Text = "Sense";
 			this.Opacity = 1; //assolutamente inutile, ma in se l'istruzione mi piaceva, magari riesco a fare i grafici meno trasparenti
-			//this.Size = new Size(1280, 960); //non può essere utilizzato come una normale chiamata a metodo this.Size(x,y), verificato con errore a compilazione
+							  //this.Size = new Size(1280, 960); //non può essere utilizzato come una normale chiamata a metodo this.Size(x,y), verificato con errore a compilazione
 			this.CenterToScreen();
 		}
 
@@ -96,7 +91,7 @@ namespace Sense {
 			double[] arrayModulo = new double[dim];
 			for (int i = 0; i < dim; ++i) {
 				double[,] instant = sampwin[i];
-				arrayModulo[i] = Math.Sqrt(Math.Pow(instant[selectedSensor, selectedSensorType*3+0], 2)*x + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 1], 2)*y + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 2], 2)*z);
+				arrayModulo[i] = Math.Sqrt(Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 0], 2) * x + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 1], 2) * y + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 2], 2) * z);
 				//printToServerConsoleProtected(arrayModulo[i] + "\n");
 			}
 			printToServerConsoleProtected("Dimensione sampwin: " + dim + "\n");
@@ -301,7 +296,7 @@ namespace Sense {
 			if (this.buttonServerStart.InvokeRequired) {
 				Invoke(new setButtonServerStartDelegate(setButtonServerStartProtected), new object[] { b });
 			} else {
-				if(b) {
+				if (b) {
 					buttonServerStart.Text = "STOP";
 				} else {
 					buttonServerStart.Text = "START";
@@ -312,7 +307,7 @@ namespace Sense {
 		public delegate void eatSampwinDelegate(List<double[,]> sampwin);
 
 		public void eatSampwinProtected(List<double[,]> sampwin) {
-			if(this.zedGraphControl1.InvokeRequired) {
+			if (this.zedGraphControl1.InvokeRequired) {
 				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin });
 			} else {
 				//double[] arrayDiProva = multiToSingleArray(sampwin, 0);
@@ -326,9 +321,9 @@ namespace Sense {
 				//double[] rI = rapportoIncrementale(sampwin, 0);
 				//double[] sampwinSingleDim = multiToSingleArray(sampwin, 0);
 				//double[] dS = deviazioneStandard(sampwinSingleDim, 3);
-				LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing(module(sampwin,1,1,1), 3)), Color.Cyan, SymbolType.None);
-				LineItem rILine2 = zedGraphControl1.GraphPane.AddCurve("Module", populate(module(sampwin,1,1,1)), Color.Magenta, SymbolType.None);
-				LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin,1,0,0)), Color.Red, SymbolType.None);
+				LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing(module(sampwin, 1, 1, 1), 3)), Color.Cyan, SymbolType.None);
+				LineItem rILine2 = zedGraphControl1.GraphPane.AddCurve("Module", populate(module(sampwin, 1, 1, 1)), Color.Magenta, SymbolType.None);
+				LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin, 1, 0, 0)), Color.Red, SymbolType.None);
 				LineItem rILineY = zedGraphControl1.GraphPane.AddCurve("Acc Y", populate(module(sampwin, 0, 1, 0)), Color.Green, SymbolType.None);
 				LineItem rILineZ = zedGraphControl1.GraphPane.AddCurve("Acc Z", populate(module(sampwin, 0, 0, 1)), Color.Blue, SymbolType.None);
 				//LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
