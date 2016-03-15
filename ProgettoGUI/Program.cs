@@ -32,6 +32,8 @@ namespace Sense {
 		eatSampwinProtectedDel eatSampwinProtected;
 		public bool serverIsActive;
 		string path;
+		int frequence;
+		int window;
 		
 		public TcpListener Server {
 			get {
@@ -81,9 +83,11 @@ namespace Sense {
 		///<param name="printToConsoleFunc">Funzione delegata per scrivere sulla console.</param>
 		///<param name="setButtonServerStartFunc">Funzione delegata per cambiare il testo di un tasto.</param>
 		///<param name="eatSampFunc">Funzione delegata per triggerare il parsing della sampwin.</param>
-		public Parser(int p, string ip, string csvPath, printToConsoleDel printToConsoleFunc, setButtonServerStartDel setButtonServerStartFunc, eatSampwinProtectedDel eatSampFunc) {
+		public Parser(int p, string ip, string csvPath, int freq, int wind, printToConsoleDel printToConsoleFunc, setButtonServerStartDel setButtonServerStartFunc, eatSampwinProtectedDel eatSampFunc) {
 			path = csvPath;
 			port = p;
+			frequence = freq;
+			window = wind;
 			try {
 				localAddr = IPAddress.Parse(ip);
 				server = new TcpListener(localAddr, port);
@@ -102,9 +106,11 @@ namespace Sense {
 		///<param name="p">Porta sul quale aprire la Socket.</param>
 		///<param name="ip">Indirizzo ip server.</param>
 		///<param name="csvPath">Path dove salvare il file csv.</param>
-		public void ActivateServer(int p, string ip, string csvPath) {
+		public void ActivateServer(int p, string ip, string csvPath, int freq, int wind) {
 			port = p;
 			path = csvPath;
+			frequence = freq;
+			window = wind;
 			//Proviamo a parsare le informazioni per istanziare il server
 			try {
 				localAddr = IPAddress.Parse(ip);
@@ -117,7 +123,9 @@ namespace Sense {
 			setButtonServerStart(serverIsActive);
 		}
 
-		///<summary>Disattiva il Server (server.Stop()).</summary>
+		///<summary>
+		///Disattiva il Server (server.Stop()).
+		///</summary>
 		public void DeactivateServer() {
 			serverIsActive = false;
 			setButtonServerStart(serverIsActive);
@@ -304,6 +312,18 @@ namespace Sense {
 									}
 									sampwin.Add(arr);
 
+									///Roba varia
+									//(!)Sistemare window
+									if(sampwin.Count <= window*frequence) {
+										if(sampwin.Count == window * frequence) {
+											//eatSampwinProtected(sampwin.GetRange(sampwin.Count - window * frequence, window * frequence));
+											eatSampwinProtected(sampwin);
+										}
+									} else if(sampwin.Count%((window * frequence)/2) == 0 && sampwin.Count != 0) {
+										///Funzione che triggera la lettura della sampwin per la creazione dei grafici.
+										//eatSampwinProtected(sampwin.GetRange(sampwin.Count - 500, 500)); //(!)Valutare gli errori generati da questo metodo
+										eatSampwinProtected(sampwin);
+									}
 									///Quando lo stream da leggere è terminato l'operazione ReadBytes ritornerà un array vuoto e quindi la lettura terminerà.
 									if (num_sensori < 5) {
 										package = reader.ReadBytes(byteToRead + 4);
@@ -324,11 +344,12 @@ namespace Sense {
 									printToServerConsole("Creating file CSV in " + path + "...\n");
 
 									///Creazione CSV.
-									if (!writeMatrixToCSV(sampwin, path + @"\sampwin.csv")) {
+									//(!)
+									/*if (!writeMatrixToCSV(sampwin, path + @"\sampwin.csv")) {
 										printToServerConsole("Csv File creation Error.\n");
 									} else {
 										printToServerConsole("File CSV created in " + path + ".\n");
-									}
+									}*/
 								}
 							} catch (IndexOutOfRangeException ex) {
 								printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");

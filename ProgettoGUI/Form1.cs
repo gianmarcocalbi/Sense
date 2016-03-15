@@ -40,7 +40,10 @@ namespace Sense {
 			parser = new Parser(
 				Int32.Parse(textBoxPort.Text),
 				String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
-				csvPath, printToServerConsoleProtected,
+				csvPath,
+				frequence,
+				window,
+				printToServerConsoleProtected,
 				setButtonServerStartProtected,
 				eatSampwinProtected
 			);
@@ -63,7 +66,13 @@ namespace Sense {
 				try {
 					//richTextConsole.AppendText(String.Format("Server Started on port {0} at IP {1}\n", parser.Port, parser.LocalAddr));		
 					//Invoke(/*delegato*/);
-					parser.ActivateServer(Int32.Parse(textBoxPort.Text), String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), csvPath);
+					parser.ActivateServer(
+						Int32.Parse(textBoxPort.Text), 
+						String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), 
+						csvPath,
+						frequence,
+						window
+					);
 					//buttonServerStart.Text = "STOP";
 				} catch (SocketException exc) {
 					richTextConsole.AppendText(String.Format("{0}\n", exc));
@@ -318,6 +327,11 @@ namespace Sense {
 				*/
 				//zoom da risistemare come opzioni nel designer o qui
 
+
+				zedGraphControl1.GraphPane.CurveList.Clear();
+				zedGraphControl1.AxisChange();
+				zedGraphControl1.Invalidate();
+
 				//double[] rI = rapportoIncrementale(sampwin, 0);
 				//double[] sampwinSingleDim = multiToSingleArray(sampwin, 0);
 				//double[] dS = deviazioneStandard(sampwinSingleDim, 3);
@@ -328,7 +342,7 @@ namespace Sense {
 				LineItem rILineZ = zedGraphControl1.GraphPane.AddCurve("Acc Z", populate(module(sampwin, 0, 0, 1)), Color.Blue, SymbolType.None);
 				//LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
 				//verificare con gimmy che effettivamente la divisione con la frequenza sia la cosa migliore da fare, fare ovviamente test con valori adatti può cambiare tutto
-
+				
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
 			}
@@ -349,7 +363,10 @@ namespace Sense {
 		}
 
 		private void textBoxFinestra_TextChanged(object sender, EventArgs e) {
-			window = Int32.Parse(textBoxFinestra.Text);
+			if (textBoxFinestra.Text != "")
+				window = Int32.Parse(textBoxFinestra.Text);
+			else
+				window = 0;
 		}
 
 		private void button1_Click(object sender, EventArgs e) {
