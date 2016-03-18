@@ -25,6 +25,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.numericUpDownFinestra = new System.Windows.Forms.NumericUpDown();
 			this.buttonSelectFolder = new System.Windows.Forms.Button();
 			this.textBoxCSVPath = new System.Windows.Forms.TextBox();
 			this.checkBoxConsoleAutoFlow = new System.Windows.Forms.CheckBox();
@@ -58,14 +59,14 @@
 			this.comboBoxChart = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-			this.numericUpDownFinestra = new System.Windows.Forms.NumericUpDown();
+			this.buttonClearConsole = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).BeginInit();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// splitContainer1
@@ -77,6 +78,7 @@
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add(this.buttonClearConsole);
 			this.splitContainer1.Panel1.Controls.Add(this.numericUpDownFinestra);
 			this.splitContainer1.Panel1.Controls.Add(this.buttonSelectFolder);
 			this.splitContainer1.Panel1.Controls.Add(this.textBoxCSVPath);
@@ -108,6 +110,29 @@
 			this.splitContainer1.SplitterDistance = 263;
 			this.splitContainer1.TabIndex = 0;
 			// 
+			// numericUpDownFinestra
+			// 
+			this.numericUpDownFinestra.Location = new System.Drawing.Point(70, 135);
+			this.numericUpDownFinestra.Maximum = new decimal(new int[] {
+            999,
+            0,
+            0,
+            0});
+			this.numericUpDownFinestra.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownFinestra.Name = "numericUpDownFinestra";
+			this.numericUpDownFinestra.Size = new System.Drawing.Size(41, 20);
+			this.numericUpDownFinestra.TabIndex = 23;
+			this.numericUpDownFinestra.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.numericUpDownFinestra.ValueChanged += new System.EventHandler(this.numericUpDownFinestra_ValueChanged);
+			// 
 			// buttonSelectFolder
 			// 
 			this.buttonSelectFolder.Location = new System.Drawing.Point(236, 163);
@@ -131,7 +156,7 @@
 			this.checkBoxConsoleAutoFlow.AutoSize = true;
 			this.checkBoxConsoleAutoFlow.Checked = true;
 			this.checkBoxConsoleAutoFlow.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkBoxConsoleAutoFlow.Location = new System.Drawing.Point(70, 540);
+			this.checkBoxConsoleAutoFlow.Location = new System.Drawing.Point(23, 540);
 			this.checkBoxConsoleAutoFlow.Name = "checkBoxConsoleAutoFlow";
 			this.checkBoxConsoleAutoFlow.Size = new System.Drawing.Size(118, 17);
 			this.checkBoxConsoleAutoFlow.TabIndex = 20;
@@ -443,28 +468,15 @@
 			this.tabPage2.Text = "tabPage2";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
-			// numericUpDownFinestra
+			// buttonClearConsole
 			// 
-			this.numericUpDownFinestra.Location = new System.Drawing.Point(70, 135);
-			this.numericUpDownFinestra.Maximum = new decimal(new int[] {
-            999,
-            0,
-            0,
-            0});
-			this.numericUpDownFinestra.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.numericUpDownFinestra.Name = "numericUpDownFinestra";
-			this.numericUpDownFinestra.Size = new System.Drawing.Size(41, 20);
-			this.numericUpDownFinestra.TabIndex = 23;
-			this.numericUpDownFinestra.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-			this.numericUpDownFinestra.ValueChanged += new System.EventHandler(this.numericUpDownFinestra_ValueChanged);
+			this.buttonClearConsole.Location = new System.Drawing.Point(161, 536);
+			this.buttonClearConsole.Name = "buttonClearConsole";
+			this.buttonClearConsole.Size = new System.Drawing.Size(75, 23);
+			this.buttonClearConsole.TabIndex = 24;
+			this.buttonClearConsole.Text = "CLEAR";
+			this.buttonClearConsole.UseVisualStyleBackColor = true;
+			this.buttonClearConsole.Click += new System.EventHandler(this.buttonClearConsole_Click);
 			// 
 			// Form1
 			// 
@@ -482,10 +494,10 @@
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
 			this.splitContainer1.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).EndInit();
 			this.tabControl1.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -529,6 +541,7 @@
 		private System.Windows.Forms.TextBox textBoxCSVPath;
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
 		private System.Windows.Forms.NumericUpDown numericUpDownFinestra;
+		private System.Windows.Forms.Button buttonClearConsole;
 	}
 }
 

@@ -52,6 +52,9 @@ namespace Sense {
 
 			csvPath = Directory.GetCurrentDirectory();
 			textBoxCSVPath.Text = csvPath;
+
+			this.textBoxCSVPath.MouseEnter += new System.EventHandler(this.textBoxCSVPath_Enter);
+
 			parser = new Parser(
 				Int32.Parse(textBoxPort.Text),
 				String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
@@ -427,6 +430,18 @@ namespace Sense {
 
 		private void numericUpDownFinestra_ValueChanged(object sender, EventArgs e) {
 			window = (int)numericUpDownFinestra.Value;
+		}
+
+		private void textBoxCSVPath_Enter(object sender, EventArgs e) {
+			TextBox TB = (TextBox)sender;
+			int VisibleTime = 500;  //in milliseconds
+
+			ToolTip tt = new ToolTip();
+			tt.Show("CSV Path", TB, 0, 20, VisibleTime);
+		}
+
+		private void buttonClearConsole_Click(object sender, EventArgs e) {
+			richTextConsole.Text = "";
 		}
 	}
 }
