@@ -28,13 +28,28 @@ namespace Sense {
 		double[,] sampwin;
 		LineItem rollLine;
 		LineItem rollSmooth;
-		int selectedSensor = 0;
-		int selectedSensorType = 0;
+		int selectedChart;
+		int selectedSensor;
+		int selectedSensorType;
 		string csvPath;
 
 		public Form1() {
 			InitializeComponent();
+			window = (int)numericUpDownFinestra.Value;
+
 			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
+			frequence = Int32.Parse(comboBoxFrequenza.Text);
+
+			comboBoxNumSensore.SelectedIndex = comboBoxNumSensore.FindStringExact("1 (Bacino)");
+			//selectedSensor = (comboBoxNumSensore.Text[0] - '0') - 1;
+			selectedSensor = comboBoxNumSensore.SelectedIndex;
+
+			comboBoxTipoSensore.SelectedIndex = comboBoxTipoSensore.FindStringExact("Acc");
+			selectedSensorType = comboBoxTipoSensore.SelectedIndex;
+
+			comboBoxChart.SelectedIndex = comboBoxChart.FindStringExact("1");
+			selectedChart = comboBoxChart.SelectedIndex;
+
 			csvPath = Directory.GetCurrentDirectory();
 			textBoxCSVPath.Text = csvPath;
 			parser = new Parser(
@@ -52,7 +67,6 @@ namespace Sense {
 			threadParser.Start();
 		}
 
-
 		private void buttonServerStartClick(object sender, EventArgs e) {
 			if (parser.serverIsActive) {
 				//STOPPING SERVER
@@ -67,8 +81,8 @@ namespace Sense {
 					//richTextConsole.AppendText(String.Format("Server Started on port {0} at IP {1}\n", parser.Port, parser.LocalAddr));		
 					//Invoke(/*delegato*/);
 					parser.ActivateServer(
-						Int32.Parse(textBoxPort.Text), 
-						String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text), 
+						Int32.Parse(textBoxPort.Text),
+						String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
 						csvPath,
 						frequence,
 						window
@@ -126,10 +140,16 @@ namespace Sense {
 			int finestra = 0, dx = 0, sx = 0;
 			double media = 0;
 			for (int i = 0; i < size; ++i) {
-				if (i < range) { sx = i; } else
+				if (i < range) {
+					sx = i;
+				} else {
 					sx = range;
-				if (size - range > i) { dx = range; } else
+				}
+				if (i < size - range) {
+					dx = range;
+				} else {
 					dx = size - i - 1;
+				}
 				finestra = dx + sx + 1;
 				for (int j = i - sx; j <= i + dx; ++j)
 					media += popolazione[j];
@@ -192,6 +212,29 @@ namespace Sense {
 				}
 			}
 			return popolazione2;
+		}
+
+		public double[] smoothing3(double[] popolazione, int range) {
+			/*for (int i = 1; i < popolazione.Length; i++) {
+				var start = (i - range > 0 ? i - range : 0);
+				var end = (i + range < popolazione.Length ? i + range : popolazione.Length);
+
+				float sum = 0;
+
+				for (int j = start; j < end; j++) {
+					sum += popolazione[j];
+				}
+
+				var avg = sum / (end - start);
+				popolazione[i] = avg;
+			}*/
+
+			double[] smooth = new double[popolazione.Length];
+
+			for(int i = 0; i < popolazione.Length; i++) {
+
+			}
+			return smooth;
 		}
 
 		public double[] deviazioneStandard(double[] popolazione, int range)//QUARTA OPERAZIONE: DEVIAZIONE STANDARD
@@ -335,14 +378,14 @@ namespace Sense {
 				//double[] rI = rapportoIncrementale(sampwin, 0);
 				//double[] sampwinSingleDim = multiToSingleArray(sampwin, 0);
 				//double[] dS = deviazioneStandard(sampwinSingleDim, 3);
-				LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing(module(sampwin, 1, 1, 1), 3)), Color.Cyan, SymbolType.None);
+				LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing2(module(sampwin, 1, 1, 1), 3)), Color.Cyan, SymbolType.None);
 				LineItem rILine2 = zedGraphControl1.GraphPane.AddCurve("Module", populate(module(sampwin, 1, 1, 1)), Color.Magenta, SymbolType.None);
 				LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin, 1, 0, 0)), Color.Red, SymbolType.None);
 				LineItem rILineY = zedGraphControl1.GraphPane.AddCurve("Acc Y", populate(module(sampwin, 0, 1, 0)), Color.Green, SymbolType.None);
 				LineItem rILineZ = zedGraphControl1.GraphPane.AddCurve("Acc Z", populate(module(sampwin, 0, 0, 1)), Color.Blue, SymbolType.None);
 				//LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
 				//verificare con gimmy che effettivamente la divisione con la frequenza sia la cosa migliore da fare, fare ovviamente test con valori adatti può cambiare tutto
-				
+
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
 			}
@@ -362,19 +405,28 @@ namespace Sense {
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
 		}
 
-		private void textBoxFinestra_TextChanged(object sender, EventArgs e) {
-			if (textBoxFinestra.Text != "")
-				window = Int32.Parse(textBoxFinestra.Text);
-			else
-				window = 0;
-		}
-
-		private void button1_Click(object sender, EventArgs e) {
+		private void buttonSelectFolder_Click(object sender, EventArgs e) {
 			DialogResult result = folderBrowserDialog1.ShowDialog();
 			if (result == DialogResult.OK) {
 				csvPath = folderBrowserDialog1.SelectedPath;
 				textBoxCSVPath.Text = csvPath;
 			}
+		}
+
+		private void comboBoxChart_SelectedIndexChanged(object sender, EventArgs e) {
+			selectedChart = comboBoxChart.SelectedIndex;
+		}
+
+		private void comboBoxTipoSensore_SelectedIndexChanged(object sender, EventArgs e) {
+			selectedSensorType = comboBoxTipoSensore.SelectedIndex;
+		}
+
+		private void comboBoxNumSensore_SelectedIndexChanged(object sender, EventArgs e) {
+			selectedSensor = comboBoxNumSensore.SelectedIndex;
+		}
+
+		private void numericUpDownFinestra_ValueChanged(object sender, EventArgs e) {
+			window = (int)numericUpDownFinestra.Value;
 		}
 	}
 }

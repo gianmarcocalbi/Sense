@@ -407,7 +407,11 @@ namespace Sense {
 					}
 					csv += "\n";
 				}
-				File.WriteAllText(csvPath, csv.ToString());
+				int t = 0;
+				while(File.Exists(csvPath + "_" + t)) {
+					t++;
+				}
+				File.WriteAllText(csvPath + "_" + t, csv.ToString());
 			} catch (Exception ex) {
 				MessageBox.Show("Print stream to CSV Error\n" + ex.Message);
 				return false;

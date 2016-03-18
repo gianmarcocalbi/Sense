@@ -25,12 +25,11 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-			this.button1 = new System.Windows.Forms.Button();
+			this.buttonSelectFolder = new System.Windows.Forms.Button();
 			this.textBoxCSVPath = new System.Windows.Forms.TextBox();
 			this.checkBoxConsoleAutoFlow = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
-			this.textBoxFinestra = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.comboBoxFrequenza = new System.Windows.Forms.ComboBox();
@@ -50,21 +49,23 @@
 			this.label10 = new System.Windows.Forms.Label();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
-			this.comboBox3 = new System.Windows.Forms.ComboBox();
-			this.comboBox2 = new System.Windows.Forms.ComboBox();
+			this.comboBoxNumSensore = new System.Windows.Forms.ComboBox();
+			this.comboBoxTipoSensore = new System.Windows.Forms.ComboBox();
 			this.label13 = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
 			this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
 			this.label11 = new System.Windows.Forms.Label();
-			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.comboBoxChart = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+			this.numericUpDownFinestra = new System.Windows.Forms.NumericUpDown();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// splitContainer1
@@ -76,12 +77,12 @@
 			// 
 			// splitContainer1.Panel1
 			// 
-			this.splitContainer1.Panel1.Controls.Add(this.button1);
+			this.splitContainer1.Panel1.Controls.Add(this.numericUpDownFinestra);
+			this.splitContainer1.Panel1.Controls.Add(this.buttonSelectFolder);
 			this.splitContainer1.Panel1.Controls.Add(this.textBoxCSVPath);
 			this.splitContainer1.Panel1.Controls.Add(this.checkBoxConsoleAutoFlow);
 			this.splitContainer1.Panel1.Controls.Add(this.label6);
 			this.splitContainer1.Panel1.Controls.Add(this.label9);
-			this.splitContainer1.Panel1.Controls.Add(this.textBoxFinestra);
 			this.splitContainer1.Panel1.Controls.Add(this.label8);
 			this.splitContainer1.Panel1.Controls.Add(this.label7);
 			this.splitContainer1.Panel1.Controls.Add(this.comboBoxFrequenza);
@@ -107,15 +108,15 @@
 			this.splitContainer1.SplitterDistance = 263;
 			this.splitContainer1.TabIndex = 0;
 			// 
-			// button1
+			// buttonSelectFolder
 			// 
-			this.button1.Location = new System.Drawing.Point(236, 163);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(24, 22);
-			this.button1.TabIndex = 22;
-			this.button1.Text = "...";
-			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
+			this.buttonSelectFolder.Location = new System.Drawing.Point(236, 163);
+			this.buttonSelectFolder.Name = "buttonSelectFolder";
+			this.buttonSelectFolder.Size = new System.Drawing.Size(24, 22);
+			this.buttonSelectFolder.TabIndex = 22;
+			this.buttonSelectFolder.Text = "...";
+			this.buttonSelectFolder.UseVisualStyleBackColor = true;
+			this.buttonSelectFolder.Click += new System.EventHandler(this.buttonSelectFolder_Click);
 			// 
 			// textBoxCSVPath
 			// 
@@ -155,15 +156,6 @@
 			this.label9.TabIndex = 18;
 			this.label9.Text = "secondi";
 			// 
-			// textBoxFinestra
-			// 
-			this.textBoxFinestra.Location = new System.Drawing.Point(70, 134);
-			this.textBoxFinestra.Name = "textBoxFinestra";
-			this.textBoxFinestra.Size = new System.Drawing.Size(41, 20);
-			this.textBoxFinestra.TabIndex = 17;
-			this.textBoxFinestra.Text = "10";
-			this.textBoxFinestra.TextChanged += new System.EventHandler(this.textBoxFinestra_TextChanged);
-			// 
 			// label8
 			// 
 			this.label8.AutoSize = true;
@@ -184,6 +176,7 @@
 			// 
 			// comboBoxFrequenza
 			// 
+			this.comboBoxFrequenza.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboBoxFrequenza.FormattingEnabled = true;
 			this.comboBoxFrequenza.Items.AddRange(new object[] {
             "50",
@@ -336,13 +329,13 @@
 			// 
 			// tabPage1
 			// 
-			this.tabPage1.Controls.Add(this.comboBox3);
-			this.tabPage1.Controls.Add(this.comboBox2);
+			this.tabPage1.Controls.Add(this.comboBoxNumSensore);
+			this.tabPage1.Controls.Add(this.comboBoxTipoSensore);
 			this.tabPage1.Controls.Add(this.label13);
 			this.tabPage1.Controls.Add(this.label12);
 			this.tabPage1.Controls.Add(this.zedGraphControl1);
 			this.tabPage1.Controls.Add(this.label11);
-			this.tabPage1.Controls.Add(this.comboBox1);
+			this.tabPage1.Controls.Add(this.comboBoxChart);
 			this.tabPage1.Location = new System.Drawing.Point(4, 22);
 			this.tabPage1.Name = "tabPage1";
 			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -351,50 +344,54 @@
 			this.tabPage1.Text = "Chart";
 			this.tabPage1.UseVisualStyleBackColor = true;
 			// 
-			// comboBox3
+			// comboBoxNumSensore
 			// 
-			this.comboBox3.FormattingEnabled = true;
-			this.comboBox3.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5"});
-			this.comboBox3.Location = new System.Drawing.Point(326, 10);
-			this.comboBox3.Name = "comboBox3";
-			this.comboBox3.Size = new System.Drawing.Size(31, 21);
-			this.comboBox3.TabIndex = 6;
+			this.comboBoxNumSensore.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboBoxNumSensore.FormattingEnabled = true;
+			this.comboBoxNumSensore.Items.AddRange(new object[] {
+            "1 (Bacino)",
+            "2 (Polso Dx)",
+            "3 (Polso Sx)",
+            "4 (Caviglia Dx)",
+            "5 (Caviglia Sx)"});
+			this.comboBoxNumSensore.Location = new System.Drawing.Point(399, 11);
+			this.comboBoxNumSensore.Name = "comboBoxNumSensore";
+			this.comboBoxNumSensore.Size = new System.Drawing.Size(93, 21);
+			this.comboBoxNumSensore.TabIndex = 6;
+			this.comboBoxNumSensore.SelectedIndexChanged += new System.EventHandler(this.comboBoxNumSensore_SelectedIndexChanged);
 			// 
-			// comboBox2
+			// comboBoxTipoSensore
 			// 
-			this.comboBox2.FormattingEnabled = true;
-			this.comboBox2.Items.AddRange(new object[] {
+			this.comboBoxTipoSensore.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboBoxTipoSensore.FormattingEnabled = true;
+			this.comboBoxTipoSensore.Items.AddRange(new object[] {
             "Acc",
             "Gyr",
             "Mag",
             "Qua"});
-			this.comboBox2.Location = new System.Drawing.Point(178, 11);
-			this.comboBox2.Name = "comboBox2";
-			this.comboBox2.Size = new System.Drawing.Size(48, 21);
-			this.comboBox2.TabIndex = 5;
+			this.comboBoxTipoSensore.Location = new System.Drawing.Point(216, 11);
+			this.comboBoxTipoSensore.Name = "comboBoxTipoSensore";
+			this.comboBoxTipoSensore.Size = new System.Drawing.Size(48, 21);
+			this.comboBoxTipoSensore.TabIndex = 5;
+			this.comboBoxTipoSensore.SelectedIndexChanged += new System.EventHandler(this.comboBoxTipoSensore_SelectedIndexChanged);
 			// 
 			// label13
 			// 
 			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(249, 14);
+			this.label13.Location = new System.Drawing.Point(313, 14);
 			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(71, 13);
+			this.label13.Size = new System.Drawing.Size(80, 13);
 			this.label13.TabIndex = 4;
-			this.label13.Text = "Num Sensore";
+			this.label13.Text = "Sensor Number";
 			// 
 			// label12
 			// 
 			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(126, 15);
+			this.label12.Location = new System.Drawing.Point(143, 14);
 			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(46, 13);
+			this.label12.Size = new System.Drawing.Size(67, 13);
 			this.label12.TabIndex = 3;
-			this.label12.Text = "Sensore";
+			this.label12.Text = "Sensor Type";
 			// 
 			// zedGraphControl1
 			// 
@@ -413,26 +410,28 @@
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(20, 15);
+			this.label11.Location = new System.Drawing.Point(20, 14);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(32, 13);
 			this.label11.TabIndex = 1;
 			this.label11.Text = "Chart";
 			// 
-			// comboBox1
+			// comboBoxChart
 			// 
-			this.comboBox1.FormattingEnabled = true;
-			this.comboBox1.Items.AddRange(new object[] {
+			this.comboBoxChart.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboBoxChart.FormattingEnabled = true;
+			this.comboBoxChart.Items.AddRange(new object[] {
             "1",
             "2",
             "3",
             "4",
             "5",
             "6"});
-			this.comboBox1.Location = new System.Drawing.Point(58, 12);
-			this.comboBox1.Name = "comboBox1";
-			this.comboBox1.Size = new System.Drawing.Size(47, 21);
-			this.comboBox1.TabIndex = 0;
+			this.comboBoxChart.Location = new System.Drawing.Point(58, 11);
+			this.comboBoxChart.Name = "comboBoxChart";
+			this.comboBoxChart.Size = new System.Drawing.Size(47, 21);
+			this.comboBoxChart.TabIndex = 0;
+			this.comboBoxChart.SelectedIndexChanged += new System.EventHandler(this.comboBoxChart_SelectedIndexChanged);
 			// 
 			// tabPage2
 			// 
@@ -443,6 +442,29 @@
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "tabPage2";
 			this.tabPage2.UseVisualStyleBackColor = true;
+			// 
+			// numericUpDownFinestra
+			// 
+			this.numericUpDownFinestra.Location = new System.Drawing.Point(70, 135);
+			this.numericUpDownFinestra.Maximum = new decimal(new int[] {
+            999,
+            0,
+            0,
+            0});
+			this.numericUpDownFinestra.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownFinestra.Name = "numericUpDownFinestra";
+			this.numericUpDownFinestra.Size = new System.Drawing.Size(41, 20);
+			this.numericUpDownFinestra.TabIndex = 23;
+			this.numericUpDownFinestra.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.numericUpDownFinestra.ValueChanged += new System.EventHandler(this.numericUpDownFinestra_ValueChanged);
 			// 
 			// Form1
 			// 
@@ -463,6 +485,7 @@
 			this.tabControl1.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -488,7 +511,6 @@
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.ComboBox comboBoxFrequenza;
 		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.TextBox textBoxFinestra;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.CheckBox checkBoxConsoleAutoFlow;
@@ -498,14 +520,15 @@
 		private System.Windows.Forms.Label label10;
 		private ZedGraph.ZedGraphControl zedGraphControl1;
 		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.ComboBox comboBox1;
-		private System.Windows.Forms.ComboBox comboBox3;
-		private System.Windows.Forms.ComboBox comboBox2;
+		private System.Windows.Forms.ComboBox comboBoxChart;
+		private System.Windows.Forms.ComboBox comboBoxNumSensore;
+		private System.Windows.Forms.ComboBox comboBoxTipoSensore;
 		private System.Windows.Forms.Label label13;
 		private System.Windows.Forms.Label label12;
-		private System.Windows.Forms.Button button1;
+		private System.Windows.Forms.Button buttonSelectFolder;
 		private System.Windows.Forms.TextBox textBoxCSVPath;
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+		private System.Windows.Forms.NumericUpDown numericUpDownFinestra;
 	}
 }
 
