@@ -304,11 +304,22 @@ namespace Sense {
 				//double[] rI = rapportoIncrementale(sampwin, 0);
 				//double[] sampwinSingleDim = multiToSingleArray(sampwin, 0);
 				//double[] dS = deviazioneStandard(sampwinSingleDim, 3);
-				LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing(module(sampwin, 1, 1, 1), 3)), Color.Cyan, SymbolType.None);
-				LineItem rILine2 = zedGraphControl1.GraphPane.AddCurve("Module", populate(module(sampwin, 1, 1, 1)), Color.Magenta, SymbolType.None);
-				LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin, 1, 0, 0)), Color.Red, SymbolType.None);
-				LineItem rILineY = zedGraphControl1.GraphPane.AddCurve("Acc Y", populate(module(sampwin, 0, 1, 0)), Color.Green, SymbolType.None);
-				LineItem rILineZ = zedGraphControl1.GraphPane.AddCurve("Acc Z", populate(module(sampwin, 0, 0, 1)), Color.Blue, SymbolType.None);
+				switch (selectedChart) {
+					///Modulo
+					case 0:
+						LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing(module(sampwin, 1, 1, 1), 3)), Color.Cyan, SymbolType.None);
+						LineItem rILine2 = zedGraphControl1.GraphPane.AddCurve("Module", populate(module(sampwin, 1, 1, 1)), Color.Magenta, SymbolType.None);
+						LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin, 1, 0, 0)), Color.Red, SymbolType.None);
+						LineItem rILineY = zedGraphControl1.GraphPane.AddCurve("Acc Y", populate(module(sampwin, 0, 1, 0)), Color.Green, SymbolType.None);
+						LineItem rILineZ = zedGraphControl1.GraphPane.AddCurve("Acc Z", populate(module(sampwin, 0, 0, 1)), Color.Blue, SymbolType.None);
+						break;
+					///Derivata
+					case 1:
+						break;
+					default:
+						break;
+				}
+				
 				//LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
 				//verificare con gimmy che effettivamente la divisione con la frequenza sia la cosa migliore da fare, fare ovviamente test con valori adatti può cambiare tutto
 
