@@ -124,13 +124,15 @@ namespace Sense {
 			return arrayModulo;
 		}
 
-		public double[] rapportoIncrementale(double[,] sampwin, int firstDimension)//TERZA OPERAZIONE: DERIVATA
+		public double[] rapportoIncrementale(List<double[,]> sampwin)//TERZA OPERAZIONE: DERIVATA
 		{
-			int dim = sampwin.GetLength(1);
-			double[] rapportoIncrementale = new double[dim];
-			for (int i = 0; i < dim - 1; i++) //ci vorra di sicuro dim-1
+            int dim = sampwin.Count();
+            double[] rapportoIncrementale = new double[dim];
+			for (int i = 0; i < dim - 1; i++) //ci vorra di sicuro dim - 1
 			{
-				rapportoIncrementale[i] = (sampwin[firstDimension, i + 1] - sampwin[firstDimension, i]) / ((double)1 / frequence);
+                double[,] instant1 = sampwin[i];
+                double[,] instant2 = sampwin[i + 1];
+                rapportoIncrementale[i] = (instant1[selectedSensor, selectedSensorType] - instant2[selectedSensor, selectedSensorType]) / ((double)1 / frequence);
 			}
 			return rapportoIncrementale;
 		}
@@ -315,7 +317,10 @@ namespace Sense {
 						break;
 					///Derivata
 					case 1:
-						break;
+                        LineItem cicciaConLaDerivata = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(smoothing(rapportoIncrementale(sampwin), 3)), Color.Cyan, SymbolType.None) ;
+                        LineItem cicciaConLaDerivata2 = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(rapportoIncrementale(sampwin)), Color.Magenta, SymbolType.None);
+
+                        break;
 					default:
 						break;
 				}
