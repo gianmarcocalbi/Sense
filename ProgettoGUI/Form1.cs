@@ -158,88 +158,11 @@ namespace Sense {
 					media += popolazione[j];
 				media /= finestra;
 				smooth[i] = media;
-				finestra = 0;
-				dx = 0;
-				sx = 0;
+				media = 0;
 			}
 			return smooth;
 		}
-
-		public double[] smoothing2(double[] popolazione, int range) //SECONDA OPERAZIONE: SMOOTHING
-		{
-			//la finestra (!= da window) <= 2*range+1 
-			double media = 0;
-			int size = popolazione.GetLength(0); //MODIFICATA RELATIVAMENTE DI RECENTE, VERIFICARE CHE VADA BENE soprattutto il paramatro passato 0
-			double[] popolazione2 = new double[size];
-			for (int i = 0; i < size; ++i) {
-				if (i < range && (size - range) > i) //stretto a sx largo a dx
-				{
-					for (int i2 = 0; i2 <= i; ++i2) //stretto
-						media += popolazione[i - i2];
-					for (int i2 = 0; i2 <= range; ++i2) //largo 
-						media += popolazione[i + i2];
-					media -= popolazione[i];
-					media /= (i + 1 + range);
-					popolazione2[i] = media;
-					media = 0;
-				} else if (i >= range && size - i <= range) //stretto a dx largo a sx
-				  {
-					for (int i2 = 0; i2 < size - i - 1; ++i2) //stretto
-						media += popolazione[i + i2];
-					for (int i2 = 0; i2 <= range; ++i2) //largo 
-						media += popolazione[i - i2];
-					media -= popolazione[i];
-					media /= (size - i + range);
-					popolazione2[i] = media;
-					media = 0;
-				} else if (i < range && size - range <= i) //stretto a dx stretto sx
-				  {
-					for (int i2 = 0; i2 < size - i - 1; ++i2) //stretto
-						media += popolazione[i + i2];
-					for (int i2 = 0; i2 < i; ++i2) //stretto
-						media += popolazione[i - i2];
-					media -= popolazione[i];
-					media /= size;
-					popolazione2[i] = media;
-					media = 0;
-				} else if (i >= range && size - range > i) //stretto a dx largo a sx
-				  {
-					for (int i2 = 0; i2 <= range; ++i2) //largo 
-						media += popolazione[i + i2];
-					for (int i2 = 0; i2 <= range; ++i2) //largo 
-						media += popolazione[i - i2];
-					media -= popolazione[i];
-					media /= (2 * range + 1);
-					popolazione2[i] = media;
-					media = 0;
-				}
-			}
-			return popolazione2;
-		}
-
-		public double[] smoothing3(double[] popolazione, int range) {
-			/*for (int i = 1; i < popolazione.Length; i++) {
-				var start = (i - range > 0 ? i - range : 0);
-				var end = (i + range < popolazione.Length ? i + range : popolazione.Length);
-
-				float sum = 0;
-
-				for (int j = start; j < end; j++) {
-					sum += popolazione[j];
-				}
-
-				var avg = sum / (end - start);
-				popolazione[i] = avg;
-			}*/
-
-			double[] smooth = new double[popolazione.Length];
-
-			for(int i = 0; i < popolazione.Length; i++) {
-
-			}
-			return smooth;
-		}
-
+				
 		public double[] deviazioneStandard(double[] popolazione, int range)//QUARTA OPERAZIONE: DEVIAZIONE STANDARD
 		{
 			double[] smooth = smoothing(popolazione, range);
@@ -381,7 +304,7 @@ namespace Sense {
 				//double[] rI = rapportoIncrementale(sampwin, 0);
 				//double[] sampwinSingleDim = multiToSingleArray(sampwin, 0);
 				//double[] dS = deviazioneStandard(sampwinSingleDim, 3);
-				LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing2(module(sampwin, 1, 1, 1), 3)), Color.Cyan, SymbolType.None);
+				LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing(module(sampwin, 1, 1, 1), 3)), Color.Cyan, SymbolType.None);
 				LineItem rILine2 = zedGraphControl1.GraphPane.AddCurve("Module", populate(module(sampwin, 1, 1, 1)), Color.Magenta, SymbolType.None);
 				LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin, 1, 0, 0)), Color.Red, SymbolType.None);
 				LineItem rILineY = zedGraphControl1.GraphPane.AddCurve("Acc Y", populate(module(sampwin, 0, 1, 0)), Color.Green, SymbolType.None);
