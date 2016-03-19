@@ -34,7 +34,8 @@ namespace Sense {
 		string path;
 		int frequence;
 		int window;
-		
+		private bool chartRefresh;
+
 		public TcpListener Server {
 			get {
 				return server;
@@ -99,6 +100,7 @@ namespace Sense {
 			setButtonServerStart = setButtonServerStartFunc;
 			eatSampwinProtected = eatSampFunc;
 			serverIsActive = false;
+			chartRefresh = false;
 			setButtonServerStart(serverIsActive); //< Setta il testo sul tasto "serverStart" a START
 		}
 
@@ -132,6 +134,14 @@ namespace Sense {
 			server.Stop();
 			//printToServerConsole(server.ToString());
 			//printToServerConsole("Server Stopped.");
+		}
+
+		/// <summary>
+		/// Setta a true chartRefresh.
+		/// Indica la necessità di riplottare la sampwin.
+		/// </summary>
+		public void	ChartRefresh() {
+			chartRefresh = true;
 		}
 
 		/// <summary>
@@ -314,11 +324,16 @@ namespace Sense {
 
 									///Roba varia
 									//(!)Sistemare window
-									if(sampwin.Count <= window*frequence) {
-										if(sampwin.Count == window * frequence) {
+
+									if (sampwin.Count <= window * frequence) {
+										if (sampwin.Count == window * frequence) {
 											//eatSampwinProtected(sampwin.GetRange(sampwin.Count - window * frequence, window * frequence));
 											eatSampwinProtected(sampwin);
 										}
+									} else if (chartRefresh) {
+										///Riplotta sampwin subito.
+										eatSampwinProtected(sampwin);
+										chartRefresh = false;
 									} else if(sampwin.Count%((window * frequence)/2) == 0 && sampwin.Count != 0) {
 										///Funzione che triggera la lettura della sampwin per la creazione dei grafici.
 										//eatSampwinProtected(sampwin.GetRange(sampwin.Count - 500, 500)); //(!)Valutare gli errori generati da questo metodo

@@ -25,6 +25,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.buttonClearConsole = new System.Windows.Forms.Button();
 			this.numericUpDownFinestra = new System.Windows.Forms.NumericUpDown();
 			this.buttonSelectFolder = new System.Windows.Forms.Button();
 			this.textBoxCSVPath = new System.Windows.Forms.TextBox();
@@ -59,7 +60,6 @@
 			this.comboBoxChart = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-			this.buttonClearConsole = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -109,6 +109,16 @@
 			this.splitContainer1.Size = new System.Drawing.Size(1006, 564);
 			this.splitContainer1.SplitterDistance = 263;
 			this.splitContainer1.TabIndex = 0;
+			// 
+			// buttonClearConsole
+			// 
+			this.buttonClearConsole.Location = new System.Drawing.Point(161, 536);
+			this.buttonClearConsole.Name = "buttonClearConsole";
+			this.buttonClearConsole.Size = new System.Drawing.Size(75, 23);
+			this.buttonClearConsole.TabIndex = 24;
+			this.buttonClearConsole.Text = "CLEAR";
+			this.buttonClearConsole.UseVisualStyleBackColor = true;
+			this.buttonClearConsole.Click += new System.EventHandler(this.buttonClearConsole_Click);
 			// 
 			// numericUpDownFinestra
 			// 
@@ -379,7 +389,7 @@
             "3 (Polso Sx)",
             "4 (Caviglia Dx)",
             "5 (Caviglia Sx)"});
-			this.comboBoxNumSensore.Location = new System.Drawing.Point(399, 11);
+			this.comboBoxNumSensore.Location = new System.Drawing.Point(463, 11);
 			this.comboBoxNumSensore.Name = "comboBoxNumSensore";
 			this.comboBoxNumSensore.Size = new System.Drawing.Size(93, 21);
 			this.comboBoxNumSensore.TabIndex = 6;
@@ -394,7 +404,7 @@
             "Gyr",
             "Mag",
             "Qua"});
-			this.comboBoxTipoSensore.Location = new System.Drawing.Point(216, 11);
+			this.comboBoxTipoSensore.Location = new System.Drawing.Point(286, 11);
 			this.comboBoxTipoSensore.Name = "comboBoxTipoSensore";
 			this.comboBoxTipoSensore.Size = new System.Drawing.Size(48, 21);
 			this.comboBoxTipoSensore.TabIndex = 5;
@@ -403,7 +413,7 @@
 			// label13
 			// 
 			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(313, 14);
+			this.label13.Location = new System.Drawing.Point(377, 14);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(80, 13);
 			this.label13.TabIndex = 4;
@@ -412,7 +422,7 @@
 			// label12
 			// 
 			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(143, 14);
+			this.label12.Location = new System.Drawing.Point(213, 14);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(67, 13);
 			this.label12.TabIndex = 3;
@@ -446,15 +456,11 @@
 			this.comboBoxChart.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboBoxChart.FormattingEnabled = true;
 			this.comboBoxChart.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6"});
+            "Modulo",
+            "Deviazione St"});
 			this.comboBoxChart.Location = new System.Drawing.Point(58, 11);
 			this.comboBoxChart.Name = "comboBoxChart";
-			this.comboBoxChart.Size = new System.Drawing.Size(47, 21);
+			this.comboBoxChart.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxChart.TabIndex = 0;
 			this.comboBoxChart.SelectedIndexChanged += new System.EventHandler(this.comboBoxChart_SelectedIndexChanged);
 			// 
@@ -467,16 +473,6 @@
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "tabPage2";
 			this.tabPage2.UseVisualStyleBackColor = true;
-			// 
-			// buttonClearConsole
-			// 
-			this.buttonClearConsole.Location = new System.Drawing.Point(161, 536);
-			this.buttonClearConsole.Name = "buttonClearConsole";
-			this.buttonClearConsole.Size = new System.Drawing.Size(75, 23);
-			this.buttonClearConsole.TabIndex = 24;
-			this.buttonClearConsole.Text = "CLEAR";
-			this.buttonClearConsole.UseVisualStyleBackColor = true;
-			this.buttonClearConsole.Click += new System.EventHandler(this.buttonClearConsole_Click);
 			// 
 			// Form1
 			// 

@@ -19,42 +19,37 @@ namespace Sense {
 		Random random = new Random();
 		int frequence = 50;
 		int window = 10;
-		bool isAngoliDiEuleroPressed = false;
-		bool isRollPressed = false;
-		bool isPitchPressed = false;
-		bool isYawPressed = false;
-		bool isSmoothPressed = false;
 		GraphPane myPane;
-		double[,] sampwin;
-		LineItem rollLine;
-		LineItem rollSmooth;
 		int selectedChart;
 		int selectedSensor;
 		int selectedSensorType;
 		string csvPath;
+		//bool isAngoliDiEuleroPressed = false;
+		//bool isRollPressed = false;
+		//bool isPitchPressed = false;
+		//bool isYawPressed = false;
+		//bool isSmoothPressed = false;
+		//double[,] sampwin;
+		//LineItem rollLine;
+		//LineItem rollSmooth;
 
+		/// <summary>
+		/// Costruttore Primario
+		/// </summary>
 		public Form1() {
+			///Inizializza i componenti grafici
 			InitializeComponent();
+			///Finestra
 			window = (int)numericUpDownFinestra.Value;
-
+			///Frequenza
 			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
-
-			comboBoxNumSensore.SelectedIndex = comboBoxNumSensore.FindStringExact("1 (Bacino)");
-			//selectedSensor = (comboBoxNumSensore.Text[0] - '0') - 1;
-			selectedSensor = comboBoxNumSensore.SelectedIndex;
-
-			comboBoxTipoSensore.SelectedIndex = comboBoxTipoSensore.FindStringExact("Acc");
-			selectedSensorType = comboBoxTipoSensore.SelectedIndex;
-
-			comboBoxChart.SelectedIndex = comboBoxChart.FindStringExact("1");
-			selectedChart = comboBoxChart.SelectedIndex;
-
+			///CSV Location
 			csvPath = Directory.GetCurrentDirectory();
 			textBoxCSVPath.Text = csvPath;
-
+			///CSV Location hint EventHandler
 			this.textBoxCSVPath.MouseEnter += new System.EventHandler(this.textBoxCSVPath_Enter);
-
+			///Creazione Parser (Server)
 			parser = new Parser(
 				Int32.Parse(textBoxPort.Text),
 				String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
@@ -65,24 +60,36 @@ namespace Sense {
 				setButtonServerStartProtected,
 				eatSampwinProtected
 			);
+
+			///I controlli su selectedChart, selectedSensorType, selectedSensor devono essere fatti dopo aver istanziato il parser perché chiamano una funzione di parser.
+			///Altrimenti ci sarebbe Eccezione del tipo "riferimento a null".
+			///selectedSensor
+			comboBoxNumSensore.SelectedIndex = comboBoxNumSensore.FindStringExact("1 (Bacino)");
+			selectedSensor = comboBoxNumSensore.SelectedIndex;
+			///selectedSensorType
+			comboBoxTipoSensore.SelectedIndex = comboBoxTipoSensore.FindStringExact("Acc");
+			selectedSensorType = comboBoxTipoSensore.SelectedIndex;
+			///selectedChart
+			comboBoxChart.SelectedIndex = comboBoxChart.FindStringExact("Modulo");
+			selectedChart = comboBoxChart.SelectedIndex;
+			///Server thread
 			threadParser = new Thread(parser.StartServer);
 			threadParser.IsBackground = true;
 			threadParser.Start();
 		}
 
+		/// <summary>
+		/// Evento di click sul tasto START del server.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void buttonServerStartClick(object sender, EventArgs e) {
 			if (parser.serverIsActive) {
-				//STOPPING SERVER
-				//bisogna fermare il server
-				//parser.Server.Close();
+				///Se il server è attivo allora lo STOPpiamo
 				parser.DeactivateServer();
-
-				//buttonServerStart.Text = "START";
 			} else {
-				//STARTING SERVER
+				///Se il server è fermo allora lo STARTiamo
 				try {
-					//richTextConsole.AppendText(String.Format("Server Started on port {0} at IP {1}\n", parser.Port, parser.LocalAddr));		
-					//Invoke(/*delegato*/);
 					parser.ActivateServer(
 						Int32.Parse(textBoxPort.Text),
 						String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
@@ -90,13 +97,17 @@ namespace Sense {
 						frequence,
 						window
 					);
-					//buttonServerStart.Text = "STOP";
 				} catch (SocketException exc) {
 					richTextConsole.AppendText(String.Format("{0}\n", exc));
 				}
 			}
 		}
 
+		/// <summary>
+		/// Funzione che trigghera quando il Form1 viene caricato.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Form1_Load(object sender, EventArgs e) {
 			//SAMPWIN ARRAY TRIDIMENSIONALE, SCRITTO CHIARAMENTE NELLA CONSEGNA, LA POSSIAMO SCRIVERE COME double[, ,] ANZICHE double[][][] SCRITTURA VAGAMENTE PIU BARBARICA
 			//SI FA RIFERIMENTO A DUE SAMPWIN UNA CON LE INIZIALI MAIUSCOLE TRIDIMENSIONALE ED UNA TUTTA IN MINUSCOLO CON 
@@ -107,10 +118,23 @@ namespace Sense {
 			this.CenterToScreen();
 		}
 
+		/// <summary>
+		/// Overload Modulo che considera tutte le tre dimensioni x,y,z.
+		/// </summary>
+		/// <param name="sampwin"></param>
+		/// <returns>Array di valori modulo.</returns>
 		public double[] module(List<double[,]> sampwin) {
 			return module(sampwin, 1, 1, 1);
 		}
 
+		/// <summary>
+		/// Modulo.
+		/// </summary>
+		/// <param name="sampwin"></param>
+		/// <param name="x">Coefficiente per il quale moltiplicare la componente X.</param>
+		/// <param name="y">Coefficiente per il quale moltiplicare la componente Y.</param>
+		/// <param name="z">Coefficiente per il quale moltiplicare la componente Z.</param>
+		/// <returns>Array di valori modulo.</returns>
 		public double[] module(List<double[,]> sampwin, int x, int y, int z) //PRIMA OPERAZIONE: MODULO
 		{
 			int dim = sampwin.Count();
@@ -120,24 +144,15 @@ namespace Sense {
 				arrayModulo[i] = Math.Sqrt(Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 0], 2) * x + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 1], 2) * y + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 2], 2) * z);
 				//printToServerConsoleProtected(arrayModulo[i] + "\n");
 			}
-			printToServerConsoleProtected("Dimensione sampwin: " + dim + "\n");
 			return arrayModulo;
 		}
 
-		public double[] rapportoIncrementale(List<double[,]> sampwin)//TERZA OPERAZIONE: DERIVATA
-		{
-            int dim = sampwin.Count();
-            double[] rapportoIncrementale = new double[dim];
-			for (int i = 0; i < dim - 1; i++) //ci vorra di sicuro dim - 1
-			{
-                double[,] instant1 = sampwin[i];
-                double[,] instant2 = sampwin[i + 1];
-                rapportoIncrementale[i] = (instant1[selectedSensor, selectedSensorType] - instant2[selectedSensor, selectedSensorType]) / ((double)1 / frequence);
-			}
-			return rapportoIncrementale;
-		}
-
-		//notare quale delle due sia effettivamente la migliore, questa seconda rende piu facile la lettura e la manutenzione
+		/// <summary>
+		/// Operazione di Smoothing.
+		/// </summary>
+		/// <param name="popolazione">Array di valori da Smoothare.</param>
+		/// <param name="range">Range di Smoothing.</param>
+		/// <returns>Array di valori Smoothati.</returns>
 		public double[] smoothing(double[] popolazione, int range)//SECONDA OPERAZIONE: SMOOTHING
 		{
 			int size = popolazione.GetLength(0);
@@ -163,6 +178,24 @@ namespace Sense {
 				media = 0;
 			}
 			return smooth;
+		}
+
+		/// <summary>
+		/// Opreazione di Derivata.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <returns>Array di valori della Derivata.</returns>
+		public double[] rapportoIncrementale(List<double[,]> sampwin)//TERZA OPERAZIONE: DERIVATA
+		{
+            int dim = sampwin.Count();
+            double[] rapportoIncrementale = new double[dim];
+			for (int i = 0; i < dim - 1; i++) //ci vorra di sicuro dim - 1
+			{
+                double[,] instant1 = sampwin[i];
+                double[,] instant2 = sampwin[i + 1];
+                rapportoIncrementale[i] = (instant1[selectedSensor, selectedSensorType] - instant2[selectedSensor, selectedSensorType]) / ((double)1 / frequence);
+			}
+			return rapportoIncrementale;
 		}
 				
 		public double[] deviazioneStandard(double[] popolazione, int range)//QUARTA OPERAZIONE: DEVIAZIONE STANDARD
@@ -256,8 +289,16 @@ namespace Sense {
 
 		}
 
+		/// <summary>
+		/// Delegato per scrivere sulla console del Server.
+		/// </summary>
+		/// <param name="s">Stringa da scrivere.</param>
 		public delegate void printToServerConsoleDelegate(string s);
 
+		/// <summary>
+		/// Stampa sulla console del Server.
+		/// </summary>
+		/// <param name="s">Stringa da scrivere.</param>
 		public void printToServerConsoleProtected(string s) {
 			if (this.richTextConsole.InvokeRequired) {
 				Invoke(new printToServerConsoleDelegate(printToServerConsoleProtected), new object[] { s });
@@ -270,8 +311,16 @@ namespace Sense {
 			}
 		}
 
+		/// <summary>
+		/// Delegato per impostare il valore del tasto per avviare il Server.
+		/// </summary>
+		/// <param name="b">True se il server viene startato altrimenti false.</param>
 		public delegate void setButtonServerStartDelegate(bool b);
 
+		/// <summary>
+		/// Imposta il testo del tasto di avvio del Server.
+		/// </summary>
+		/// <param name="b">True se il server viene startato altrimenti false.</param>
 		public void setButtonServerStartProtected(bool b) {
 			if (this.buttonServerStart.InvokeRequired) {
 				Invoke(new setButtonServerStartDelegate(setButtonServerStartProtected), new object[] { b });
@@ -284,8 +333,16 @@ namespace Sense {
 			}
 		}
 
+		/// <summary>
+		/// Delegato per plottare la sampwin.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
 		public delegate void eatSampwinDelegate(List<double[,]> sampwin);
 
+		/// <summary>
+		/// Plotta la sampwin.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
 		public void eatSampwinProtected(List<double[,]> sampwin) {
 			if (this.zedGraphControl1.InvokeRequired) {
 				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin });
@@ -314,13 +371,14 @@ namespace Sense {
 						LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin, 1, 0, 0)), Color.Red, SymbolType.None);
 						LineItem rILineY = zedGraphControl1.GraphPane.AddCurve("Acc Y", populate(module(sampwin, 0, 1, 0)), Color.Green, SymbolType.None);
 						LineItem rILineZ = zedGraphControl1.GraphPane.AddCurve("Acc Z", populate(module(sampwin, 0, 0, 1)), Color.Blue, SymbolType.None);
+						printToServerConsoleProtected("Module chart drawn.\n");
 						break;
 					///Derivata
 					case 1:
                         LineItem cicciaConLaDerivata = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(smoothing(rapportoIncrementale(sampwin), 3)), Color.Cyan, SymbolType.None) ;
                         LineItem cicciaConLaDerivata2 = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(rapportoIncrementale(sampwin)), Color.Magenta, SymbolType.None);
-
-                        break;
+						printToServerConsoleProtected("Derivate chart drawn.\n");
+						break;
 					default:
 						break;
 				}
@@ -333,16 +391,9 @@ namespace Sense {
 			}
 		}
 
-		/*public delegate string getCSVPathDelegate();
-
-		public string getCSVPathProtected() {
-			if (this.textBoxCSVPath.InvokeRequired) {
-				return Invoke(new getCSVPathDelegate(getCSVPathProtected));
-			} else {
-				return textBoxCSVPath
-			}
-		}*/
-
+		/****************************************************/
+		/*** Eventi triggherati da input Utente sulla GUI ***/
+		/****************************************************/
 		private void comboBoxFrequenza_SelectedIndexChanged(object sender, EventArgs e) {
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
 		}
@@ -357,14 +408,17 @@ namespace Sense {
 
 		private void comboBoxChart_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedChart = comboBoxChart.SelectedIndex;
+			parser.ChartRefresh();
 		}
 
 		private void comboBoxTipoSensore_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedSensorType = comboBoxTipoSensore.SelectedIndex;
+			parser.ChartRefresh();
 		}
 
 		private void comboBoxNumSensore_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedSensor = comboBoxNumSensore.SelectedIndex;
+			parser.ChartRefresh();
 		}
 
 		private void numericUpDownFinestra_ValueChanged(object sender, EventArgs e) {
