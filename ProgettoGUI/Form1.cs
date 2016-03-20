@@ -382,8 +382,30 @@ namespace Sense {
 						LineItem cicciaConLaDerivata2 = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(rapportoIncrementale(sampwin)), Color.Magenta, SymbolType.None);
 						printToServerConsoleProtected("Derivate chart drawn.\n");
 						break;
-					default:
+                    case 2:
+                        int length = sampwin.Count();
+                        double[,] instant = angoliDiEulero(sampwin);
+                        double[] Phi = new double[length];
+                        double[] Theta = new double[length];
+                        double[] Psi = new double[length];
+                        for (int i = 0; i < length; i++)
+                        {
+                            Phi[i] = instant[0, i];
+                            Theta[i] = instant[1, i];
+                            Psi[i] = instant[2, i];
+                        }
+                        LineItem euleroPhi = zedGraphControl1.GraphPane.AddCurve("Phi", populate(Phi), Color.Cyan, SymbolType.None);
+                        LineItem euleroSmoothPhi = zedGraphControl1.GraphPane.AddCurve("PhiSmooth", populate(smoothing(Phi, 3)), Color.DarkCyan, SymbolType.None);
+                        LineItem euleroTheta = zedGraphControl1.GraphPane.AddCurve("Theta", populate(Theta), Color.Magenta, SymbolType.None);
+                        LineItem euleroSmoothTheta = zedGraphControl1.GraphPane.AddCurve("ThetaSmooth", populate(smoothing(Theta, 3)), Color.DarkMagenta, SymbolType.None);
+                        LineItem euleroPsi = zedGraphControl1.GraphPane.AddCurve("Psi", populate(Psi), Color.Orange, SymbolType.None);
+                        LineItem euleroSmoothPsi = zedGraphControl1.GraphPane.AddCurve("PsiSmooth", populate(smoothing(Psi, 3)), Color.DarkOrange, SymbolType.None);
+                        printToServerConsoleProtected("Eulero chart drawn.\n");
+                        break;
+                    default:
 						break;
+                    
+
 				}
 
 				//LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
