@@ -587,6 +587,9 @@ namespace Sense {
 
 		private void buttonClearConsole_Click(object sender, EventArgs e) {
 			richTextConsole.Text = "";
+			if(parser.serverIsActive) {
+				richTextConsole.Text = "Server is Active.\n";
+			}
 		}
 
 		private void checkBoxSmoothing_CheckedChanged(object sender, EventArgs e) {
