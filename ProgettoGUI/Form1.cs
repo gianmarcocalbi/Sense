@@ -382,7 +382,7 @@ namespace Sense {
 						LineItem cicciaConLaDerivata2 = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(rapportoIncrementale(sampwin)), Color.Magenta, SymbolType.None);
 						printToServerConsoleProtected("Derivate chart drawn.\n");
 						break;
-                    case 2:
+                    case 2: 
                         int length = sampwin.Count();
                         double[,] instant = angoliDiEulero(sampwin);
                         double[] Phi = new double[length];
