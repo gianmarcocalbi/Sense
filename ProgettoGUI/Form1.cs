@@ -516,11 +516,7 @@ namespace Sense {
 				zedGraphControl1.GraphPane.YAxis.Title.Text = yAxisStr;
 				Color[] colors = { Color.Blue, Color.Red, Color.Green, Color.Magenta, Color.Cyan, Color.Yellow, Color.Brown};
 				for (int i=0; i < myCurve.Count; i++) {
-					int c = i;
-					if(i >= colors.Length) {
-						c = colors.Length;
-					}
-					zedGraphControl1.GraphPane.AddCurve(chartStr[i], myCurve[i], colors[c], SymbolType.None);
+					zedGraphControl1.GraphPane.AddCurve(chartStr[i], myCurve[i], colors[i%colors.Length], SymbolType.None);
 					printToServerConsoleProtected(chartStr[i] + " chart drawn.\n");
 				}
 				zedGraphControl1.AxisChange();
