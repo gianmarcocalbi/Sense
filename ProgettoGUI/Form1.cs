@@ -24,6 +24,7 @@ namespace Sense {
 		int selectedSensor;
 		int selectedSensorType;
 		string csvPath;
+		List<double[,]> mySampwin;
 		//bool isAngoliDiEuleroPressed = false;
 		//bool isRollPressed = false;
 		//bool isPitchPressed = false;
@@ -358,6 +359,9 @@ namespace Sense {
 				*/
 				//zoom da risistemare come opzioni nel designer o qui
 
+				if(parser.SampwinIsFullIdle) {
+					mySampwin = sampwin;
+				}
 
 				zedGraphControl1.GraphPane.CurveList.Clear();
 				zedGraphControl1.AxisChange();
@@ -420,23 +424,48 @@ namespace Sense {
 
 				//(!) Codice Zedraph Finale da implementare alle fine appunto
 				/*
+				zedGraphControl1.GraphPane.CurveList.Clear();
+				zedGraphControl1.AxisChange();
+				zedGraphControl1.Invalidate();
+				
 				double[] myCurveList = new double[sampwin.Count];
 				PointPairList myCurve;
 				string chartStr = "";
+				string xAxisStr = "time";
+				string yAxisStr = "";
+				string chartTitle = "";
 				switch (selectedChart) {
 					case 0:
 						myCurveList = module(sampwin, 1, 1, 1);
 						chartStr = "Module";
+						chartTitle = "Module";
 						break;
 					case 1:
 						myCurveList = rapportoIncrementale(sampwin);
+						chartStr = "Derivate";
+						chartTitle = "Derivate";
 						break;
 					default:
 						break;
 				}
+				switch(selectedSensorType) {
+					case 0:
+						///acc
+						yAxisStr = "m²";
+						break;
+					case 1:
+						///gyr
+						yAxisStr = "m²";
+						break;
+					default:
+						///bohh
+						yAxisStr = "merda secca";
+						break;
+				}
+
 				if (checkBoxSmoothing.Checked) {
 					myCurveList = smoothing(myCurveList, 3);
-					chartStr += " smoothing";
+					chartStr = "Smoothed " + chartStr;
 				}
 				if (checkBoxSegmentation.Checked) {
 					//myCurveList = segmentation(myCurveList);
@@ -449,7 +478,13 @@ namespace Sense {
 					//mostra solo ultima finestra
 					//myCurve = curveCut(myCurveList, window);
 				}
-				LineItem rILine = zedGraphControl1.GraphPane.AddCurve(chartStr, myCurve, Color.Cyan, SymbolType.None);
+				zedGraphControl1.GraphPane.Title.Text = chartTitle;
+				zedGraphControl1.GraphPane.XAxis.Title.Text = xAxisStr;
+				zedGraphControl1.GraphPane.YAxis.Title.Text = yAxisStr;
+				LineItem myLine = zedGraphControl1.GraphPane.AddCurve(chartStr, myCurve, Color.Blue, SymbolType.None);
+				printToServerConsoleProtected(chartStr + " chart drawn.\n");
+				zedGraphControl1.AxisChange();
+				zedGraphControl1.Refresh();
 				//etc...	
 				*/
 			}
@@ -472,17 +507,29 @@ namespace Sense {
 
 		private void comboBoxChart_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedChart = comboBoxChart.SelectedIndex;
-			parser.ChartRefresh();
+			if (parser.SampwinIsFullIdle) {
+				eatSampwinProtected(mySampwin);
+			} else {
+				parser.ChartRefresh();
+			}
 		}
 
 		private void comboBoxTipoSensore_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedSensorType = comboBoxTipoSensore.SelectedIndex;
-			parser.ChartRefresh();
+			if (parser.SampwinIsFullIdle) {
+				eatSampwinProtected(mySampwin);
+			} else {
+				parser.ChartRefresh();
+			}
 		}
 
 		private void comboBoxNumSensore_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedSensor = comboBoxNumSensore.SelectedIndex;
-			parser.ChartRefresh();
+			if (parser.SampwinIsFullIdle) {
+				eatSampwinProtected(mySampwin);
+			} else {
+				parser.ChartRefresh();
+			}
 		}
 
 		private void numericUpDownFinestra_ValueChanged(object sender, EventArgs e) {

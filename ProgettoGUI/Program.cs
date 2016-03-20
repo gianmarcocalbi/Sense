@@ -35,6 +35,7 @@ namespace Sense {
 		int frequence;
 		int window;
 		private bool chartRefresh;
+		private bool sampwinIsFullIdle;
 
 		public TcpListener Server {
 			get {
@@ -63,6 +64,16 @@ namespace Sense {
 
 			set {
 				port = value;
+			}
+		}
+
+		public bool SampwinIsFullIdle {
+			get {
+				return sampwinIsFullIdle;
+			}
+
+			set {
+				sampwinIsFullIdle = value;
 			}
 		}
 
@@ -101,6 +112,7 @@ namespace Sense {
 			eatSampwinProtected = eatSampFunc;
 			serverIsActive = false;
 			chartRefresh = false;
+			sampwinIsFullIdle = false;
 			setButtonServerStart(serverIsActive); //< Setta il testo sul tasto "serverStart" a START
 		}
 
@@ -178,6 +190,8 @@ namespace Sense {
 								throw new InvalidOperationException("Client connection error.\n" + ex.Message);
 							} catch (SocketException ex) {
 								throw new SocketException();
+							} finally {
+								sampwinIsFullIdle = false;
 							}
 
 							///Se supera la chiamata vuol dire che è avvenuta la connessione col Client.
@@ -352,10 +366,9 @@ namespace Sense {
 								if (package.Length == 0) {
 									///Lettura dati terminata, tutti i dati in arrivo dal Client sono stati ricevuti, parsati e inseriti nella lista sampwin.
 									printToServerConsole("Stream finished.\n");
-
+									sampwinIsFullIdle = true;
 									///Funzione che triggera la lettura della sampwin per la creazione dei grafici.
 									eatSampwinProtected(sampwin); //(!)Valutare gli errori generati da questo metodo
-
 									printToServerConsole("Creating file CSV in " + path + "...\n");
 
 									///Creazione CSV.
