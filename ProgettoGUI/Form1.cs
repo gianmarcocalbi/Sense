@@ -87,6 +87,12 @@ namespace Sense {
 		private void buttonServerStartClick(object sender, EventArgs e) {
 			if (parser.serverIsActive) {
 				///Se il server è attivo allora lo STOPpiamo
+				zedGraphControl1.GraphPane.CurveList.Clear();
+				zedGraphControl1.Invalidate();
+				zedGraphControl1.GraphPane.Title.Text = "Chart";
+				zedGraphControl1.GraphPane.XAxis.Title.Text = "x";
+				zedGraphControl1.GraphPane.YAxis.Title.Text = "y";
+				zedGraphControl1.AxisChange();
 				parser.DeactivateServer();
 			} else {
 				///Se il server è fermo allora lo STARTiamo
@@ -361,7 +367,6 @@ namespace Sense {
 
 				/*
 				zedGraphControl1.GraphPane.CurveList.Clear();
-				zedGraphControl1.AxisChange();
 				zedGraphControl1.Invalidate();
 				
 				switch (selectedChart) {
