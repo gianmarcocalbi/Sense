@@ -484,7 +484,12 @@ namespace Sense {
 						chartTitle = "Eulero Angles";
 						yAxisStr = "rad";
 						break;
-					default:
+                    case 3:
+                        myCurveList.Add(deviazioneStandard(module(sampwin), 3));
+                        chartStr.Add("Deviazione Standard");
+                        chartTitle = "Deviazione Standard";
+                        break;
+                    default:
 						break;
 				}
 				
@@ -505,8 +510,29 @@ namespace Sense {
 					//myCurveList = segmentation(myCurveList);
 				}
 				if (checkBoxNoiseCanceling.Checked) {
-					//myCurveList = checkBoxNoiseCanceling(myCurveList);
-				}
+                    List<double[]> myNewCurveList = new List<double[]>();
+                    List<string> NewchartStr = new List<string>();
+                    for (int j = 0; j < myCurveList.Count; j++)
+                    {
+                        double[] instant1 = smoothing(myCurveList[j], 3);
+                        double[] instant2 = deviazioneStandard(myCurveList[j], 3);
+                        for (int i = 0; i < myCurveList[j].Length; i++)
+                        {
+                            instant1[i] = instant1[i] + instant2[i];
+                            instant2[i] = instant1[i] - 2 * instant2[i];
+                        }
+                        myNewCurveList.Add(myCurveList[j]);
+                        myNewCurveList.Add(instant1);
+                        myNewCurveList.Add(instant2);
+                        NewchartStr.Add(chartStr[j]);
+                        NewchartStr.Add("istant1");
+                        NewchartStr.Add("istant2");
+                    }
+                    myCurveList = myNewCurveList;
+                    chartStr = NewchartStr;
+                }
+
+
 
 				foreach (double[] c in myCurveList) {
 					myCurve.Add(populate(c));
