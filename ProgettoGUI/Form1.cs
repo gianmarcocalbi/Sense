@@ -346,30 +346,24 @@ namespace Sense {
 			if (this.zedGraphControl1.InvokeRequired) {
 				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin });
 			} else {
+				if (parser.SampwinIsFullIdle) {
+					mySampwin = sampwin;
+				}
 
 				/*****************************************/
 				/*** ZEDGRAPH TEST BEGIN *****************/
 				/*****************************************/
-
-				//double[] arrayDiProva = multiToSingleArray(sampwin, 0);
-				//double[] arrayDiProva2 = smoothing(arrayDiProva, 10);
 				/*
 					sampwin:
 					lista di double[,] arr = new double[num_sensori, 13];
 				*/
 				//zoom da risistemare come opzioni nel designer o qui
 
-				if(parser.SampwinIsFullIdle) {
-					mySampwin = sampwin;
-				}
-
+				/*
 				zedGraphControl1.GraphPane.CurveList.Clear();
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Invalidate();
-
-				//double[] rI = rapportoIncrementale(sampwin, 0);
-				//double[] sampwinSingleDim = multiToSingleArray(sampwin, 0);
-				//double[] dS = deviazioneStandard(sampwinSingleDim, 3);
+				
 				switch (selectedChart) {
 					///Modulo
 					case 0:
@@ -408,54 +402,45 @@ namespace Sense {
                         break;
                     default:
 						break;
-                    
-
-				}
-
-				//LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
-				//verificare con gimmy che effettivamente la divisione con la frequenza sia la cosa migliore da fare, fare ovviamente test con valori adatti può cambiare tutto
+					}
 
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
 
+				*/
 				/*****************************************/
 				/*** ZEDGRAPH TEST END *******************/
 				/*****************************************/
 
 				//(!) Codice Zedraph Finale da implementare alle fine appunto
-				/*
+
 				zedGraphControl1.GraphPane.CurveList.Clear();
-				zedGraphControl1.AxisChange();
+				//zedGraphControl1.AxisChange();
 				zedGraphControl1.Invalidate();
 				
-				double[] myCurveList = new double[sampwin.Count];
-				PointPairList myCurve;
-				string chartStr = "";
+				List<double[]> myCurveList = new List<double[]>();
+				List<PointPairList> myCurve = new List<PointPairList>();
+				List<string> chartStr = new List<string>();
 				string xAxisStr = "time";
 				string yAxisStr = "";
 				string chartTitle = "";
-				switch (selectedChart) {
-					case 0:
-						myCurveList = module(sampwin, 1, 1, 1);
-						chartStr = "Module";
-						chartTitle = "Module";
-						break;
-					case 1:
-						myCurveList = rapportoIncrementale(sampwin);
-						chartStr = "Derivate";
-						chartTitle = "Derivate";
-						break;
-					default:
-						break;
-				}
-				switch(selectedSensorType) {
+
+				switch (selectedSensorType) {
 					case 0:
 						///acc
 						yAxisStr = "m²";
 						break;
 					case 1:
 						///gyr
-						yAxisStr = "m²";
+						yAxisStr = "y";
+						break;
+					case 2:
+						///mag
+						yAxisStr = "roba di magneti";
+						break;
+					case 3:
+						///qua
+						yAxisStr = "roba di quadernoni";
 						break;
 					default:
 						///bohh
@@ -463,9 +448,53 @@ namespace Sense {
 						break;
 				}
 
+				switch (selectedChart) {
+					case 0:
+						myCurveList.Add(module(sampwin, 1, 1, 1));
+						chartStr.Add("Module");
+						chartTitle = "Module";
+						break;
+					case 1:
+						myCurveList.Add(rapportoIncrementale(sampwin));
+						chartStr.Add("Derivate");
+						chartTitle = "Derivate";
+						break;
+					case 2:
+						int length = sampwin.Count();
+						double[,] instant = angoliDiEulero(sampwin);
+						double[] Phi = new double[length];
+						double[] Theta = new double[length];
+						double[] Psi = new double[length];
+						for (int i = 0; i < length; i++) {
+							Phi[i] = instant[0, i];
+							Theta[i] = instant[1, i];
+							Psi[i] = instant[2, i];
+						}
+						myCurveList.Add(Phi);
+						myCurveList.Add(Theta);
+						myCurveList.Add(Psi);
+						chartStr.Add("Phi");
+						chartStr.Add("Theta");
+						chartStr.Add("Psi");
+						chartTitle = "Eulero Angles";
+						yAxisStr = "rad";
+						break;
+					default:
+						break;
+				}
+				
+
 				if (checkBoxSmoothing.Checked) {
-					myCurveList = smoothing(myCurveList, 3);
-					chartStr = "Smoothed " + chartStr;
+					List<double[]> myNewCurveList = new List<double[]>();
+					foreach (double[] c in myCurveList) {
+						myNewCurveList.Add(smoothing(c, 3));
+					}
+					List<string> NewchartStr = new List<string>();
+					foreach (string s in chartStr) {
+						NewchartStr.Add(s + " smoothed");
+					}
+					myCurveList = myNewCurveList;
+					chartStr = NewchartStr;
 				}
 				if (checkBoxSegmentation.Checked) {
 					//myCurveList = segmentation(myCurveList);
@@ -473,7 +502,11 @@ namespace Sense {
 				if (checkBoxNoiseCanceling.Checked) {
 					//myCurveList = checkBoxNoiseCanceling(myCurveList);
 				}
-				myCurve = populate(myCurveList);
+
+				foreach (double[] c in myCurveList) {
+					myCurve.Add(populate(c));
+				}
+
 				if(checkBoxPlotDomain.Checked) {
 					//mostra solo ultima finestra
 					//myCurve = curveCut(myCurveList, window);
@@ -481,12 +514,19 @@ namespace Sense {
 				zedGraphControl1.GraphPane.Title.Text = chartTitle;
 				zedGraphControl1.GraphPane.XAxis.Title.Text = xAxisStr;
 				zedGraphControl1.GraphPane.YAxis.Title.Text = yAxisStr;
-				LineItem myLine = zedGraphControl1.GraphPane.AddCurve(chartStr, myCurve, Color.Blue, SymbolType.None);
-				printToServerConsoleProtected(chartStr + " chart drawn.\n");
+				Color[] colors = { Color.Blue, Color.Red, Color.Green, Color.Magenta, Color.Cyan, Color.Yellow, Color.Brown};
+				for (int i=0; i < myCurve.Count; i++) {
+					int c = i;
+					if(i >= colors.Length) {
+						c = colors.Length;
+					}
+					zedGraphControl1.GraphPane.AddCurve(chartStr[i], myCurve[i], colors[c], SymbolType.None);
+					printToServerConsoleProtected(chartStr[i] + " chart drawn.\n");
+				}
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
 				//etc...	
-				*/
+				
 			}
 		}
 
@@ -549,15 +589,27 @@ namespace Sense {
 		}
 
 		private void checkBoxSmoothing_CheckedChanged(object sender, EventArgs e) {
-
+			if (parser.SampwinIsFullIdle) {
+				eatSampwinProtected(mySampwin);
+			} else {
+				parser.ChartRefresh();
+			}
 		}
 
 		private void checkBoxSegmentation_CheckedChanged(object sender, EventArgs e) {
-
+			if (parser.SampwinIsFullIdle) {
+				eatSampwinProtected(mySampwin);
+			} else {
+				parser.ChartRefresh();
+			}
 		}
 
 		private void checkBoxNoiseCanceling_CheckedChanged(object sender, EventArgs e) {
-
+			if (parser.SampwinIsFullIdle) {
+				eatSampwinProtected(mySampwin);
+			} else {
+				parser.ChartRefresh();
+			}
 		}
 	}
 }
