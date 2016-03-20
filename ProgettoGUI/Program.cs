@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using ZedGraph;
+using System.Drawing;
 
 namespace Sense {
 	static class Program {
@@ -152,7 +154,7 @@ namespace Sense {
 		/// Setta a true chartRefresh.
 		/// Indica la necessità di riplottare la sampwin.
 		/// </summary>
-		public void	ChartRefresh() {
+		public void ChartRefresh() {
 			chartRefresh = true;
 		}
 
@@ -214,7 +216,7 @@ namespace Sense {
 							//Console.WriteLine("Reading stream.");
 
 							///Comincia la lettura del pacchetto.
-							
+
 							try {
 
 								///Lettura primo pacchetto "da scartare" perché sono solo dati di connessione.
@@ -348,7 +350,7 @@ namespace Sense {
 										///Riplotta sampwin subito.
 										eatSampwinProtected(sampwin);
 										chartRefresh = false;
-									} else if(sampwin.Count%((window * frequence)/2) == 0 && sampwin.Count != 0) {
+									} else if (sampwin.Count % ((window * frequence) / 2) == 0 && sampwin.Count != 0) {
 										///Funzione che triggera la lettura della sampwin per la creazione dei grafici.
 										//eatSampwinProtected(sampwin.GetRange(sampwin.Count - 500, 500)); //(!)Valutare gli errori generati da questo metodo
 										eatSampwinProtected(sampwin);
@@ -384,11 +386,11 @@ namespace Sense {
 								///Eccezione che si verifica in seguito ad un'interruzione precoce della comunicazione Server-Client che causa un utilizzo scorretto di array all'interno del codice.
 								///La gestiamo consideranso la comunicazione interrotta e pertanto ignoriamo e stoppiamo la comunicazione col Client. 
 							} catch (Exception ex) {
-								throw new Exception(ex.Message); //(!)codice di cui verificare il corretto funzionamento
+								throw new Exception(ex.ToString() + "\n"); //(!)codice di cui verificare il corretto funzionamento
 							} finally {
 								client.Close();
 								printToServerConsole("Client Disconnected.\n");
-							}  
+							}
 						}
 					} catch (ObjectDisposedException ex) {
 						MessageBox.Show(ex.Message);
@@ -436,7 +438,7 @@ namespace Sense {
 					csv += "\n";
 				}
 				int t = 0;
-				while(File.Exists(csvPath + "_" + t)) {
+				while (File.Exists(csvPath + "_" + t)) {
 					t++;
 				}
 				File.WriteAllText(csvPath + "_" + t, csv.ToString());
@@ -446,5 +448,111 @@ namespace Sense {
 			}
 			return true;
 		}
+	}
+
+	/*public class Chart {
+		ZedGraphControl zdc;
+		GraphPane myPane;
+		List<Curve> myCurveList;
+		public Chart(ref ZedGraphControl zdc) {
+			this.zdc = zdc;
+			myPane = zdc.GraphPane;
+			myCurveList = new List<Curve>();
+		}
+
+		public void SetXAxisTitle(string XAxisTitle) {
+			myPane.XAxis.Title.Text = XAxisTitle;
+		}
+
+		public void SetYAxisTitle(string YAxisTitle) {
+			myPane.YAxis.Title.Text = YAxisTitle;
+		}
+
+		public void SetTitle(string title) {
+			myPane.Title.Text = title;
+		}
+
+		public void addCurve(Curve curve) {
+		}
+
+		public void ClearGraphPane() {
+			myPane.CurveList.Clear();
+			zdc.Invalidate();
+		}
+	}*/
+
+	public class Curve {
+		private string label;
+		private double[] pointsValue;
+		private Color color;
+		private SymbolType symbolType;
+
+		public string Label {
+			get {
+				return label;
+			}
+
+			set {
+				label = value;
+			}
+		}
+
+		public Color Color {
+			get {
+				return color;
+			}
+
+			set {
+				color = value;
+			}
+		}
+
+		public SymbolType SymbolType {
+			get {
+				return symbolType;
+			}
+
+			set {
+				symbolType = value;
+			}
+		}
+
+		public double[] PointsValue {
+			get {
+				return pointsValue;
+			}
+
+			set {
+				pointsValue = value;
+			}
+		}
+
+		public Curve(string label, double[] pointsValue, Color color, SymbolType symbolType) {
+			this.label = label;
+			this.pointsValue = pointsValue;
+			this.color = color;
+			this.symbolType = symbolType;
+		}
+
+		public Curve(string label, double[] pointsValue, Color color) : this(label, pointsValue, color, SymbolType.None) { }
+
+		public Curve(string label, double[] pointsValue) : this(label, pointsValue, Color.Blue, SymbolType.None) { }
+
+		public Curve(double[] pointsValue) : this("", pointsValue, Color.Blue, SymbolType.None) { }
+
+		public Curve(string label, Color color, SymbolType symbolType) {
+			this.label = label;
+			this.pointsValue = null;
+			this.color = color;
+			this.symbolType = symbolType;
+		}
+
+		public Curve(string label, Color color) : this(label, null, color, SymbolType.None) { }
+
+		public Curve(string label) : this(label, null, Color.Blue, SymbolType.None) { }
+
+		public Curve() : this("", null, Color.Blue, SymbolType.None) { }
+		
+		public Curve(Curve other) : this(other.Label, other.PointsValue, other.Color, other.SymbolType) { }
 	}
 }

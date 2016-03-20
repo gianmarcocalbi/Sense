@@ -40,6 +40,8 @@ namespace Sense {
 		public Form1() {
 			///Inizializza i componenti grafici
 			InitializeComponent();
+			///
+			myPane = zedGraphControl1.GraphPane;
 			///Finestra
 			window = (int)numericUpDownFinestra.Value;
 			///Frequenza
@@ -225,12 +227,12 @@ namespace Sense {
 		public double[,] angoliDiEulero(List<double[,]> sampwin) //QUINTA OPERAZIONE: ANGOLI DI EULERO
 		{
 			double q0, q1, q2, q3;
-            int dim = sampwin.Count();
-            double[,] arrayAngoli = new double[3, dim];
+			int dim = sampwin.Count();
+			double[,] arrayAngoli = new double[3, dim];
 			for (int i = 0; i < dim; ++i) {
-                //estrazione della quadrupla del campione iesimo
-                double[,] instant = sampwin[i];
-                q0 = instant[selectedSensor, 9];
+				//estrazione della quadrupla del campione iesimo
+				double[,] instant = sampwin[i];
+				q0 = instant[selectedSensor, 9];
 				q1 = instant[selectedSensor, 10];
 				q2 = instant[selectedSensor, 11];
 				q3 = instant[selectedSensor, 12];
@@ -417,8 +419,9 @@ namespace Sense {
 				/*** ZEDGRAPH TEST END *******************/
 				/*****************************************/
 
+				/*
 				//(!) Codice Zedraph Finale da implementare alle fine appunto
-
+				
 				zedGraphControl1.GraphPane.CurveList.Clear();
 				//zedGraphControl1.AxisChange();
 				zedGraphControl1.Invalidate();
@@ -553,7 +556,108 @@ namespace Sense {
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
 				//etc...	
-				
+				*/
+
+				List<Curve> myCurveList = new List<Curve>();
+				myPane.CurveList.Clear();
+				zedGraphControl1.Invalidate();
+				myPane.Title.Text = "Chart";
+				myPane.XAxis.Title.Text = "time (seconds)";
+
+				switch (selectedSensorType) {
+					case 0:
+						///acc
+						myPane.YAxis.Title.Text = "m²";
+						break;
+					case 1:
+						///gyr
+						myPane.YAxis.Title.Text = "y";
+						break;
+					case 2:
+						///mag
+						myPane.YAxis.Title.Text = "Tesla (?)";
+						break;
+					case 3:
+						///qua
+						myPane.YAxis.Title.Text = "roba di quaternioni";
+						break;
+					default:
+						///bohh
+						myPane.YAxis.Title.Text = "none";
+						break;
+				}
+
+				switch (selectedChart) {
+					case 0:
+						myCurveList.Add(new Curve("Module", module(sampwin), Color.Blue));
+						myPane.Title.Text = "Module";
+						break;
+					case 1:
+						myCurveList.Add(new Curve("Derivate", rapportoIncrementale(sampwin), Color.Blue));
+						myPane.Title.Text = "Derivate";
+						break;
+					case 2:
+						int length = sampwin.Count();
+						double[,] instant = angoliDiEulero(sampwin);
+						double[] Phi = new double[length];
+						double[] Theta = new double[length];
+						double[] Psi = new double[length];
+						for (int i = 0; i < length; i++) {
+							Phi[i] = instant[0, i];
+							Theta[i] = instant[1, i];
+							Psi[i] = instant[2, i];
+						}
+						myCurveList.Add(new Curve("Phi", Phi, Color.Cyan));
+						myCurveList.Add(new Curve("Theta", Theta, Color.Magenta));
+						myCurveList.Add(new Curve("Psi", Psi, Color.Yellow));
+						myPane.YAxis.Title.Text = "rad";
+						break;
+					case 3:
+						myCurveList.Add(new Curve("Standard Deviation", deviazioneStandard(module(sampwin), 3), Color.Blue));
+						myPane.Title.Text = "Standard Deviation";
+						break;
+					default:
+						break;
+				}
+
+
+				if (checkBoxSmoothing.Checked) {
+					foreach (Curve c in myCurveList) {
+						c.PointsValue = smoothing(c.PointsValue, 3);
+						c.Label += " smoothed";
+					}
+				}
+				if (checkBoxSegmentation.Checked) {
+					//myCurveList = segmentation(myCurveList);
+				}
+				if (checkBoxNoiseCanceling.Checked) {
+					List<Curve> myNewCurveList = new List<Curve>();
+					for (int i = 0; i < myCurveList.Count; i++) {
+						double[] instant1 = myCurveList[i].PointsValue;
+						double[] instant2 = deviazioneStandard(myCurveList[i].PointsValue, 3);
+						for (int j = 0; j < myCurveList[i].PointsValue.Length; j++) {
+							instant1[j] = myCurveList[i].PointsValue[j] + instant2[j];
+							instant2[j] = instant1[j] - 2 * instant2[j];
+						}
+						myNewCurveList.Add(new Curve("instant1", instant1, Color.Magenta));
+						myNewCurveList.Add(new Curve("instant2", instant2, Color.Green));
+						myNewCurveList.Add(new Curve(myCurveList[i].Label, myCurveList[i].PointsValue, Color.Cyan));
+					}
+					myCurveList = myNewCurveList;
+				}
+
+				if (checkBoxPlotDomain.Checked) {
+					//mostra solo ultima finestra
+					//myCurve = curveCut(myCurveList, window);
+				}
+
+				foreach (Curve c in myCurveList) {
+					myPane.AddCurve(c.Label, populate(c.PointsValue), c.Color, c.SymbolType);
+					printToServerConsoleProtected(c.Label + " chart drawn.\n");
+				}
+
+				zedGraphControl1.AxisChange();
+				zedGraphControl1.Refresh();
 			}
 		}
 
@@ -613,7 +717,7 @@ namespace Sense {
 
 		private void buttonClearConsole_Click(object sender, EventArgs e) {
 			richTextConsole.Text = "";
-			if(parser.serverIsActive) {
+			if (parser.serverIsActive) {
 				richTextConsole.Text = "Server is Active.\n";
 			}
 		}
