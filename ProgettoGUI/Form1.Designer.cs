@@ -24,6 +24,7 @@
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.buttonClearConsole = new System.Windows.Forms.Button();
 			this.numericUpDownFinestra = new System.Windows.Forms.NumericUpDown();
@@ -48,9 +49,11 @@
 			this.textBoxPort = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.richTextConsole = new System.Windows.Forms.RichTextBox();
-			this.label10 = new System.Windows.Forms.Label();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.checkBoxNoiseCanceling = new System.Windows.Forms.CheckBox();
+			this.checkBoxSegmentation = new System.Windows.Forms.CheckBox();
+			this.checkBoxSmoothing = new System.Windows.Forms.CheckBox();
 			this.comboBoxNumSensore = new System.Windows.Forms.ComboBox();
 			this.comboBoxTipoSensore = new System.Windows.Forms.ComboBox();
 			this.label13 = new System.Windows.Forms.Label();
@@ -60,6 +63,7 @@
 			this.comboBoxChart = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+			this.checkBoxPlotDomain = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -104,7 +108,6 @@
 			// 
 			// splitContainer1.Panel2
 			// 
-			this.splitContainer1.Panel2.Controls.Add(this.label10);
 			this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
 			this.splitContainer1.Size = new System.Drawing.Size(1006, 564);
 			this.splitContainer1.SplitterDistance = 263;
@@ -187,9 +190,9 @@
 			this.label9.AutoSize = true;
 			this.label9.Location = new System.Drawing.Point(122, 137);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(44, 13);
+			this.label9.Size = new System.Drawing.Size(47, 13);
 			this.label9.TabIndex = 18;
-			this.label9.Text = "secondi";
+			this.label9.Text = "seconds";
 			// 
 			// label8
 			// 
@@ -341,29 +344,22 @@
 			this.richTextConsole.TabIndex = 1;
 			this.richTextConsole.Text = "";
 			// 
-			// label10
-			// 
-			this.label10.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label10.Location = new System.Drawing.Point(7, 5);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(724, 32);
-			this.label10.TabIndex = 14;
-			this.label10.Text = "Chart";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			// 
 			// tabControl1
 			// 
 			this.tabControl1.Controls.Add(this.tabPage1);
 			this.tabControl1.Controls.Add(this.tabPage2);
-			this.tabControl1.Location = new System.Drawing.Point(3, 44);
+			this.tabControl1.Location = new System.Drawing.Point(3, 3);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(732, 517);
+			this.tabControl1.Size = new System.Drawing.Size(732, 558);
 			this.tabControl1.TabIndex = 0;
 			// 
 			// tabPage1
 			// 
+			this.tabPage1.Controls.Add(this.checkBoxPlotDomain);
+			this.tabPage1.Controls.Add(this.checkBoxNoiseCanceling);
+			this.tabPage1.Controls.Add(this.checkBoxSegmentation);
+			this.tabPage1.Controls.Add(this.checkBoxSmoothing);
 			this.tabPage1.Controls.Add(this.comboBoxNumSensore);
 			this.tabPage1.Controls.Add(this.comboBoxTipoSensore);
 			this.tabPage1.Controls.Add(this.label13);
@@ -374,10 +370,43 @@
 			this.tabPage1.Location = new System.Drawing.Point(4, 22);
 			this.tabPage1.Name = "tabPage1";
 			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(724, 491);
+			this.tabPage1.Size = new System.Drawing.Size(724, 532);
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "Chart";
 			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// checkBoxNoiseCanceling
+			// 
+			this.checkBoxNoiseCanceling.AutoSize = true;
+			this.checkBoxNoiseCanceling.Location = new System.Drawing.Point(557, 509);
+			this.checkBoxNoiseCanceling.Name = "checkBoxNoiseCanceling";
+			this.checkBoxNoiseCanceling.Size = new System.Drawing.Size(103, 17);
+			this.checkBoxNoiseCanceling.TabIndex = 9;
+			this.checkBoxNoiseCanceling.Text = "Noise Canceling";
+			this.checkBoxNoiseCanceling.UseVisualStyleBackColor = true;
+			this.checkBoxNoiseCanceling.CheckedChanged += new System.EventHandler(this.checkBoxNoiseCanceling_CheckedChanged);
+			// 
+			// checkBoxSegmentation
+			// 
+			this.checkBoxSegmentation.AutoSize = true;
+			this.checkBoxSegmentation.Location = new System.Drawing.Point(398, 509);
+			this.checkBoxSegmentation.Name = "checkBoxSegmentation";
+			this.checkBoxSegmentation.Size = new System.Drawing.Size(91, 17);
+			this.checkBoxSegmentation.TabIndex = 8;
+			this.checkBoxSegmentation.Text = "Segmentation";
+			this.checkBoxSegmentation.UseVisualStyleBackColor = true;
+			this.checkBoxSegmentation.CheckedChanged += new System.EventHandler(this.checkBoxSegmentation_CheckedChanged);
+			// 
+			// checkBoxSmoothing
+			// 
+			this.checkBoxSmoothing.AutoSize = true;
+			this.checkBoxSmoothing.Location = new System.Drawing.Point(250, 509);
+			this.checkBoxSmoothing.Name = "checkBoxSmoothing";
+			this.checkBoxSmoothing.Size = new System.Drawing.Size(76, 17);
+			this.checkBoxSmoothing.TabIndex = 7;
+			this.checkBoxSmoothing.Text = "Smoothing";
+			this.checkBoxSmoothing.UseVisualStyleBackColor = true;
+			this.checkBoxSmoothing.CheckedChanged += new System.EventHandler(this.checkBoxSmoothing_CheckedChanged);
 			// 
 			// comboBoxNumSensore
 			// 
@@ -389,9 +418,9 @@
             "3 (Polso Sx)",
             "4 (Caviglia Dx)",
             "5 (Caviglia Sx)"});
-			this.comboBoxNumSensore.Location = new System.Drawing.Point(463, 11);
+			this.comboBoxNumSensore.Location = new System.Drawing.Point(558, 11);
 			this.comboBoxNumSensore.Name = "comboBoxNumSensore";
-			this.comboBoxNumSensore.Size = new System.Drawing.Size(93, 21);
+			this.comboBoxNumSensore.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxNumSensore.TabIndex = 6;
 			this.comboBoxNumSensore.SelectedIndexChanged += new System.EventHandler(this.comboBoxNumSensore_SelectedIndexChanged);
 			// 
@@ -404,16 +433,16 @@
             "Gyr",
             "Mag",
             "Qua"});
-			this.comboBoxTipoSensore.Location = new System.Drawing.Point(286, 11);
+			this.comboBoxTipoSensore.Location = new System.Drawing.Point(305, 11);
 			this.comboBoxTipoSensore.Name = "comboBoxTipoSensore";
-			this.comboBoxTipoSensore.Size = new System.Drawing.Size(48, 21);
+			this.comboBoxTipoSensore.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxTipoSensore.TabIndex = 5;
 			this.comboBoxTipoSensore.SelectedIndexChanged += new System.EventHandler(this.comboBoxTipoSensore_SelectedIndexChanged);
 			// 
 			// label13
 			// 
 			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(377, 14);
+			this.label13.Location = new System.Drawing.Point(472, 14);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(80, 13);
 			this.label13.TabIndex = 4;
@@ -422,7 +451,7 @@
 			// label12
 			// 
 			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(213, 14);
+			this.label12.Location = new System.Drawing.Point(232, 14);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(67, 13);
 			this.label12.TabIndex = 3;
@@ -430,7 +459,7 @@
 			// 
 			// zedGraphControl1
 			// 
-			this.zedGraphControl1.Location = new System.Drawing.Point(6, 40);
+			this.zedGraphControl1.Location = new System.Drawing.Point(6, 38);
 			this.zedGraphControl1.Name = "zedGraphControl1";
 			this.zedGraphControl1.ScrollGrace = 0D;
 			this.zedGraphControl1.ScrollMaxX = 0D;
@@ -439,13 +468,13 @@
 			this.zedGraphControl1.ScrollMinX = 0D;
 			this.zedGraphControl1.ScrollMinY = 0D;
 			this.zedGraphControl1.ScrollMinY2 = 0D;
-			this.zedGraphControl1.Size = new System.Drawing.Size(712, 445);
+			this.zedGraphControl1.Size = new System.Drawing.Size(712, 465);
 			this.zedGraphControl1.TabIndex = 2;
 			// 
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(20, 14);
+			this.label11.Location = new System.Drawing.Point(35, 14);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(32, 13);
 			this.label11.TabIndex = 1;
@@ -458,7 +487,7 @@
 			this.comboBoxChart.Items.AddRange(new object[] {
             "Modulo",
             "Deviazione St"});
-			this.comboBoxChart.Location = new System.Drawing.Point(58, 11);
+			this.comboBoxChart.Location = new System.Drawing.Point(73, 11);
 			this.comboBoxChart.Name = "comboBoxChart";
 			this.comboBoxChart.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxChart.TabIndex = 0;
@@ -469,10 +498,20 @@
 			this.tabPage2.Location = new System.Drawing.Point(4, 22);
 			this.tabPage2.Name = "tabPage2";
 			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(724, 491);
+			this.tabPage2.Size = new System.Drawing.Size(724, 532);
 			this.tabPage2.TabIndex = 1;
-			this.tabPage2.Text = "tabPage2";
+			this.tabPage2.Text = "Help";
 			this.tabPage2.UseVisualStyleBackColor = true;
+			// 
+			// checkBoxPlotDomain
+			// 
+			this.checkBoxPlotDomain.AutoSize = true;
+			this.checkBoxPlotDomain.Location = new System.Drawing.Point(62, 509);
+			this.checkBoxPlotDomain.Name = "checkBoxPlotDomain";
+			this.checkBoxPlotDomain.Size = new System.Drawing.Size(124, 17);
+			this.checkBoxPlotDomain.TabIndex = 10;
+			this.checkBoxPlotDomain.Text = "Plot only last window";
+			this.checkBoxPlotDomain.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
@@ -481,6 +520,7 @@
 			this.ClientSize = new System.Drawing.Size(1006, 564);
 			this.Controls.Add(this.splitContainer1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.Name = "Form1";
 			this.Text = "Sense";
@@ -525,7 +565,6 @@
 		private System.Windows.Forms.TabControl tabControl1;
 		private System.Windows.Forms.TabPage tabPage1;
 		private System.Windows.Forms.TabPage tabPage2;
-		private System.Windows.Forms.Label label10;
 		private ZedGraph.ZedGraphControl zedGraphControl1;
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.ComboBox comboBoxChart;
@@ -538,6 +577,10 @@
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
 		private System.Windows.Forms.NumericUpDown numericUpDownFinestra;
 		private System.Windows.Forms.Button buttonClearConsole;
+		private System.Windows.Forms.CheckBox checkBoxNoiseCanceling;
+		private System.Windows.Forms.CheckBox checkBoxSegmentation;
+		private System.Windows.Forms.CheckBox checkBoxSmoothing;
+		private System.Windows.Forms.CheckBox checkBoxPlotDomain;
 	}
 }
 

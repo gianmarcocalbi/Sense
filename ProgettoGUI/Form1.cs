@@ -187,17 +187,17 @@ namespace Sense {
 		/// <returns>Array di valori della Derivata.</returns>
 		public double[] rapportoIncrementale(List<double[,]> sampwin)//TERZA OPERAZIONE: DERIVATA
 		{
-            int dim = sampwin.Count();
-            double[] rapportoIncrementale = new double[dim];
+			int dim = sampwin.Count();
+			double[] rapportoIncrementale = new double[dim];
 			for (int i = 0; i < dim - 1; i++) //ci vorra di sicuro dim - 1
 			{
-                double[,] instant1 = sampwin[i];
-                double[,] instant2 = sampwin[i + 1];
-                rapportoIncrementale[i] = (instant1[selectedSensor, selectedSensorType] - instant2[selectedSensor, selectedSensorType]) / ((double)1 / frequence);
+				double[,] instant1 = sampwin[i];
+				double[,] instant2 = sampwin[i + 1];
+				rapportoIncrementale[i] = (instant1[selectedSensor, selectedSensorType] - instant2[selectedSensor, selectedSensorType]) / ((double)1 / frequence);
 			}
 			return rapportoIncrementale;
 		}
-				
+
 		public double[] deviazioneStandard(double[] popolazione, int range)//QUARTA OPERAZIONE: DEVIAZIONE STANDARD
 		{
 			double[] smooth = smoothing(popolazione, range);
@@ -347,6 +347,11 @@ namespace Sense {
 			if (this.zedGraphControl1.InvokeRequired) {
 				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin });
 			} else {
+
+				/*****************************************/
+				/*** ZEDGRAPH TEST BEGIN *****************/
+				/*****************************************/
+
 				//double[] arrayDiProva = multiToSingleArray(sampwin, 0);
 				//double[] arrayDiProva2 = smoothing(arrayDiProva, 10);
 				/*
@@ -375,19 +380,58 @@ namespace Sense {
 						break;
 					///Derivata
 					case 1:
-                        LineItem cicciaConLaDerivata = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(smoothing(rapportoIncrementale(sampwin), 3)), Color.Cyan, SymbolType.None) ;
-                        LineItem cicciaConLaDerivata2 = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(rapportoIncrementale(sampwin)), Color.Magenta, SymbolType.None);
+						LineItem cicciaConLaDerivata = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(smoothing(rapportoIncrementale(sampwin), 3)), Color.Cyan, SymbolType.None);
+						LineItem cicciaConLaDerivata2 = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(rapportoIncrementale(sampwin)), Color.Magenta, SymbolType.None);
 						printToServerConsoleProtected("Derivate chart drawn.\n");
 						break;
 					default:
 						break;
 				}
-				
+
 				//LineItem dSLine = zedGraphControl1.GraphPane.AddCurve("DS", populate(dS), Color.DarkCyan, SymbolType.None);
 				//verificare con gimmy che effettivamente la divisione con la frequenza sia la cosa migliore da fare, fare ovviamente test con valori adatti può cambiare tutto
 
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
+
+				/*****************************************/
+				/*** ZEDGRAPH TEST END *******************/
+				/*****************************************/
+
+				//(!) Codice Zedraph Finale da implementare alle fine appunto
+				/*
+				double[] myCurveList = new double[sampwin.Count];
+				PointPairList myCurve;
+				string chartStr = "";
+				switch (selectedChart) {
+					case 0:
+						myCurveList = module(sampwin, 1, 1, 1);
+						chartStr = "Module";
+						break;
+					case 1:
+						myCurveList = rapportoIncrementale(sampwin);
+						break;
+					default:
+						break;
+				}
+				if (checkBoxSmoothing.Checked) {
+					myCurveList = smoothing(myCurveList, 3);
+					chartStr += " smoothing";
+				}
+				if (checkBoxSegmentation.Checked) {
+					//myCurveList = segmentation(myCurveList);
+				}
+				if (checkBoxNoiseCanceling.Checked) {
+					//myCurveList = checkBoxNoiseCanceling(myCurveList);
+				}
+				myCurve = populate(myCurveList);
+				if(checkBoxPlotDomain.Checked) {
+					//mostra solo ultima finestra
+					//myCurve = curveCut(myCurveList, window);
+				}
+				LineItem rILine = zedGraphControl1.GraphPane.AddCurve(chartStr, myCurve, Color.Cyan, SymbolType.None);
+				//etc...	
+				*/
 			}
 		}
 
@@ -435,6 +479,18 @@ namespace Sense {
 
 		private void buttonClearConsole_Click(object sender, EventArgs e) {
 			richTextConsole.Text = "";
+		}
+
+		private void checkBoxSmoothing_CheckedChanged(object sender, EventArgs e) {
+
+		}
+
+		private void checkBoxSegmentation_CheckedChanged(object sender, EventArgs e) {
+
+		}
+
+		private void checkBoxNoiseCanceling_CheckedChanged(object sender, EventArgs e) {
+
 		}
 	}
 }
