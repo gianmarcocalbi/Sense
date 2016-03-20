@@ -211,30 +211,28 @@ namespace Sense {
 					dx = size - i - 1;
 				finestra = dx + sx + 1;
 				deviazioneStandard[i] = Math.Sqrt(Math.Pow((popolazione[i] - smooth[i]), 2) / (finestra));
-				finestra = 0;
-				dx = 0;
-				sx = 0;
 			}
 			return deviazioneStandard;
 		}
 
-		public double[,] angoliDiEulero(double[,] sampwin) //QUINTA OPERAZIONE: ANGOLI DI EULERO
+		public double[,] angoliDiEulero(List<double[,]> sampwin) //QUINTA OPERAZIONE: ANGOLI DI EULERO
 		{
 			double q0, q1, q2, q3;
-			int dim = sampwin.GetLength(1);
-			double[,] arrayAngoli = new double[3, dim];
+            int dim = sampwin.Count();
+            double[,] arrayAngoli = new double[3, dim];
 			for (int i = 0; i < dim; ++i) {
-				//estrazione della quadrupla del campione iesimo
-				q0 = sampwin[9, i];
-				q1 = sampwin[10, i];
-				q2 = sampwin[11, i];
-				q3 = sampwin[12, i];
+                //estrazione della quadrupla del campione iesimo
+                double[,] instant = sampwin[i];
+                q0 = instant[selectedSensor, 9];
+				q1 = instant[selectedSensor, 10];
+				q2 = instant[selectedSensor, 11];
+				q3 = instant[selectedSensor, 12];
 				//roll/phi
-				arrayAngoli[0, i] = Math.Atan((2 * q2 * q3 + 2 * q0 * q1) / (2 * Math.Pow(q0, 2) * Math.Pow(q3, 2) - 1));
+				arrayAngoli[0, i] = Math.Atan((2 * q2 * q3 + 2 * q0 * q1) / (2 * Math.Pow(q0, 2) + 2 * Math.Pow(q3, 2) - 1));
 				//pitch/theta
 				arrayAngoli[1, i] = -Math.Asin(2 * q1 * q3 - 2 * q0 * q2);
 				//yaw/psi
-				arrayAngoli[2, i] = Math.Atan((2 * q1 * q2 + 2 * q0 * q3) / (2 * Math.Pow(q0, 2) * Math.Pow(q1, 2) - 1));
+				arrayAngoli[2, i] = Math.Atan((2 * q1 * q2 + 2 * q0 * q3) / (2 * Math.Pow(q0, 2) + 2 * Math.Pow(q1, 2) - 1));
 			}
 			return arrayAngoli;
 		}
