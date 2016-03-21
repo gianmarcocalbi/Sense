@@ -25,14 +25,6 @@ namespace Sense {
 		int selectedSensorType;
 		string csvPath;
 		List<double[,]> mySampwin;
-		//bool isAngoliDiEuleroPressed = false;
-		//bool isRollPressed = false;
-		//bool isPitchPressed = false;
-		//bool isYawPressed = false;
-		//bool isSmoothPressed = false;
-		//double[,] sampwin;
-		//LineItem rollLine;
-		//LineItem rollSmooth;
 
 		/// <summary>
 		/// Costruttore Primario
@@ -117,7 +109,7 @@ namespace Sense {
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void Form1_Load(object sender, EventArgs e) {
+		private void Form1_Load(object sender, EventArgs e) {	//(!) Valutare l'utilità di questo metodo
 			//SAMPWIN ARRAY TRIDIMENSIONALE, SCRITTO CHIARAMENTE NELLA CONSEGNA, LA POSSIAMO SCRIVERE COME double[, ,] ANZICHE double[][][] SCRITTURA VAGAMENTE PIU BARBARICA
 			//SI FA RIFERIMENTO A DUE SAMPWIN UNA CON LE INIZIALI MAIUSCOLE TRIDIMENSIONALE ED UNA TUTTA IN MINUSCOLO CON 
 
@@ -127,6 +119,7 @@ namespace Sense {
 			this.CenterToScreen();
 		}
 
+	//Plotting Functions BEGIN
 		/// <summary>
 		/// Overload Modulo che considera tutte le tre dimensioni x,y,z.
 		/// </summary>
@@ -144,7 +137,7 @@ namespace Sense {
 		/// <param name="y">Coefficiente per il quale moltiplicare la componente Y.</param>
 		/// <param name="z">Coefficiente per il quale moltiplicare la componente Z.</param>
 		/// <returns>Array di valori modulo.</returns>
-		public double[] module(List<double[,]> sampwin, int x, int y, int z) //PRIMA OPERAZIONE: MODULO
+		public double[] module(List<double[,]> sampwin, int x, int y, int z)	//PRIMA OPERAZIONE: MODULO
 		{
 			int dim = sampwin.Count();
 			double[] arrayModulo = new double[dim];
@@ -162,7 +155,7 @@ namespace Sense {
 		/// <param name="popolazione">Array di valori da Smoothare.</param>
 		/// <param name="range">Range di Smoothing.</param>
 		/// <returns>Array di valori Smoothati.</returns>
-		public double[] smoothing(double[] popolazione, int range)//SECONDA OPERAZIONE: SMOOTHING
+		public double[] smoothing(double[] popolazione, int range)				//SECONDA OPERAZIONE: SMOOTHING
 		{
 			int size = popolazione.GetLength(0);
 			double[] smooth = new double[size];
@@ -190,11 +183,11 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Opreazione di Derivata.
+		/// Operazione di Derivata.
 		/// </summary>
 		/// <param name="sampwin">Sampwin.</param>
 		/// <returns>Array di valori della Derivata.</returns>
-		public double[] rapportoIncrementale(List<double[,]> sampwin)//TERZA OPERAZIONE: DERIVATA
+		public double[] rapportoIncrementale(List<double[,]> sampwin)			//TERZA OPERAZIONE: DERIVATA
 		{
 			int dim = sampwin.Count();
 			double[] rapportoIncrementale = new double[dim];
@@ -207,7 +200,13 @@ namespace Sense {
 			return rapportoIncrementale;
 		}
 
-		public double[] deviazioneStandard(double[] popolazione, int range)//QUARTA OPERAZIONE: DEVIAZIONE STANDARD
+		/// <summary>
+		/// Operazione per calcolare la Deviazione Standard.
+		/// </summary>
+		/// <param name="popolazione">Popolazione sulla quale calcolare la D.S.</param>
+		/// <param name="range">Range entro il quale calcolare la media da usare per il calcolo della D.S.</param>
+		/// <returns>Array di valori della D.S.</returns>
+		public double[] deviazioneStandard(double[] popolazione, int range)		//QUARTA OPERAZIONE: DEVIAZIONE STANDARD
 		{
 			double[] smooth = smoothing(popolazione, range);
 			int size = popolazione.GetLength(0);
@@ -224,7 +223,12 @@ namespace Sense {
 			return deviazioneStandard;
 		}
 
-		public double[,] angoliDiEulero(List<double[,]> sampwin) //QUINTA OPERAZIONE: ANGOLI DI EULERO
+		/// <summary>
+		/// Operazione per il calcolo degli Angoli di Eulero.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
+		public double[,] angoliDiEulero(List<double[,]> sampwin)				//QUINTA OPERAZIONE: ANGOLI DI EULERO
 		{
 			double q0, q1, q2, q3;
 			int dim = sampwin.Count();
@@ -246,6 +250,40 @@ namespace Sense {
 			return arrayAngoli;
 		}
 
+		/// <summary>
+		/// Overload di populate() che considera tutti i valori dell'array in input.
+		/// </summary>
+		/// <param name="array">Array contenente i valori di f(x).</param>
+		/// <returns>Lista di punti (x,y).</returns>
+		private PointPairList populate(double[] array)
+		{
+			return populate(array, 0, array.Length);
+		}
+
+		/// <summary>
+		/// Funzione per creare una lista di punti (x,y=f(x)) da un array di valori double.
+		/// Ogni cella di double[] contiene un valore di f(x) dove x (tempo) è calcolata sulla base della frequenza di campionamento.
+		/// </summary>
+		/// <param name="array">Array contenente i valori di f(x).</param>
+		/// <param name="begin">Indice del primo elemento del dominio di f(x).</param>
+		/// <param name="range">Range di elementi dell'intervallo che comporrà il dominio di f(x).</param>
+		/// <returns>Lista di punti (x,y) da plottare.</returns>
+		private PointPairList populate(double[] array, int begin, int range) {
+			int length = array.Length;
+			if (begin < 0) {
+				begin = 0;
+			}
+			if (begin + range < length) {
+				length = begin + range;
+			}
+			PointPairList list = new PointPairList();
+			for (int i = begin; i < length; ++i)
+				list.Add((double)i / frequence, array[i]);
+			return list;
+		}
+	//Plotting Functions END
+
+	//Old Functions BEGIN
 		/*private void createGraph(ZedGraph.ZedGraphControl zedGraphControl, int drawX, int drawY, int sizeX, int sizeY, string titolo, string x, string y) {
 			zedGraphControl.Location = new Point(drawX, drawY);
 			zedGraphControl.Size = new Size(sizeX, sizeY);
@@ -254,25 +292,6 @@ namespace Sense {
 			myPane.XAxis.Title.Text = x;
 			myPane.YAxis.Title.Text = y;
 		}*/
-
-		private PointPairList populate(double[] array) //selesnia - vecchio arrayToSeries
-		{
-			return populate(array, 0, array.Length);
-		}
-
-		private PointPairList populate(double[] array, int begin, int range) {
-			int length = array.Length;
-			if (begin < 0) {
-				begin = 0;
-			}
-				if (begin+range < length) {
-				length = begin + range;
-			}
-			PointPairList list = new PointPairList();
-			for (int i = begin; i < length; ++i)
-				list.Add((double)i / frequence, array[i]);
-			return list;
-		}
 
 		/*public double[,] generateSampwin() //generazione simulata di un sampwin semplificato
 		{
@@ -304,7 +323,9 @@ namespace Sense {
 			}
 			return base.ProcessDialogKey(keyData);
 		}*/
+	//Old Functions END
 
+	//Delegate functions BEGIN
 		/// <summary>
 		/// Delegato per scrivere sulla console del Server.
 		/// </summary>
@@ -366,7 +387,7 @@ namespace Sense {
 				if (parser.SampwinIsFullIdle) {
 					mySampwin = sampwin;
 				}
-				
+
 				List<Curve> myCurveList = new List<Curve>();
 				List<LineItem> myLineList = new List<LineItem>();
 				myPane.CurveList.Clear();
@@ -459,7 +480,7 @@ namespace Sense {
 				foreach (Curve c in myCurveList) {
 					PointPairList ppl = new PointPairList();
 					if (checkBoxPlotDomain.Checked) {
-						ppl = populate(c.PointsValue, c.PointsValue.Length-window*frequence, c.PointsValue.Length);
+						ppl = populate(c.PointsValue, c.PointsValue.Length - window * frequence, c.PointsValue.Length);
 					} else {
 						ppl = populate(c.PointsValue);
 					}
@@ -467,16 +488,17 @@ namespace Sense {
 					printToServerConsoleProtected(c.Label + " chart drawn.\n");
 				}
 
-				
+
 
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
 			}
 		}
+	//Delegate functions END
 
-		/****************************************************/
-		/*** Eventi triggherati da input Utente sulla GUI ***/
-		/****************************************************/
+	/****************************************************/
+	/*** Eventi triggherati da input Utente sulla GUI ***/
+	/****************************************************/
 		private void comboBoxFrequenza_SelectedIndexChanged(object sender, EventArgs e) {
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
 		}
