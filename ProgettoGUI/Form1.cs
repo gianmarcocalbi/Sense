@@ -246,14 +246,14 @@ namespace Sense {
 			return arrayAngoli;
 		}
 
-		private void createGraph(ZedGraph.ZedGraphControl zedGraphControl, int drawX, int drawY, int sizeX, int sizeY, string titolo, string x, string y) {
+		/*private void createGraph(ZedGraph.ZedGraphControl zedGraphControl, int drawX, int drawY, int sizeX, int sizeY, string titolo, string x, string y) {
 			zedGraphControl.Location = new Point(drawX, drawY);
 			zedGraphControl.Size = new Size(sizeX, sizeY);
 			myPane = zedGraphControl.GraphPane;
 			myPane.Title.Text = titolo;
 			myPane.XAxis.Title.Text = x;
 			myPane.YAxis.Title.Text = y;
-		}
+		}*/
 
 		private PointPairList populate(double[] array) //selesnia - vecchio arrayToSeries
 		{
@@ -264,7 +264,7 @@ namespace Sense {
 			return list;
 		}
 
-		public double[,] generateSampwin() //generazione simulata di un sampwin semplificato
+		/*public double[,] generateSampwin() //generazione simulata di un sampwin semplificato
 		{
 			int firstDimension = 13;
 			double[,] sampwin = new double[firstDimension, frequence * window];
@@ -274,9 +274,9 @@ namespace Sense {
 				for (int j = 1; j < frequence * window; ++j)
 					sampwin[i, j] = sampwin[i, j - 1] + (random.Next(-100, 100));
 			return sampwin;
-		}
+		}*/
 
-		public double[] multiToSingleArray(double[,] multiArray, int firstDimension) {
+		/*public double[] multiToSingleArray(double[,] multiArray, int firstDimension) {
 			//if 0 <= firstDimension <= 2 stiamo estraendo una delle coordinate per la simulazione di un primo generico sensore
 			//if 9 <= firstDimension <= 12 stiamo estraendo uno dei quaternioni
 			int dim = multiArray.GetLength(1);
@@ -284,17 +284,16 @@ namespace Sense {
 			for (int i = 0; i < dim; ++i)
 				singleArray[i] = multiArray[firstDimension, i];
 			return singleArray;
-		}
+		}*/
 
-		protected override bool ProcessDialogKey(Keys keyData) //escape 
+		/*protected override bool ProcessDialogKey(Keys keyData) //escape 
 		{
 			if (Form.ModifierKeys == Keys.None && keyData == Keys.Escape) {
 				this.Close();
 				return true;
 			}
 			return base.ProcessDialogKey(keyData);
-
-		}
+		}*/
 
 		/// <summary>
 		/// Delegato per scrivere sulla console del Server.
@@ -357,207 +356,7 @@ namespace Sense {
 				if (parser.SampwinIsFullIdle) {
 					mySampwin = sampwin;
 				}
-
-				/*****************************************/
-				/*** ZEDGRAPH TEST BEGIN *****************/
-				/*****************************************/
-				/*
-					sampwin:
-					lista di double[,] arr = new double[num_sensori, 13];
-				*/
-				//zoom da risistemare come opzioni nel designer o qui
-
-				/*
-				zedGraphControl1.GraphPane.CurveList.Clear();
-				zedGraphControl1.Invalidate();
 				
-				switch (selectedChart) {
-					///Modulo
-					case 0:
-						LineItem rILine = zedGraphControl1.GraphPane.AddCurve("Module \\w smoothing", populate(smoothing(module(sampwin, 1, 1, 1), 3)), Color.Cyan, SymbolType.None);
-						LineItem rILine2 = zedGraphControl1.GraphPane.AddCurve("Module", populate(module(sampwin, 1, 1, 1)), Color.Magenta, SymbolType.None);
-						LineItem rILineX = zedGraphControl1.GraphPane.AddCurve("Acc X", populate(module(sampwin, 1, 0, 0)), Color.Red, SymbolType.None);
-						LineItem rILineY = zedGraphControl1.GraphPane.AddCurve("Acc Y", populate(module(sampwin, 0, 1, 0)), Color.Green, SymbolType.None);
-						LineItem rILineZ = zedGraphControl1.GraphPane.AddCurve("Acc Z", populate(module(sampwin, 0, 0, 1)), Color.Blue, SymbolType.None);
-						printToServerConsoleProtected("Module chart drawn.\n");
-						break;
-					///Derivata
-					case 1:
-						LineItem cicciaConLaDerivata = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(smoothing(rapportoIncrementale(sampwin), 3)), Color.Cyan, SymbolType.None);
-						LineItem cicciaConLaDerivata2 = zedGraphControl1.GraphPane.AddCurve("Derivata", populate(rapportoIncrementale(sampwin)), Color.Magenta, SymbolType.None);
-						printToServerConsoleProtected("Derivate chart drawn.\n");
-						break;
-                    case 2: 
-                        int length = sampwin.Count();
-                        double[,] instant = angoliDiEulero(sampwin);
-                        double[] Phi = new double[length];
-                        double[] Theta = new double[length];
-                        double[] Psi = new double[length];
-                        for (int i = 0; i < length; i++)
-                        {
-                            Phi[i] = instant[0, i];
-                            Theta[i] = instant[1, i];
-                            Psi[i] = instant[2, i];
-                        }
-                        LineItem euleroPhi = zedGraphControl1.GraphPane.AddCurve("Phi", populate(Phi), Color.Cyan, SymbolType.None);
-                        LineItem euleroSmoothPhi = zedGraphControl1.GraphPane.AddCurve("PhiSmooth", populate(smoothing(Phi, 3)), Color.DarkCyan, SymbolType.None);
-                        LineItem euleroTheta = zedGraphControl1.GraphPane.AddCurve("Theta", populate(Theta), Color.Magenta, SymbolType.None);
-                        LineItem euleroSmoothTheta = zedGraphControl1.GraphPane.AddCurve("ThetaSmooth", populate(smoothing(Theta, 3)), Color.DarkMagenta, SymbolType.None);
-                        LineItem euleroPsi = zedGraphControl1.GraphPane.AddCurve("Psi", populate(Psi), Color.Orange, SymbolType.None);
-                        LineItem euleroSmoothPsi = zedGraphControl1.GraphPane.AddCurve("PsiSmooth", populate(smoothing(Psi, 3)), Color.DarkOrange, SymbolType.None);
-                        printToServerConsoleProtected("Eulero chart drawn.\n");
-                        break;
-                    default:
-						break;
-					}
-
-				zedGraphControl1.AxisChange();
-				zedGraphControl1.Refresh();
-
-				*/
-				/*****************************************/
-				/*** ZEDGRAPH TEST END *******************/
-				/*****************************************/
-
-				/*
-				//(!) Codice Zedraph Finale da implementare alle fine appunto
-				
-				zedGraphControl1.GraphPane.CurveList.Clear();
-				//zedGraphControl1.AxisChange();
-				zedGraphControl1.Invalidate();
-				
-				List<double[]> myCurveList = new List<double[]>();
-				List<PointPairList> myCurve = new List<PointPairList>();
-				List<string> chartStr = new List<string>();
-				string xAxisStr = "time";
-				string yAxisStr = "";
-				string chartTitle = "";
-
-				switch (selectedSensorType) {
-					case 0:
-						///acc
-						yAxisStr = "m²";
-						break;
-					case 1:
-						///gyr
-						yAxisStr = "y";
-						break;
-					case 2:
-						///mag
-						yAxisStr = "roba di magneti";
-						break;
-					case 3:
-						///qua
-						yAxisStr = "roba di quadernoni";
-						break;
-					default:
-						///bohh
-						yAxisStr = "merda secca";
-						break;
-				}
-
-				switch (selectedChart) {
-					case 0:
-						myCurveList.Add(module(sampwin, 1, 1, 1));
-						chartStr.Add("Module");
-						chartTitle = "Module";
-						break;
-					case 1:
-						myCurveList.Add(rapportoIncrementale(sampwin));
-						chartStr.Add("Derivate");
-						chartTitle = "Derivate";
-						break;
-					case 2:
-						int length = sampwin.Count();
-						double[,] instant = angoliDiEulero(sampwin);
-						double[] Phi = new double[length];
-						double[] Theta = new double[length];
-						double[] Psi = new double[length];
-						for (int i = 0; i < length; i++) {
-							Phi[i] = instant[0, i];
-							Theta[i] = instant[1, i];
-							Psi[i] = instant[2, i];
-						}
-						myCurveList.Add(Phi);
-						myCurveList.Add(Theta);
-						myCurveList.Add(Psi);
-						chartStr.Add("Phi");
-						chartStr.Add("Theta");
-						chartStr.Add("Psi");
-						chartTitle = "Eulero Angles";
-						yAxisStr = "rad";
-						break;
-                    case 3:
-                        myCurveList.Add(deviazioneStandard(module(sampwin), 3));
-                        chartStr.Add("Deviazione Standard");
-                        chartTitle = "Deviazione Standard";
-                        break;
-                    default:
-						break;
-				}
-				
-
-				if (checkBoxSmoothing.Checked) {
-					List<double[]> myNewCurveList = new List<double[]>();
-					foreach (double[] c in myCurveList) {
-						myNewCurveList.Add(smoothing(c, 3));
-					}
-					List<string> NewchartStr = new List<string>();
-					foreach (string s in chartStr) {
-						NewchartStr.Add(s + " smoothed");
-					}
-					myCurveList = myNewCurveList;
-					chartStr = NewchartStr;
-				}
-				if (checkBoxSegmentation.Checked) {
-					//myCurveList = segmentation(myCurveList);
-				}
-				if (checkBoxNoiseCanceling.Checked) {
-                    List<double[]> myNewCurveList = new List<double[]>();
-                    List<string> NewchartStr = new List<string>();
-                    for (int j = 0; j < myCurveList.Count; j++)
-                    {
-                        double[] instant1 = smoothing(myCurveList[j], 3);
-                        double[] instant2 = deviazioneStandard(myCurveList[j], 3);
-                        for (int i = 0; i < myCurveList[j].Length; i++)
-                        {
-                            instant1[i] = instant1[i] + instant2[i];
-                            instant2[i] = instant1[i] - 2 * instant2[i];
-                        }
-                        myNewCurveList.Add(myCurveList[j]);
-                        myNewCurveList.Add(instant1);
-                        myNewCurveList.Add(instant2);
-                        NewchartStr.Add(chartStr[j]);
-                        NewchartStr.Add("istant1");
-                        NewchartStr.Add("istant2");
-                    }
-                    myCurveList = myNewCurveList;
-                    chartStr = NewchartStr;
-                }
-
-
-
-				foreach (double[] c in myCurveList) {
-					myCurve.Add(populate(c));
-				}
-
-				if(checkBoxPlotDomain.Checked) {
-					//mostra solo ultima finestra
-					//myCurve = curveCut(myCurveList, window);
-				}
-				zedGraphControl1.GraphPane.Title.Text = chartTitle;
-				zedGraphControl1.GraphPane.XAxis.Title.Text = xAxisStr;
-				zedGraphControl1.GraphPane.YAxis.Title.Text = yAxisStr;
-				Color[] colors = { Color.Blue, Color.Red, Color.Green, Color.Magenta, Color.Cyan, Color.Yellow, Color.Brown};
-				for (int i=0; i < myCurve.Count; i++) {
-					zedGraphControl1.GraphPane.AddCurve(chartStr[i], myCurve[i], colors[i%colors.Length], SymbolType.None);
-					printToServerConsoleProtected(chartStr[i] + " chart drawn.\n");
-				}
-				zedGraphControl1.AxisChange();
-				zedGraphControl1.Refresh();
-				//etc...	
-				*/
-
 				List<Curve> myCurveList = new List<Curve>();
 				myPane.CurveList.Clear();
 				zedGraphControl1.Invalidate();
@@ -609,7 +408,7 @@ namespace Sense {
 						}
 						myCurveList.Add(new Curve("Phi", Phi, Color.Cyan));
 						myCurveList.Add(new Curve("Theta", Theta, Color.Magenta));
-						myCurveList.Add(new Curve("Psi", Psi, Color.Yellow));
+						myCurveList.Add(new Curve("Psi", Psi, Color.YellowGreen));
 						myPane.YAxis.Title.Text = "rad";
 						break;
 					case 3:
@@ -636,7 +435,7 @@ namespace Sense {
 						double[] instant1 = myCurveList[i].PointsValue;
 						double[] instant2 = deviazioneStandard(myCurveList[i].PointsValue, 3);
 						for (int j = 0; j < myCurveList[i].PointsValue.Length; j++) {
-							instant1[j] = myCurveList[i].PointsValue[j] + instant2[j];
+							instant1[j] += instant2[j];
 							instant2[j] = instant1[j] - 2 * instant2[j];
 						}
 						myNewCurveList.Add(new Curve("instant1", instant1, Color.Magenta));

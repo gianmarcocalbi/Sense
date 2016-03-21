@@ -11,6 +11,9 @@ using ZedGraph;
 using System.Drawing;
 
 namespace Sense {
+	/// <summary>
+	/// Main Program.
+	/// </summary>
 	static class Program {
 		/// <summary>
 		/// Punto di ingresso principale dell'applicazione.
@@ -24,6 +27,9 @@ namespace Sense {
 		}
 	}
 
+	/// <summary>
+	/// Classe Parser.
+	/// </summary>
 	class Parser {
 		public List<double[,]> sampwin;
 		int port;
@@ -481,12 +487,17 @@ namespace Sense {
 		}
 	}*/
 
+	/// <summary>
+	/// Classe Curve.
+	/// Consiste in una curva da plottare sul zedGraphControl.
+	/// </summary>
 	public class Curve {
-		private string label;
-		private double[] pointsValue;
-		private Color color;
-		private SymbolType symbolType;
-
+		private string label;			/// Etichetta curva.
+		private double[] pointsValue;	/// Array di valori double della funzione.
+		private Color color;			/// Colore curva.
+		private SymbolType symbolType;	/// Tipo simbolo.
+		
+		//Properties Begin
 		public string Label {
 			get {
 				return label;
@@ -519,14 +530,22 @@ namespace Sense {
 
 		public double[] PointsValue {
 			get {
-				return pointsValue;
+				return (double[])pointsValue.Clone();
 			}
 
 			set {
 				pointsValue = value;
 			}
 		}
+		//Properties End
 
+		/// <summary>
+		/// Costruttore Primario (Completo).
+		/// </summary>
+		/// <param name="label">Etichetta curva.</param>
+		/// <param name="pointsValue">Array di valori double della funzione.</param>
+		/// <param name="color">Colore curva.</param>
+		/// <param name="symbolType">Tipo simbolo.</param>
 		public Curve(string label, double[] pointsValue, Color color, SymbolType symbolType) {
 			this.label = label;
 			this.pointsValue = pointsValue;
@@ -534,12 +553,33 @@ namespace Sense {
 			this.symbolType = symbolType;
 		}
 
+		/// <summary>
+		/// Overload Costruttore Primario.
+		/// </summary>
+		/// <param name="label">Etichetta curva.</param>
+		/// <param name="pointsValue">Array di valori double della funzione.</param>
+		/// <param name="color">Colore curva.</param>
 		public Curve(string label, double[] pointsValue, Color color) : this(label, pointsValue, color, SymbolType.None) { }
 
+		/// <summary>
+		/// Overload Costruttore Primario.
+		/// </summary>
+		/// <param name="label">Etichetta curva.</param>
+		/// <param name="pointsValue">Array di valori double della funzione.</param>
 		public Curve(string label, double[] pointsValue) : this(label, pointsValue, Color.Blue, SymbolType.None) { }
 
+		/// <summary>
+		/// Overload Costruttore Primario.
+		/// </summary>
+		/// <param name="pointsValue">Array di valori double della funzione.</param>
 		public Curve(double[] pointsValue) : this("", pointsValue, Color.Blue, SymbolType.None) { }
 
+		/// <summary>
+		/// Overload Costruttore Primario.
+		/// </summary>
+		/// <param name="label">Etichetta curva.</param>
+		/// <param name="color">Colore curva.</param>
+		/// <param name="symbolType">Tipo simbolo.</param>
 		public Curve(string label, Color color, SymbolType symbolType) {
 			this.label = label;
 			this.pointsValue = null;
@@ -547,12 +587,40 @@ namespace Sense {
 			this.symbolType = symbolType;
 		}
 
+		/// <summary>
+		/// Overload Costruttore Primario.
+		/// </summary>
+		/// <param name="label">Etichetta curva.</param>
+		/// <param name="color">Colore curva.</param>
 		public Curve(string label, Color color) : this(label, null, color, SymbolType.None) { }
 
+		/// <summary>
+		/// Overload Costruttore Primario.
+		/// </summary>
+		/// <param name="label">Etichetta curva.</param>
 		public Curve(string label) : this(label, null, Color.Blue, SymbolType.None) { }
 
+		/// <summary>
+		/// Overload Costruttore Primario senza argomenti.
+		/// </summary>
 		public Curve() : this("", null, Color.Blue, SymbolType.None) { }
 		
+		/// <summary>
+		/// Copy Constructor.
+		/// </summary>
+		/// <param name="other">Curva da copiare.</param>
 		public Curve(Curve other) : this(other.Label, other.PointsValue, other.Color, other.SymbolType) { }
+
+		/// <summary>
+		/// Valida la Curva.
+		/// </summary>
+		/// <returns>True se la Curva è valida per il plotting, false altrimenti.</returns>
+		public bool IsValid() {
+			bool b = true;
+			if(pointsValue == null) {
+				b = false;
+			}
+			return b;
+		}
 	}
 }
