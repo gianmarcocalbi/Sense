@@ -391,6 +391,8 @@ namespace Sense {
 								printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");
 								///Eccezione che si verifica in seguito ad un'interruzione precoce della comunicazione Server-Client che causa un utilizzo scorretto di array all'interno del codice.
 								///La gestiamo consideranso la comunicazione interrotta e pertanto ignoriamo e stoppiamo la comunicazione col Client. 
+							} catch(ArgumentOutOfRangeException ex) {
+								printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");
 							} catch (Exception ex) {
 								throw new Exception(ex.ToString() + "\n"); //(!)codice di cui verificare il corretto funzionamento
 							} finally {

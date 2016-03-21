@@ -94,6 +94,8 @@ namespace Sense {
 				parser.DeactivateServer();
 			} else {
 				///Se il server è fermo allora lo STARTiamo
+				frequence = Int32.Parse(comboBoxFrequenza.Text);
+				numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
 				try {
 					parser.ActivateServer(
 						Int32.Parse(textBoxPort.Text),
@@ -393,8 +395,28 @@ namespace Sense {
 				Invoke(new setButtonServerStartDelegate(setButtonServerStartProtected), new object[] { b });
 			} else {
 				if (b) {
+					///Disabilita input server quando server attivo
+					textBoxPort.Enabled = false;
+					textBoxIP1.Enabled = false;
+					textBoxIP2.Enabled = false;
+					textBoxIP3.Enabled = false;
+					textBoxIP4.Enabled = false;
+					comboBoxFrequenza.Enabled = false;
+					numericUpDownFinestra.Enabled = false;
+					textBoxCSVPath.Enabled = false;
+					buttonSelectFolder.Enabled = false;
 					buttonServerStart.Text = "STOP";
 				} else {
+					///Riabilita input server quando server inattivo
+					textBoxPort.Enabled = true;
+					textBoxIP1.Enabled = true;
+					textBoxIP2.Enabled = true;
+					textBoxIP3.Enabled = true;
+					textBoxIP4.Enabled = true;
+					comboBoxFrequenza.Enabled = true;
+					numericUpDownFinestra.Enabled = true;
+					textBoxCSVPath.Enabled = true;
+					buttonSelectFolder.Enabled = true;
 					buttonServerStart.Text = "START";
 				}
 			}
@@ -534,8 +556,8 @@ namespace Sense {
 	/*** Eventi triggherati da input Utente sulla GUI ***/
 	/****************************************************/
 		private void comboBoxFrequenza_SelectedIndexChanged(object sender, EventArgs e) {
-			frequence = Int32.Parse(comboBoxFrequenza.Text);
-			numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
+			//frequence = Int32.Parse(comboBoxFrequenza.Text);
+			//numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
 		}
 
 		private void buttonSelectFolder_Click(object sender, EventArgs e) {
