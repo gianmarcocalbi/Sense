@@ -143,14 +143,40 @@ namespace Sense {
 		/// <returns>Array di valori modulo.</returns>
 		public double[] module(List<double[,]> sampwin, int x, int y, int z)	//PRIMA OPERAZIONE: MODULO
 		{
+			return module(sampwin, selectedSensor, selectedSensorType, x, y, z);
+		}
+
+		/// <summary>
+		/// Overload Modulo che consente impostazione manuale del sensore e tipo di sensore selezionati.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="selSensor">Sensore da considerare.</param>
+		/// <param name="selSensorType">Tipo sensore da considerare.</param>
+		/// <param name="x">Coefficiente per il quale moltiplicare la componente X.</param>
+		/// <param name="y">Coefficiente per il quale moltiplicare la componente Y.</param>
+		/// <param name="z">Coefficiente per il quale moltiplicare la componente Z.</param>
+		/// <returns>Array di valori modulo.</returns>
+		public double[] module(List<double[,]> sampwin, int selSensor, int selSensorType, int x, int y, int z)    //PRIMA OPERAZIONE: MODULO
+		{
 			int dim = sampwin.Count();
 			double[] arrayModulo = new double[dim];
 			for (int i = 0; i < dim; ++i) {
 				double[,] instant = sampwin[i];
-				arrayModulo[i] = Math.Sqrt(Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 0], 2) * x + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 1], 2) * y + Math.Pow(instant[selectedSensor, selectedSensorType * 3 + 2], 2) * z);
+				arrayModulo[i] = Math.Sqrt(Math.Pow(instant[selSensor, selSensorType * 3 + 0], 2) * x + Math.Pow(instant[selSensor, selSensorType * 3 + 1], 2) * y + Math.Pow(instant[selSensor, selSensorType * 3 + 2], 2) * z);
 				//printToServerConsoleProtected(arrayModulo[i] + "\n");
 			}
 			return arrayModulo;
+		}
+
+		/// <summary>
+		/// Overload Modulo che consente impostazione manuale del sensore e tipo di sensore selezionati in tutte le dimensioni.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="selSensor">Sensore da considerare.</param>
+		/// <param name="selSensorType">Tipo sensore da considerare.</param>
+		/// <returns></returns>
+		public double[] module(List<double[,]> sampwin, int selSensor, int selSensorType) {
+			return module(sampwin, selSensor, selSensorType, 1, 1, 1);
 		}
 
 		/// <summary>
@@ -448,7 +474,7 @@ namespace Sense {
 						myPane.YAxis.Title.Text = "rad";
 						break;
 					case 3:
-						myCurveList.Add(new Curve("Standard Deviation", deviazioneStandard(module(sampwin), 3), Color.Blue));
+						myCurveList.Add(new Curve("Standard Deviation", deviazioneStandard(module(sampwin), smoothRange), Color.Blue));
 						myPane.Title.Text = "Standard Deviation";
 						break;
 					default:
@@ -494,6 +520,12 @@ namespace Sense {
 
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
+
+				///Parse Actions
+				List<double[,]> parsingMatrix = sampwin.GetRange(sampwin.Count-window*frequence, window*frequence);
+				double[] parsingArray = module(parsingMatrix, 0, 0);
+
+
 			}
 		}
 	//Delegate functions END
