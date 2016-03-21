@@ -469,9 +469,9 @@ namespace Sense {
 							instant1[j] += instant2[j];
 							instant2[j] = instant1[j] - 2 * instant2[j];
 						}
-						myNewCurveList.Add(new Curve("instant1", instant1, Color.Magenta));
-						myNewCurveList.Add(new Curve("instant2", instant2, Color.Green));
-						myNewCurveList.Add(new Curve(myCurveList[i].Label, myCurveList[i].PointsValue, Color.Cyan));
+						myNewCurveList.Add(new Curve("instant1", instant1, Color.Cyan));
+						myNewCurveList.Add(new Curve("instant2", instant2, Color.Cyan));
+						myNewCurveList.Add(new Curve(myCurveList[i].Label, myCurveList[i].PointsValue, Color.Blue));
 					}
 					myCurveList = myNewCurveList;
 				}
