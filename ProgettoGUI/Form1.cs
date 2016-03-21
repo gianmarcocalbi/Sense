@@ -257,9 +257,19 @@ namespace Sense {
 
 		private PointPairList populate(double[] array) //selesnia - vecchio arrayToSeries
 		{
+			return populate(array, 0, array.Length);
+		}
+
+		private PointPairList populate(double[] array, int begin, int range) {
 			int length = array.Length;
+			if (begin < 0) {
+				begin = 0;
+			}
+				if (begin+range < length) {
+				length = begin + range;
+			}
 			PointPairList list = new PointPairList();
-			for (int i = 0; i < length; ++i)
+			for (int i = begin; i < length; ++i)
 				list.Add((double)i / frequence, array[i]);
 			return list;
 		}
@@ -358,6 +368,7 @@ namespace Sense {
 				}
 				
 				List<Curve> myCurveList = new List<Curve>();
+				List<LineItem> myLineList = new List<LineItem>();
 				myPane.CurveList.Clear();
 				zedGraphControl1.Invalidate();
 				myPane.Title.Text = "Chart";
@@ -445,15 +456,18 @@ namespace Sense {
 					myCurveList = myNewCurveList;
 				}
 
-				if (checkBoxPlotDomain.Checked) {
-					//mostra solo ultima finestra
-					//myCurve = curveCut(myCurveList, window);
-				}
-
 				foreach (Curve c in myCurveList) {
-					myPane.AddCurve(c.Label, populate(c.PointsValue), c.Color, c.SymbolType);
+					PointPairList ppl = new PointPairList();
+					if (checkBoxPlotDomain.Checked) {
+						ppl = populate(c.PointsValue, c.PointsValue.Length-window*frequence, c.PointsValue.Length);
+					} else {
+						ppl = populate(c.PointsValue);
+					}
+					myLineList.Add(myPane.AddCurve(c.Label, ppl, c.Color, c.SymbolType));
 					printToServerConsoleProtected(c.Label + " chart drawn.\n");
 				}
+
+				
 
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
@@ -538,6 +552,14 @@ namespace Sense {
 		}
 
 		private void checkBoxNoiseCanceling_CheckedChanged(object sender, EventArgs e) {
+			if (parser.SampwinIsFullIdle) {
+				eatSampwinProtected(mySampwin);
+			} else {
+				parser.ChartRefresh();
+			}
+		}
+
+		private void checkBoxPlotDomain_CheckedChanged(object sender, EventArgs e) {
 			if (parser.SampwinIsFullIdle) {
 				eatSampwinProtected(mySampwin);
 			} else {
