@@ -249,7 +249,7 @@ namespace Sense {
 			}
 			return arrayAngoli;
 		}
-
+		
 		/// <summary>
 		/// Overload di populate() che considera tutti i valori dell'array in input.
 		/// </summary>
@@ -450,8 +450,7 @@ namespace Sense {
 					default:
 						break;
 				}
-
-
+				
 				if (checkBoxSmoothing.Checked) {
 					foreach (Curve c in myCurveList) {
 						c.PointsValue = smoothing(c.PointsValue, 3);
@@ -484,11 +483,10 @@ namespace Sense {
 					} else {
 						ppl = populate(c.PointsValue);
 					}
-					myLineList.Add(myPane.AddCurve(c.Label, ppl, c.Color, c.SymbolType));
+					LineItem myLine = myPane.AddCurve(c.Label, ppl, c.Color, c.SymbolType);
+					myLineList.Add(myLine);
 					printToServerConsoleProtected(c.Label + " chart drawn.\n");
 				}
-
-
 
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
