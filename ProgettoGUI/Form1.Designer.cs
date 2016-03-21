@@ -51,6 +51,7 @@
 			this.richTextConsole = new System.Windows.Forms.RichTextBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.numericUpDownSmoothing = new System.Windows.Forms.NumericUpDown();
 			this.checkBoxPlotDomain = new System.Windows.Forms.CheckBox();
 			this.checkBoxNoiseCanceling = new System.Windows.Forms.CheckBox();
 			this.checkBoxSegmentation = new System.Windows.Forms.CheckBox();
@@ -71,6 +72,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).BeginInit();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownSmoothing)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// splitContainer1
@@ -356,6 +358,7 @@
 			// 
 			// tabPage1
 			// 
+			this.tabPage1.Controls.Add(this.numericUpDownSmoothing);
 			this.tabPage1.Controls.Add(this.checkBoxPlotDomain);
 			this.tabPage1.Controls.Add(this.checkBoxNoiseCanceling);
 			this.tabPage1.Controls.Add(this.checkBoxSegmentation);
@@ -375,6 +378,24 @@
 			this.tabPage1.Text = "Chart";
 			this.tabPage1.UseVisualStyleBackColor = true;
 			// 
+			// numericUpDownSmoothing
+			// 
+			this.numericUpDownSmoothing.Location = new System.Drawing.Point(318, 508);
+			this.numericUpDownSmoothing.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownSmoothing.Name = "numericUpDownSmoothing";
+			this.numericUpDownSmoothing.Size = new System.Drawing.Size(35, 20);
+			this.numericUpDownSmoothing.TabIndex = 11;
+			this.numericUpDownSmoothing.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownSmoothing.ValueChanged += new System.EventHandler(this.numericUpDownSmoothing_ValueChanged);
+			// 
 			// checkBoxPlotDomain
 			// 
 			this.checkBoxPlotDomain.AutoSize = true;
@@ -389,7 +410,7 @@
 			// checkBoxNoiseCanceling
 			// 
 			this.checkBoxNoiseCanceling.AutoSize = true;
-			this.checkBoxNoiseCanceling.Location = new System.Drawing.Point(557, 509);
+			this.checkBoxNoiseCanceling.Location = new System.Drawing.Point(558, 509);
 			this.checkBoxNoiseCanceling.Name = "checkBoxNoiseCanceling";
 			this.checkBoxNoiseCanceling.Size = new System.Drawing.Size(48, 17);
 			this.checkBoxNoiseCanceling.TabIndex = 9;
@@ -400,7 +421,7 @@
 			// checkBoxSegmentation
 			// 
 			this.checkBoxSegmentation.AutoSize = true;
-			this.checkBoxSegmentation.Location = new System.Drawing.Point(398, 509);
+			this.checkBoxSegmentation.Location = new System.Drawing.Point(417, 509);
 			this.checkBoxSegmentation.Name = "checkBoxSegmentation";
 			this.checkBoxSegmentation.Size = new System.Drawing.Size(91, 17);
 			this.checkBoxSegmentation.TabIndex = 8;
@@ -411,7 +432,7 @@
 			// checkBoxSmoothing
 			// 
 			this.checkBoxSmoothing.AutoSize = true;
-			this.checkBoxSmoothing.Location = new System.Drawing.Point(250, 509);
+			this.checkBoxSmoothing.Location = new System.Drawing.Point(240, 509);
 			this.checkBoxSmoothing.Name = "checkBoxSmoothing";
 			this.checkBoxSmoothing.Size = new System.Drawing.Size(76, 17);
 			this.checkBoxSmoothing.TabIndex = 7;
@@ -537,6 +558,7 @@
 			this.tabControl1.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownSmoothing)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -584,6 +606,7 @@
 		private System.Windows.Forms.CheckBox checkBoxSegmentation;
 		private System.Windows.Forms.CheckBox checkBoxSmoothing;
 		private System.Windows.Forms.CheckBox checkBoxPlotDomain;
+		private System.Windows.Forms.NumericUpDown numericUpDownSmoothing;
 	}
 }
 

@@ -25,6 +25,7 @@ namespace Sense {
 		int selectedSensorType;
 		string csvPath;
 		List<double[,]> mySampwin;
+		int smoothRange;
 
 		/// <summary>
 		/// Costruttore Primario
@@ -44,6 +45,9 @@ namespace Sense {
 			textBoxCSVPath.Text = csvPath;
 			///CSV Location hint EventHandler
 			this.textBoxCSVPath.MouseEnter += new System.EventHandler(this.textBoxCSVPath_Enter);
+			///numericUpDownSmoothing maximum value
+			numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
+			smoothRange = (int)numericUpDownSmoothing.Value;
 			///Creazione Parser (Server)
 			parser = new Parser(
 				Int32.Parse(textBoxPort.Text),
@@ -453,7 +457,7 @@ namespace Sense {
 				
 				if (checkBoxSmoothing.Checked) {
 					foreach (Curve c in myCurveList) {
-						c.PointsValue = smoothing(c.PointsValue, 3);
+						c.PointsValue = smoothing(c.PointsValue, smoothRange);
 						c.Label += " smoothed";
 					}
 				}
@@ -464,7 +468,7 @@ namespace Sense {
 					List<Curve> myNewCurveList = new List<Curve>();
 					for (int i = 0; i < myCurveList.Count; i++) {
 						double[] instant1 = myCurveList[i].PointsValue;
-						double[] instant2 = deviazioneStandard(myCurveList[i].PointsValue, 3);
+						double[] instant2 = deviazioneStandard(myCurveList[i].PointsValue, smoothRange);
 						for (int j = 0; j < myCurveList[i].PointsValue.Length; j++) {
 							instant1[j] += instant2[j];
 							instant2[j] = instant1[j] - 2 * instant2[j];
@@ -499,6 +503,7 @@ namespace Sense {
 	/****************************************************/
 		private void comboBoxFrequenza_SelectedIndexChanged(object sender, EventArgs e) {
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
+			numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
 		}
 
 		private void buttonSelectFolder_Click(object sender, EventArgs e) {
@@ -538,6 +543,7 @@ namespace Sense {
 
 		private void numericUpDownFinestra_ValueChanged(object sender, EventArgs e) {
 			window = (int)numericUpDownFinestra.Value;
+			numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
 		}
 
 		private void textBoxCSVPath_Enter(object sender, EventArgs e) {
@@ -561,6 +567,7 @@ namespace Sense {
 			} else {
 				parser.ChartRefresh();
 			}
+			//(!)numericUpDownSmoothing.Enabled = checkBoxSmoothing.Checked;
 		}
 
 		private void checkBoxSegmentation_CheckedChanged(object sender, EventArgs e) {
@@ -580,6 +587,15 @@ namespace Sense {
 		}
 
 		private void checkBoxPlotDomain_CheckedChanged(object sender, EventArgs e) {
+			if (parser.SampwinIsFullIdle) {
+				eatSampwinProtected(mySampwin);
+			} else {
+				parser.ChartRefresh();
+			}
+		}
+
+		private void numericUpDownSmoothing_ValueChanged(object sender, EventArgs e) {
+			smoothRange = (int)numericUpDownSmoothing.Value;
 			if (parser.SampwinIsFullIdle) {
 				eatSampwinProtected(mySampwin);
 			} else {
