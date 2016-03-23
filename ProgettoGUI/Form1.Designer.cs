@@ -139,7 +139,7 @@
             0,
             0});
 			this.numericUpDownFinestra.Name = "numericUpDownFinestra";
-			this.numericUpDownFinestra.Size = new System.Drawing.Size(41, 31);
+			this.numericUpDownFinestra.Size = new System.Drawing.Size(41, 20);
 			this.numericUpDownFinestra.TabIndex = 23;
 			this.numericUpDownFinestra.Value = new decimal(new int[] {
             10,
@@ -162,7 +162,7 @@
 			// 
 			this.textBoxCSVPath.Location = new System.Drawing.Point(13, 164);
 			this.textBoxCSVPath.Name = "textBoxCSVPath";
-			this.textBoxCSVPath.Size = new System.Drawing.Size(223, 31);
+			this.textBoxCSVPath.Size = new System.Drawing.Size(223, 20);
 			this.textBoxCSVPath.TabIndex = 21;
 			this.textBoxCSVPath.Text = "CSV Location";
 			// 
@@ -173,7 +173,7 @@
 			this.checkBoxConsoleAutoFlow.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkBoxConsoleAutoFlow.Location = new System.Drawing.Point(24, 536);
 			this.checkBoxConsoleAutoFlow.Name = "checkBoxConsoleAutoFlow";
-			this.checkBoxConsoleAutoFlow.Size = new System.Drawing.Size(233, 29);
+			this.checkBoxConsoleAutoFlow.Size = new System.Drawing.Size(118, 17);
 			this.checkBoxConsoleAutoFlow.TabIndex = 20;
 			this.checkBoxConsoleAutoFlow.Text = "Console Auto Scroll";
 			this.checkBoxConsoleAutoFlow.UseVisualStyleBackColor = true;
@@ -183,7 +183,7 @@
 			this.label6.AutoSize = true;
 			this.label6.Location = new System.Drawing.Point(122, 106);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(38, 25);
+			this.label6.Size = new System.Drawing.Size(20, 13);
 			this.label6.TabIndex = 19;
 			this.label6.Text = "Hz";
 			// 
@@ -192,7 +192,7 @@
 			this.label9.AutoSize = true;
 			this.label9.Location = new System.Drawing.Point(122, 137);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(93, 25);
+			this.label9.Size = new System.Drawing.Size(47, 13);
 			this.label9.TabIndex = 18;
 			this.label9.Text = "seconds";
 			// 
@@ -201,7 +201,7 @@
 			this.label8.AutoSize = true;
 			this.label8.Location = new System.Drawing.Point(10, 137);
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(88, 25);
+			this.label8.Size = new System.Drawing.Size(46, 13);
 			this.label8.TabIndex = 16;
 			this.label8.Text = "Window";
 			// 
@@ -210,7 +210,7 @@
 			this.label7.AutoSize = true;
 			this.label7.Location = new System.Drawing.Point(10, 107);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(115, 25);
+			this.label7.Size = new System.Drawing.Size(58, 13);
 			this.label7.TabIndex = 15;
 			this.label7.Text = "Frequence";
 			// 
@@ -224,7 +224,7 @@
             "200"});
 			this.comboBoxFrequenza.Location = new System.Drawing.Point(70, 103);
 			this.comboBoxFrequenza.Name = "comboBoxFrequenza";
-			this.comboBoxFrequenza.Size = new System.Drawing.Size(41, 33);
+			this.comboBoxFrequenza.Size = new System.Drawing.Size(41, 21);
 			this.comboBoxFrequenza.TabIndex = 14;
 			this.comboBoxFrequenza.SelectedIndexChanged += new System.EventHandler(this.comboBoxFrequenza_SelectedIndexChanged);
 			// 
@@ -253,7 +253,7 @@
 			// 
 			this.textBoxIP4.Location = new System.Drawing.Point(211, 74);
 			this.textBoxIP4.Name = "textBoxIP4";
-			this.textBoxIP4.Size = new System.Drawing.Size(25, 31);
+			this.textBoxIP4.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP4.TabIndex = 11;
 			this.textBoxIP4.Text = "1";
 			// 
@@ -262,7 +262,7 @@
 			this.label5.AutoSize = true;
 			this.label5.Location = new System.Drawing.Point(195, 81);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(18, 25);
+			this.label5.Size = new System.Drawing.Size(10, 13);
 			this.label5.TabIndex = 10;
 			this.label5.Text = ".";
 			// 
@@ -270,7 +270,7 @@
 			// 
 			this.textBoxIP3.Location = new System.Drawing.Point(164, 74);
 			this.textBoxIP3.Name = "textBoxIP3";
-			this.textBoxIP3.Size = new System.Drawing.Size(25, 31);
+			this.textBoxIP3.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP3.TabIndex = 9;
 			this.textBoxIP3.Text = "0";
 			// 
@@ -279,7 +279,7 @@
 			this.label4.AutoSize = true;
 			this.label4.Location = new System.Drawing.Point(148, 81);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(18, 25);
+			this.label4.Size = new System.Drawing.Size(10, 13);
 			this.label4.TabIndex = 8;
 			this.label4.Text = ".";
 			// 
@@ -288,7 +288,7 @@
 			this.label3.AutoSize = true;
 			this.label3.Location = new System.Drawing.Point(101, 81);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(18, 25);
+			this.label3.Size = new System.Drawing.Size(10, 13);
 			this.label3.TabIndex = 7;
 			this.label3.Text = ".";
 			// 
@@ -296,7 +296,7 @@
 			// 
 			this.textBoxIP2.Location = new System.Drawing.Point(117, 74);
 			this.textBoxIP2.Name = "textBoxIP2";
-			this.textBoxIP2.Size = new System.Drawing.Size(25, 31);
+			this.textBoxIP2.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP2.TabIndex = 6;
 			this.textBoxIP2.Text = "0";
 			// 
@@ -304,7 +304,7 @@
 			// 
 			this.textBoxIP1.Location = new System.Drawing.Point(70, 74);
 			this.textBoxIP1.Name = "textBoxIP1";
-			this.textBoxIP1.Size = new System.Drawing.Size(25, 31);
+			this.textBoxIP1.Size = new System.Drawing.Size(25, 20);
 			this.textBoxIP1.TabIndex = 5;
 			this.textBoxIP1.Text = "127";
 			// 
@@ -313,7 +313,7 @@
 			this.label2.AutoSize = true;
 			this.label2.Location = new System.Drawing.Point(10, 78);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(31, 25);
+			this.label2.Size = new System.Drawing.Size(17, 13);
 			this.label2.TabIndex = 4;
 			this.label2.Text = "IP";
 			// 
@@ -321,7 +321,7 @@
 			// 
 			this.textBoxPort.Location = new System.Drawing.Point(70, 44);
 			this.textBoxPort.Name = "textBoxPort";
-			this.textBoxPort.Size = new System.Drawing.Size(41, 31);
+			this.textBoxPort.Size = new System.Drawing.Size(41, 20);
 			this.textBoxPort.TabIndex = 3;
 			this.textBoxPort.Text = "45555";
 			// 
@@ -330,7 +330,7 @@
 			this.label1.AutoSize = true;
 			this.label1.Location = new System.Drawing.Point(10, 47);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(51, 25);
+			this.label1.Size = new System.Drawing.Size(26, 13);
 			this.label1.TabIndex = 2;
 			this.label1.Text = "Port";
 			// 
@@ -370,10 +370,10 @@
 			this.tabPage1.Controls.Add(this.zedGraphControl1);
 			this.tabPage1.Controls.Add(this.label11);
 			this.tabPage1.Controls.Add(this.comboBoxChart);
-			this.tabPage1.Location = new System.Drawing.Point(8, 39);
+			this.tabPage1.Location = new System.Drawing.Point(4, 22);
 			this.tabPage1.Name = "tabPage1";
 			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(716, 511);
+			this.tabPage1.Size = new System.Drawing.Size(724, 532);
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "Chart";
 			this.tabPage1.UseVisualStyleBackColor = true;
@@ -387,7 +387,7 @@
             0,
             0});
 			this.numericUpDownSmoothing.Name = "numericUpDownSmoothing";
-			this.numericUpDownSmoothing.Size = new System.Drawing.Size(35, 31);
+			this.numericUpDownSmoothing.Size = new System.Drawing.Size(35, 20);
 			this.numericUpDownSmoothing.TabIndex = 11;
 			this.numericUpDownSmoothing.Value = new decimal(new int[] {
             1,
@@ -401,7 +401,7 @@
 			this.checkBoxPlotDomain.AutoSize = true;
 			this.checkBoxPlotDomain.Location = new System.Drawing.Point(62, 509);
 			this.checkBoxPlotDomain.Name = "checkBoxPlotDomain";
-			this.checkBoxPlotDomain.Size = new System.Drawing.Size(244, 29);
+			this.checkBoxPlotDomain.Size = new System.Drawing.Size(124, 17);
 			this.checkBoxPlotDomain.TabIndex = 10;
 			this.checkBoxPlotDomain.Text = "Plot only last window";
 			this.checkBoxPlotDomain.UseVisualStyleBackColor = true;
@@ -412,7 +412,7 @@
 			this.checkBoxNoiseCanceling.AutoSize = true;
 			this.checkBoxNoiseCanceling.Location = new System.Drawing.Point(558, 509);
 			this.checkBoxNoiseCanceling.Name = "checkBoxNoiseCanceling";
-			this.checkBoxNoiseCanceling.Size = new System.Drawing.Size(86, 29);
+			this.checkBoxNoiseCanceling.Size = new System.Drawing.Size(48, 17);
 			this.checkBoxNoiseCanceling.TabIndex = 9;
 			this.checkBoxNoiseCanceling.Text = "STD";
 			this.checkBoxNoiseCanceling.UseVisualStyleBackColor = true;
@@ -423,7 +423,7 @@
 			this.checkBoxSegmentation.AutoSize = true;
 			this.checkBoxSegmentation.Location = new System.Drawing.Point(417, 509);
 			this.checkBoxSegmentation.Name = "checkBoxSegmentation";
-			this.checkBoxSegmentation.Size = new System.Drawing.Size(176, 29);
+			this.checkBoxSegmentation.Size = new System.Drawing.Size(91, 17);
 			this.checkBoxSegmentation.TabIndex = 8;
 			this.checkBoxSegmentation.Text = "Segmentation";
 			this.checkBoxSegmentation.UseVisualStyleBackColor = true;
@@ -434,7 +434,7 @@
 			this.checkBoxSmoothing.AutoSize = true;
 			this.checkBoxSmoothing.Location = new System.Drawing.Point(240, 509);
 			this.checkBoxSmoothing.Name = "checkBoxSmoothing";
-			this.checkBoxSmoothing.Size = new System.Drawing.Size(146, 29);
+			this.checkBoxSmoothing.Size = new System.Drawing.Size(76, 17);
 			this.checkBoxSmoothing.TabIndex = 7;
 			this.checkBoxSmoothing.Text = "Smoothing";
 			this.checkBoxSmoothing.UseVisualStyleBackColor = true;
@@ -452,7 +452,7 @@
             "5 (Caviglia Sx)"});
 			this.comboBoxNumSensore.Location = new System.Drawing.Point(558, 11);
 			this.comboBoxNumSensore.Name = "comboBoxNumSensore";
-			this.comboBoxNumSensore.Size = new System.Drawing.Size(120, 33);
+			this.comboBoxNumSensore.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxNumSensore.TabIndex = 6;
 			this.comboBoxNumSensore.SelectedIndexChanged += new System.EventHandler(this.comboBoxNumSensore_SelectedIndexChanged);
 			// 
@@ -467,7 +467,7 @@
             "Qua"});
 			this.comboBoxTipoSensore.Location = new System.Drawing.Point(305, 11);
 			this.comboBoxTipoSensore.Name = "comboBoxTipoSensore";
-			this.comboBoxTipoSensore.Size = new System.Drawing.Size(120, 33);
+			this.comboBoxTipoSensore.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxTipoSensore.TabIndex = 5;
 			this.comboBoxTipoSensore.SelectedIndexChanged += new System.EventHandler(this.comboBoxTipoSensore_SelectedIndexChanged);
 			// 
@@ -476,7 +476,7 @@
 			this.label13.AutoSize = true;
 			this.label13.Location = new System.Drawing.Point(472, 14);
 			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(161, 25);
+			this.label13.Size = new System.Drawing.Size(80, 13);
 			this.label13.TabIndex = 4;
 			this.label13.Text = "Sensor Number";
 			// 
@@ -485,14 +485,14 @@
 			this.label12.AutoSize = true;
 			this.label12.Location = new System.Drawing.Point(232, 14);
 			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(134, 25);
+			this.label12.Size = new System.Drawing.Size(67, 13);
 			this.label12.TabIndex = 3;
 			this.label12.Text = "Sensor Type";
 			// 
 			// zedGraphControl1
 			// 
 			this.zedGraphControl1.Location = new System.Drawing.Point(6, 38);
-			this.zedGraphControl1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+			this.zedGraphControl1.Margin = new System.Windows.Forms.Padding(6);
 			this.zedGraphControl1.Name = "zedGraphControl1";
 			this.zedGraphControl1.ScrollGrace = 0D;
 			this.zedGraphControl1.ScrollMaxX = 0D;
@@ -509,7 +509,7 @@
 			this.label11.AutoSize = true;
 			this.label11.Location = new System.Drawing.Point(35, 14);
 			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(64, 25);
+			this.label11.Size = new System.Drawing.Size(32, 13);
 			this.label11.TabIndex = 1;
 			this.label11.Text = "Chart";
 			// 
@@ -524,23 +524,24 @@
             "Deviazione"});
 			this.comboBoxChart.Location = new System.Drawing.Point(73, 11);
 			this.comboBoxChart.Name = "comboBoxChart";
-			this.comboBoxChart.Size = new System.Drawing.Size(120, 33);
+			this.comboBoxChart.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxChart.TabIndex = 0;
 			this.comboBoxChart.SelectedIndexChanged += new System.EventHandler(this.comboBoxChart_SelectedIndexChanged);
 			// 
 			// tabPage2
 			// 
-			this.tabPage2.Location = new System.Drawing.Point(8, 39);
+			this.tabPage2.Location = new System.Drawing.Point(4, 22);
 			this.tabPage2.Name = "tabPage2";
 			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(716, 511);
+			this.tabPage2.Size = new System.Drawing.Size(724, 532);
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "Help";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.ClientSize = new System.Drawing.Size(1006, 564);
 			this.Controls.Add(this.splitContainer1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
