@@ -26,11 +26,18 @@ namespace Sense {
 		string csvPath;
 		List<double[,]> mySampwin;
 		int smoothRange;
+        int motoLength = 0;
+        int fermoLength = 0;
+        double motoEnd = 0;
+        double motoStart = 0;
+        double fermoEnd = 0;
+        double fermoStart = 0;
+        string action = null;
 
-		/// <summary>
-		/// Costruttore Primario
-		/// </summary>
-		public Form1() {
+        /// <summary>
+        /// Costruttore Primario
+        /// </summary>
+        public Form1() {
 			///Inizializza i componenti grafici
 			InitializeComponent();
 			///
@@ -347,14 +354,14 @@ namespace Sense {
 			return singleArray;
 		}*/
 
-		/*protected override bool ProcessDialogKey(Keys keyData) //escape 
+		protected override bool ProcessDialogKey(Keys keyData) //escape 
 		{
 			if (Form.ModifierKeys == Keys.None && keyData == Keys.Escape) {
 				this.Close();
 				return true;
 			}
 			return base.ProcessDialogKey(keyData);
-		}*/
+		}
 	//Old Functions END
 
 	//Delegate functions BEGIN
@@ -543,12 +550,90 @@ namespace Sense {
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
 
-				///Parse Actions
-				List<double[,]> parsingMatrix = sampwin.GetRange(sampwin.Count-window*frequence, window*frequence);
-				double[] parsingArray = module(parsingMatrix, 0, 0);
+                ///Parse Actions
+                List<double[,]> parsingMatrix = new List<double[,]>();
 
+                if (sampwin.Count > window * frequence)
+                {
+                    parsingMatrix = sampwin.GetRange(sampwin.Count - window * frequence, window * frequence);
+                }
+                else {
+                    parsingMatrix = sampwin;
+                }
 
-			}
+                //Scrittura su file
+                //System.IO.StreamWriter actionFile = new System.IO.StreamWriter(csvPath + @"\actions_log", true);
+                //actionFile.WriteLine("Ciao");
+                
+                //STABILIRE IL NUMERO DELLA FINESTRA
+                //... DA FARE
+
+                //Importante
+                //tempoIesimoELemento = (sampwin.Count-window*frequence > 0 ? sampwin.Count-window*frequence+i/frequence : i/frequence)
+
+                //avete cancellato tutta la mia roba mentre non c'ero?
+
+                ///MOTO-STAZIONAMENTO
+
+                ///Modulo accelerometro sensore bacino
+                double[] parsingArray = module(parsingMatrix, 0, 0);
+
+                ///Deviazione Standard modulo accelerometro
+                double[] stDevArray = smoothing(deviazioneStandard(parsingArray, 10),10); //(!) Valutare la possibilità di settare una costante al posto di smoothRange (e.g. 10)
+                for (int i = 0; i < stDevArray.Length; i++)
+                {
+
+                    if (stDevArray[i] < 0.02)
+                    { //(!) 0.02 valore determinato in modo empirico altamente fallace
+                      //possibile moto stazionario
+                      //finisce il moto
+
+                        if (motoLength > 0 && action != null)
+                        {
+                            //il moto è finito
+
+                            //save end point moto
+                            motoEnd = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
+                            //actionFile.WriteLine(motoStart + " " + motoEnd + " non-fermo");
+                            printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
+                            //save start point moto stazionario
+                            fermoStart = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
+                            motoLength = 0;
+                            //fermoLength = 0;
+                        }
+                        action = "fermo";
+                        //il moto stazionario continua
+                        fermoLength++;
+
+                    }
+                    else {
+                        //possibile moto motoso
+                        //finisce il moto stazionario
+                        if (fermoLength > 0 && action != null)
+                        {
+                            //il non moto è finito, mi salvo i dati che devo salvare
+
+                            //save end point non moto
+                            fermoEnd = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
+                            printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
+                            //save start point moto stazionario
+                            motoStart = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
+                            fermoLength = 0; 
+                        }
+                        action = "non-fermo";
+                        motoLength++;
+                    }
+                }
+                /*
+                motoLength = 0;
+                fermoLength = 0;
+                motoEnd = 0;
+                motoStart = 0;
+                fermoEnd = 0;
+                fermoStart = 0;
+                action = null;
+                */
+            }
 		}
 	//Delegate functions END
 
