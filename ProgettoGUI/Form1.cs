@@ -26,18 +26,18 @@ namespace Sense {
 		string csvPath;
 		List<double[,]> mySampwin;
 		int smoothRange;
-        int motoLength = 0;
-        int fermoLength = 0;
-        double motoEnd = 0;
-        double motoStart = 0;
-        double fermoEnd = 0;
-        double fermoStart = 0;
-        string action = null;
+		int motoLength = 0;
+		int fermoLength = 0;
+		double motoEnd = 0;
+		double motoStart = 0;
+		double fermoEnd = 0;
+		double fermoStart = 0;
+		string action = null;
 
-        /// <summary>
-        /// Costruttore Primario
-        /// </summary>
-        public Form1() {
+		/// <summary>
+		/// Costruttore Primario
+		/// </summary>
+		public Form1() {
 			///Inizializza i componenti grafici
 			InitializeComponent();
 			///
@@ -122,9 +122,9 @@ namespace Sense {
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void Form1_Load(object sender, EventArgs e) {	//(!) Valutare l'utilità di questo metodo
-			//SAMPWIN ARRAY TRIDIMENSIONALE, SCRITTO CHIARAMENTE NELLA CONSEGNA, LA POSSIAMO SCRIVERE COME double[, ,] ANZICHE double[][][] SCRITTURA VAGAMENTE PIU BARBARICA
-			//SI FA RIFERIMENTO A DUE SAMPWIN UNA CON LE INIZIALI MAIUSCOLE TRIDIMENSIONALE ED UNA TUTTA IN MINUSCOLO CON 
+		private void Form1_Load(object sender, EventArgs e) {   //(!) Valutare l'utilità di questo metodo
+																//SAMPWIN ARRAY TRIDIMENSIONALE, SCRITTO CHIARAMENTE NELLA CONSEGNA, LA POSSIAMO SCRIVERE COME double[, ,] ANZICHE double[][][] SCRITTURA VAGAMENTE PIU BARBARICA
+																//SI FA RIFERIMENTO A DUE SAMPWIN UNA CON LE INIZIALI MAIUSCOLE TRIDIMENSIONALE ED UNA TUTTA IN MINUSCOLO CON 
 
 			this.Text = "Sense";
 			this.Opacity = 1; //assolutamente inutile, ma in se l'istruzione mi piaceva, magari riesco a fare i grafici meno trasparenti
@@ -132,7 +132,7 @@ namespace Sense {
 			this.CenterToScreen();
 		}
 
-	//Plotting Functions BEGIN
+		//Plotting Functions BEGIN
 		/// <summary>
 		/// Overload Modulo che considera tutte le tre dimensioni x,y,z.
 		/// </summary>
@@ -150,7 +150,7 @@ namespace Sense {
 		/// <param name="y">Coefficiente per il quale moltiplicare la componente Y.</param>
 		/// <param name="z">Coefficiente per il quale moltiplicare la componente Z.</param>
 		/// <returns>Array di valori modulo.</returns>
-		public double[] module(List<double[,]> sampwin, int x, int y, int z)	//PRIMA OPERAZIONE: MODULO
+		public double[] module(List<double[,]> sampwin, int x, int y, int z)    //PRIMA OPERAZIONE: MODULO
 		{
 			return module(sampwin, selectedSensor, selectedSensorType, x, y, z);
 		}
@@ -194,7 +194,7 @@ namespace Sense {
 		/// <param name="popolazione">Array di valori da Smoothare.</param>
 		/// <param name="range">Range di Smoothing.</param>
 		/// <returns>Array di valori Smoothati.</returns>
-		public double[] smoothing(double[] popolazione, int range)				//SECONDA OPERAZIONE: SMOOTHING
+		public double[] smoothing(double[] popolazione, int range)              //SECONDA OPERAZIONE: SMOOTHING
 		{
 			int size = popolazione.GetLength(0);
 			double[] smooth = new double[size];
@@ -226,7 +226,7 @@ namespace Sense {
 		/// </summary>
 		/// <param name="sampwin">Sampwin.</param>
 		/// <returns>Array di valori della Derivata.</returns>
-		public double[] rapportoIncrementale(List<double[,]> sampwin)			//TERZA OPERAZIONE: DERIVATA
+		public double[] rapportoIncrementale(List<double[,]> sampwin)           //TERZA OPERAZIONE: DERIVATA
 		{
 			int dim = sampwin.Count();
 			double[] rapportoIncrementale = new double[dim];
@@ -245,7 +245,7 @@ namespace Sense {
 		/// <param name="popolazione">Popolazione sulla quale calcolare la D.S.</param>
 		/// <param name="range">Range entro il quale calcolare la media da usare per il calcolo della D.S.</param>
 		/// <returns>Array di valori della D.S.</returns>
-		public double[] deviazioneStandard(double[] popolazione, int range)		//QUARTA OPERAZIONE: DEVIAZIONE STANDARD
+		public double[] deviazioneStandard(double[] popolazione, int range)     //QUARTA OPERAZIONE: DEVIAZIONE STANDARD
 		{
 			double[] smooth = smoothing(popolazione, range);
 			int size = popolazione.GetLength(0);
@@ -267,7 +267,7 @@ namespace Sense {
 		/// </summary>
 		/// <param name="sampwin">Sampwin.</param>
 		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
-		public double[,] angoliDiEulero(List<double[,]> sampwin)				//QUINTA OPERAZIONE: ANGOLI DI EULERO
+		public double[,] angoliDiEulero(List<double[,]> sampwin)                //QUINTA OPERAZIONE: ANGOLI DI EULERO
 		{
 			double q0, q1, q2, q3;
 			int dim = sampwin.Count();
@@ -288,14 +288,13 @@ namespace Sense {
 			}
 			return arrayAngoli;
 		}
-		
+
 		/// <summary>
 		/// Overload di populate() che considera tutti i valori dell'array in input.
 		/// </summary>
 		/// <param name="array">Array contenente i valori di f(x).</param>
 		/// <returns>Lista di punti (x,y).</returns>
-		private PointPairList populate(double[] array)
-		{
+		private PointPairList populate(double[] array) {
 			return populate(array, 0, array.Length);
 		}
 
@@ -320,9 +319,9 @@ namespace Sense {
 				list.Add((double)i / frequence, array[i]);
 			return list;
 		}
-	//Plotting Functions END
+		//Plotting Functions END
 
-	//Old Functions BEGIN
+		//Old Functions BEGIN
 		/*private void createGraph(ZedGraph.ZedGraphControl zedGraphControl, int drawX, int drawY, int sizeX, int sizeY, string titolo, string x, string y) {
 			zedGraphControl.Location = new Point(drawX, drawY);
 			zedGraphControl.Size = new Size(sizeX, sizeY);
@@ -362,9 +361,9 @@ namespace Sense {
 			}
 			return base.ProcessDialogKey(keyData);
 		}
-	//Old Functions END
+		//Old Functions END
 
-	//Delegate functions BEGIN
+		//Delegate functions BEGIN
 		/// <summary>
 		/// Delegato per scrivere sulla console del Server.
 		/// </summary>
@@ -509,7 +508,7 @@ namespace Sense {
 					default:
 						break;
 				}
-				
+
 				if (checkBoxSmoothing.Checked) {
 					foreach (Curve c in myCurveList) {
 						c.PointsValue = smoothing(c.PointsValue, smoothRange);
@@ -544,102 +543,104 @@ namespace Sense {
 					}
 					LineItem myLine = myPane.AddCurve(c.Label, ppl, c.Color, c.SymbolType);
 					myLineList.Add(myLine);
-					printToServerConsoleProtected(c.Label + " chart drawn.\n");
+					//(!)printToServerConsoleProtected(c.Label + " chart drawn.\n");
 				}
 
 				zedGraphControl1.AxisChange();
 				zedGraphControl1.Refresh();
 
-                ///Parse Actions
-                List<double[,]> parsingMatrix = new List<double[,]>();
+				///Parse Actions
+				List<double[,]> parsingMatrix = new List<double[,]>();
 
-                if (sampwin.Count > window * frequence)
-                {
-                    parsingMatrix = sampwin.GetRange(sampwin.Count - window * frequence, window * frequence);
-                }
-                else {
-                    parsingMatrix = sampwin;
-                }
+				if (sampwin.Count > window * frequence) {
+					parsingMatrix = sampwin.GetRange(sampwin.Count - window * frequence, window * frequence);
+				} else {
+					parsingMatrix = sampwin;
+				}
 
-                //Scrittura su file
-                //System.IO.StreamWriter actionFile = new System.IO.StreamWriter(csvPath + @"\actions_log", true);
-                //actionFile.WriteLine("Ciao");
-                
-                //STABILIRE IL NUMERO DELLA FINESTRA
-                //... DA FARE
+				//Scrittura su file
+				//System.IO.StreamWriter actionFile = new System.IO.StreamWriter(csvPath + @"\actions_log", true);
+				//actionFile.WriteLine("Ciao");
 
-                //Importante
-                //tempoIesimoELemento = (sampwin.Count-window*frequence > 0 ? sampwin.Count-window*frequence+i/frequence : i/frequence)
+				//STABILIRE IL NUMERO DELLA FINESTRA
+				//... DA FARE
 
-                //avete cancellato tutta la mia roba mentre non c'ero?
+				//Importante
+				//tempoIesimoELemento = (sampwin.Count-window*frequence > 0 ? sampwin.Count-window*frequence+i/frequence : i/frequence)
 
-                ///MOTO-STAZIONAMENTO
+				//avete cancellato tutta la mia roba mentre non c'ero?
 
-                ///Modulo accelerometro sensore bacino
-                double[] parsingArray = module(parsingMatrix, 0, 0);
+				///MOTO-STAZIONAMENTO
 
-                ///Deviazione Standard modulo accelerometro
-                double[] stDevArray = smoothing(deviazioneStandard(parsingArray, 10),10); //(!) Valutare la possibilità di settare una costante al posto di smoothRange (e.g. 10)
-                for (int i = 0; i < stDevArray.Length; i++)
-                {
+				///Modulo accelerometro sensore bacino
+				double[] parsingArray = module(parsingMatrix, 0, 0);
 
-                    if (stDevArray[i] < 0.02)
-                    { //(!) 0.02 valore determinato in modo empirico altamente fallace
-                      //possibile moto stazionario
-                      //finisce il moto
+				///Deviazione Standard modulo accelerometro
+				double[] stDevArray = smoothing(deviazioneStandard(parsingArray, 10), 10); //(!) Valutare la possibilità di settare una costante al posto di smoothRange (e.g. 10)
+				
+				for (int i = 0; i < stDevArray.Length; i++) {
+					double time = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
+					if (stDevArray[i] < 0.02) { //(!) 0.02 valore determinato in modo empirico altamente fallace
+												//possibile moto stazionario
+												//finisce il moto
+						if (motoLength > 0 && action != null && fermoEnd <= time) {
+							//il moto è finito
+							//save end point moto
+							motoEnd = time;
+							//actionFile.WriteLine(motoStart + " " + motoEnd + " non-fermo");
+							printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
+							//save start point moto stazionario
+							fermoStart = time;
+							motoLength = 0;
+							//fermoLength = 0;
+						}
+						action = "fermo";
+						//il moto stazionario continua
+						fermoLength++;
+					} else {
+						//possibile moto motoso
+						//finisce il moto stazionario
+						if (fermoLength > 0 && action != null && motoEnd <= time) {
+							//il non moto è finito, mi salvo i dati che devo salvare
+							//save end point non moto
+							fermoEnd = time;
+							printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
+							//save start point moto stazionario
+							motoStart = time;
+							fermoLength = 0;
+						}
+						action = "non-fermo";
+						motoLength++;
+					}
+				}
 
-                        if (motoLength > 0 && action != null)
-                        {
-                            //il moto è finito
+				if (action == "fermo") {
+					fermoEnd = fermoStart + fermoLength;
+				} else {
+					motoEnd = motoStart + motoLength;
+				}
 
-                            //save end point moto
-                            motoEnd = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
-                            //actionFile.WriteLine(motoStart + " " + motoEnd + " non-fermo");
-                            printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
-                            //save start point moto stazionario
-                            fermoStart = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
-                            motoLength = 0;
-                            //fermoLength = 0;
-                        }
-                        action = "fermo";
-                        //il moto stazionario continua
-                        fermoLength++;
-
-                    }
-                    else {
-                        //possibile moto motoso
-                        //finisce il moto stazionario
-                        if (fermoLength > 0 && action != null)
-                        {
-                            //il non moto è finito, mi salvo i dati che devo salvare
-
-                            //save end point non moto
-                            fermoEnd = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
-                            printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
-                            //save start point moto stazionario
-                            motoStart = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
-                            fermoLength = 0; 
-                        }
-                        action = "non-fermo";
-                        motoLength++;
-                    }
-                }
-                /*
-                motoLength = 0;
-                fermoLength = 0;
-                motoEnd = 0;
-                motoStart = 0;
-                fermoEnd = 0;
-                fermoStart = 0;
-                action = null;
-                */
-            }
+				if (parser.SampwinIsFullIdle) {
+					if (motoLength > 0) {
+						printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
+					} else {
+						printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
+					}
+					motoLength = 0;
+					fermoLength = 0;
+					motoEnd = 0;
+					motoStart = 0;
+					fermoEnd = 0;
+					fermoStart = 0;
+					action = null;
+				}				
+			}
 		}
-	//Delegate functions END
+		//Delegate functions END
 
-	/****************************************************/
-	/*** Eventi triggherati da input Utente sulla GUI ***/
-	/****************************************************/
+		/****************************************************/
+		/*** Eventi triggherati da input Utente sulla GUI ***/
+		/****************************************************/
 		private void comboBoxFrequenza_SelectedIndexChanged(object sender, EventArgs e) {
 			//frequence = Int32.Parse(comboBoxFrequenza.Text);
 			//numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
