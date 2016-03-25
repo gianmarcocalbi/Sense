@@ -559,16 +559,12 @@ namespace Sense {
 					parsingMatrix = sampwin;
 				}
 
-				//Scrittura su file
-				System.IO.StreamWriter actionFile = new System.IO.StreamWriter(csvPath + @"\actions_log.txt", true);
-
-				//STABILIRE IL NUMERO DELLA FINESTRA
-				//... DA FARE
-
-				//Importante
-				//tempoIesimoELemento = (sampwin.Count-window*frequence > 0 ? sampwin.Count-window*frequence+i/frequence : i/frequence)
-
-				//avete cancellato tutta la mia roba mentre non c'ero?
+				///Scrittura su file, open stream.
+				int t = 0;
+				while(File.Exists(csvPath + @"\actions_log_" + t + ".txt")) {
+					t++;
+				}
+				StreamWriter actionFile = new StreamWriter(csvPath + @"\actions_log_" + t + ".txt", true);
 
 				///MOTO-STAZIONAMENTO
 
@@ -581,7 +577,7 @@ namespace Sense {
 				for (int i = 0; i < stDevArray.Length; i++) {
 					time = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
 					if (time > winTime) {
-						if (stDevArray[i] < 0.02) { //(!) 0.02 valore determinato in modo empirico altamente fallace
+						if (stDevArray[i] < 0.01) { //(!) 0.02 valore determinato in modo empirico altamente fallace
 													//possibile moto stazionario
 													//finisce il moto
 							if (action == "non-fermo" /*&& fermoEnd <= time*/) {
@@ -590,7 +586,7 @@ namespace Sense {
 								motoEnd = time;
 								///Stampa l'azione di moto appena terminata.
 								actionFile.WriteLine(motoStart + " " + motoEnd + " non-fermo");
-								printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
+								//printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
 								//save start point moto stazionario
 								fermoStart = time; ///L'inizio del moto-stazionario coincide con la fine del moto.
 								motoLength = 0; ///La lunghezza del moto viene posta uguale a zero dato che il moto è terminato.
@@ -607,7 +603,7 @@ namespace Sense {
 								//save end point non moto
 								fermoEnd = time;
 								actionFile.WriteLine(fermoStart + " " + fermoEnd + " fermo");
-								printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
+								//printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
 								//save start point moto stazionario
 								motoStart = time;
 								fermoLength = 0;
@@ -620,14 +616,18 @@ namespace Sense {
 				winTime = time;
 
 				if (parser.SampwinIsFullIdle) {
-					if (motoLength > 0) {
+					if (motoLength > 0 && action=="non-fermo") {
 						actionFile.WriteLine(motoStart + " " + motoEnd + " non-fermo");
-						printToServerConsoleProtected(motoStart + " " + winTime + " non-fermo\n");
-					} else {
-						actionFile.WriteLine(fermoStart + " " + fermoEnd + " fermo");
-						printToServerConsoleProtected(fermoStart + " " + winTime + " fermo\n");
+						//printToServerConsoleProtected(motoStart + " " + winTime + " non-fermo\n");
+						printToServerConsoleProtected("RECOGNIZING END\n");
+						action = null;
 					}
-					printToServerConsoleProtected("RECOGNIZING END\n");
+					if (fermoLength > 0 && action=="fermo"){
+						actionFile.WriteLine(fermoStart + " " + fermoEnd + " fermo");
+						//printToServerConsoleProtected(fermoStart + " " + winTime + " fermo\n");
+						printToServerConsoleProtected("RECOGNIZING END\n");
+						action = null;
+					}
 					motoLength = 0;
 					fermoLength = 0;
 					motoEnd = 0;
@@ -636,6 +636,7 @@ namespace Sense {
 					fermoStart = 0;
 					action = null;
 				}
+
 				actionFile.Close();
 			}
 		}
