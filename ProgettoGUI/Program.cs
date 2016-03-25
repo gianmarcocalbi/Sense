@@ -85,6 +85,12 @@ namespace Sense {
 			}
 		}
 
+		public bool GetChartRefresh {
+			get {
+				return chartRefresh;
+			}
+		}
+
 		///Delegate printToConsoleDel Declarations
 		public delegate void printToConsoleDel(string s);
 
@@ -161,7 +167,9 @@ namespace Sense {
 		/// Indica la necessità di riplottare la sampwin.
 		/// </summary>
 		public void ChartRefresh() {
-			chartRefresh = true;
+			if (serverIsActive) {
+				chartRefresh = true;
+			}
 		}
 
 		/// <summary>
@@ -353,7 +361,7 @@ namespace Sense {
 											eatSampwinProtected(sampwin);
 										}
 									} else if (chartRefresh) {
-										///Riplotta sampwin subito.
+										///Riplotta sampwin subito perché l'utente ha effettutato un cambio degli input che determinano un diverso output.
 										eatSampwinProtected(sampwin);
 										chartRefresh = false;
 									} else if (sampwin.Count % ((window * frequence) / 2) == 0 && sampwin.Count != 0) {
@@ -391,7 +399,7 @@ namespace Sense {
 								printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");
 								///Eccezione che si verifica in seguito ad un'interruzione precoce della comunicazione Server-Client che causa un utilizzo scorretto di array all'interno del codice.
 								///La gestiamo consideranso la comunicazione interrotta e pertanto ignoriamo e stoppiamo la comunicazione col Client. 
-							} catch(ArgumentOutOfRangeException ex) {
+							} catch (ArgumentOutOfRangeException ex) {
 								printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");
 							} catch (Exception ex) {
 								throw new Exception(ex.ToString() + "\n"); //(!)codice di cui verificare il corretto funzionamento
@@ -494,11 +502,11 @@ namespace Sense {
 	/// Consiste in una curva da plottare sul zedGraphControl.
 	/// </summary>
 	public class Curve {
-		private string label;			/// Etichetta curva.
-		private double[] pointsValue;	/// Array di valori double della funzione.
-		private Color color;			/// Colore curva.
-		private SymbolType symbolType;	/// Tipo simbolo.
-		
+		private string label;           /// Etichetta curva.
+		private double[] pointsValue;   /// Array di valori double della funzione.
+		private Color color;            /// Colore curva.
+		private SymbolType symbolType;  /// Tipo simbolo.
+
 		//Properties Begin
 		public string Label {
 			get {
@@ -606,7 +614,7 @@ namespace Sense {
 		/// Overload Costruttore Primario senza argomenti.
 		/// </summary>
 		public Curve() : this("", null, Color.Blue, SymbolType.None) { }
-		
+
 		/// <summary>
 		/// Copy Constructor.
 		/// </summary>
@@ -619,7 +627,7 @@ namespace Sense {
 		/// <returns>True se la Curva è valida per il plotting, false altrimenti.</returns>
 		public bool IsValid() {
 			bool b = true;
-			if(pointsValue == null) {
+			if (pointsValue == null) {
 				b = false;
 			}
 			return b;

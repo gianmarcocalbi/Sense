@@ -26,8 +26,8 @@ namespace Sense {
 		string csvPath;
 		List<double[,]> mySampwin;
 		int smoothRange;
-		int motoLength = 0;
-		int fermoLength = 0;
+		double motoLength = 0;
+		double fermoLength = 0;
 		double motoEnd = 0;
 		double motoStart = 0;
 		double fermoEnd = 0;
@@ -577,47 +577,91 @@ namespace Sense {
 
 				///Deviazione Standard modulo accelerometro
 				double[] stDevArray = smoothing(deviazioneStandard(parsingArray, 10), 10); //(!) Valutare la possibilità di settare una costante al posto di smoothRange (e.g. 10)
-				
+
 				for (int i = 0; i < stDevArray.Length; i++) {
 					double time = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
 					if (stDevArray[i] < 0.02) { //(!) 0.02 valore determinato in modo empirico altamente fallace
 												//possibile moto stazionario
 												//finisce il moto
-						if (motoLength > 0 && action != null && fermoEnd <= time) {
-							//il moto è finito
+						if (action == "non-fermo" /*&& fermoEnd <= time*/) {
+							///Fine del moto.
 							//save end point moto
 							motoEnd = time;
+							///Stampa l'azione di moto appena terminata.
 							//actionFile.WriteLine(motoStart + " " + motoEnd + " non-fermo");
-							printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
+							printToServerConsoleProtected("[" + time + "] : " + motoStart + " " + motoEnd + " non-fermo\n");
 							//save start point moto stazionario
-							fermoStart = time;
-							motoLength = 0;
-							//fermoLength = 0;
+							fermoStart = time; ///L'inizio del moto-stazionario coincide con la fine del moto.
+							motoLength = 0; ///La lunghezza del moto viene posta uguale a zero dato che il moto è terminato.
 						}
+						///Viene impostata l'azione attuale. 
 						action = "fermo";
 						//il moto stazionario continua
-						fermoLength++;
+						fermoLength += 1 / (double)frequence;
 					} else {
 						//possibile moto motoso
 						//finisce il moto stazionario
-						if (fermoLength > 0 && action != null && motoEnd <= time) {
+						if (action == "fermo" /*&& motoEnd <= time*/) {
 							//il non moto è finito, mi salvo i dati che devo salvare
 							//save end point non moto
 							fermoEnd = time;
-							printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
+							printToServerConsoleProtected("[" + time + "] : " + fermoStart + " " + fermoEnd + " fermo\n");
 							//save start point moto stazionario
 							motoStart = time;
 							fermoLength = 0;
 						}
 						action = "non-fermo";
-						motoLength++;
+						motoLength += 1 / (double)frequence;
 					}
 				}
 
-				if (action == "fermo") {
-					fermoEnd = fermoStart + fermoLength;
-				} else {
-					motoEnd = motoStart + motoLength;
+				/*
+				OUTPUT
+				[1,22] : 0 1,22 fermo
+				[17,54] : 1,22 17,54 non-fermo
+				[18,76] : 17,54 18,76 fermo
+				[17,54] : 18,76 17,54 non-fermo
+				[18,76] : 17,54 18,76 fermo
+				[35,36] : 18,76 35,36 non-fermo
+				[36,28] : 35,36 36,28 fermo
+				[35,4] : 36,28 35,4 non-fermo
+				[36,28] : 35,4 36,28 fermo
+
+
+				FINESTRE
+				1) 0 5
+				fermoLength = 0;
+				fermoStart = 0;
+				fermoEnd = 1.22;
+				motoLength = 3.78;
+				motoStart = 1.22;
+				motoEnd = 5;
+
+				2) 0 10
+
+				*/
+
+				//if (action == "fermo") {
+				//	fermoEnd = fermoStart + fermoLength;
+				//} else {
+				//	motoEnd = motoStart + motoLength;
+				//}
+				//fermoLength = 0;
+				//motoLength = 0;
+
+				{
+					fermoLength = fermoLength;
+					stDevArray = stDevArray;
+					fermoStart = fermoStart;
+					fermoEnd = fermoEnd;
+					motoLength = motoLength;
+					motoStart = motoStart;
+					motoEnd = motoEnd;
+					action = action;
+					sampwin = sampwin;
+					parsingMatrix = parsingMatrix;
+					parsingArray = parsingArray;
+					bool ChartRefresh = parser.GetChartRefresh;
 				}
 
 				if (parser.SampwinIsFullIdle) {
@@ -626,6 +670,7 @@ namespace Sense {
 					} else {
 						printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
 					}
+					printToServerConsoleProtected("RECOGNIZING END\n");
 					motoLength = 0;
 					fermoLength = 0;
 					motoEnd = 0;
@@ -633,7 +678,7 @@ namespace Sense {
 					fermoEnd = 0;
 					fermoStart = 0;
 					action = null;
-				}				
+				}
 			}
 		}
 		//Delegate functions END
