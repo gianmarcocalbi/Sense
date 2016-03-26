@@ -33,6 +33,7 @@ namespace Sense {
 		string state = null;
 		double stateStart = 0;
 		string outToFileStr = "";
+		DateTime startTime = new DateTime(1900, 1, 1, 0, 0, 0, 0);
 
 		/// <summary>
 		/// Costruttore Primario
@@ -486,7 +487,7 @@ namespace Sense {
 
 			switch (selectedChart) {
 				case 0:
-					myCurveList.Add(new Curve("Module", module(sampwin, 0, 1, 0), Color.Blue));
+					myCurveList.Add(new Curve("Module", module(sampwin), Color.Blue));
 					myPane.Title.Text = "Module";
 					break;
 				case 1:
@@ -572,6 +573,9 @@ namespace Sense {
 			}
 
 			///MOTO-STAZIONAMENTO
+			if (startTime.Year == 1900) {
+				startTime = DateTime.Now;
+			}
 
 			///Modulo accelerometro sensore bacino
 			double[] parsingArray = module(parsingMatrix, 0, 0);
@@ -580,6 +584,7 @@ namespace Sense {
 			double[] stDevArray = smoothing(deviazioneStandard(parsingArray, 10), 10); //(!) Valutare la possibilità di settare una costante al posto di smoothRange (e.g. 10)
 			double[] accXArray = smoothing(module(parsingMatrix, 0, 0, 1, 0, 0), 10);
 			double time = 0;
+			DateTime tempTime = startTime;
 			for (int i = 0; i < stDevArray.Length; i++) {
 				time = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
 				if (time > winTime) {
@@ -591,7 +596,7 @@ namespace Sense {
 						if (action == "non-fermo" /*&& fermoEnd <= time*/) {
 							///Fine del moto.
 							///Stampa l'azione di moto appena terminata.
-							outToFileStr += motoStart + " " + time + " non-fermo\n";
+							outToFileStr += tempTime.AddSeconds(motoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " non-fermo\n";
 							//printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
 							//save start point moto stazionario
 							fermoStart = time; ///L'inizio del moto-stazionario coincide con la fine del moto.
@@ -604,7 +609,7 @@ namespace Sense {
 						if (action == "fermo" /*&& motoEnd <= time*/) {
 							//il non moto è finito, mi salvo i dati che devo salvare
 							//save end point non moto
-							outToFileStr += fermoStart + " " + time + " fermo\n";
+							outToFileStr += tempTime.AddSeconds(fermoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " fermo\n";
 							//printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
 							//save start point moto stazionario
 							motoStart = time;
@@ -614,25 +619,25 @@ namespace Sense {
 
 					if (accXArray[i] <= 2.7) {
 						if (state != "Lay" && state != null) {
-							outToFileStr += stateStart + " " + time + " " + state + "\n";
+							outToFileStr += tempTime.AddSeconds(stateStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + state + "\n";
 							stateStart = time;
 						}
 						state = "Lay";
 					} else if (2.7 < accXArray[i] && accXArray[i] <= 3.7) {
 						if (state != "LaySit" && state != null) {
-							outToFileStr += stateStart + " " + time + " " + state + "\n";
+							outToFileStr += tempTime.AddSeconds(stateStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + state + "\n";
 							stateStart = time;
 						}
 						state = "LaySit";
 					} else if (3.7 < accXArray[i] && accXArray[i] <= 7) {
 						if (state != "Sit" && state != null) {
-							outToFileStr += stateStart + " " + time + " " + state + "\n";
+							outToFileStr += tempTime.AddSeconds(stateStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + state + "\n";
 							stateStart = time;
 						}
 						state = "Sit";
 					} else { //> 7
 						if (state != "Stand" && state != null) {
-							outToFileStr += stateStart + " " + time + " " + state + "\n";
+							outToFileStr += tempTime.AddSeconds(stateStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + state + "\n";
 							stateStart = time;
 						}
 						state = "Stand";
@@ -651,19 +656,19 @@ namespace Sense {
 				StreamWriter actionFile = new StreamWriter(csvPath + @"\actions_log_" + t + ".txt", true);
 				//Se lo stato non è null allora stampo la sua fine.
 				if (state != null) {
-					actionFile.WriteLine(outToFileStr + stateStart + " " + time + " " + state);
+					actionFile.WriteLine(outToFileStr + tempTime.AddSeconds(stateStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + state);
 					outToFileStr = "";
 				}
 				//Se c'è moto allora ne stampo la fine.
 				if (action == "non-fermo") {
-					actionFile.WriteLine(outToFileStr + motoStart + " " + winTime + " non-fermo");
+					actionFile.WriteLine(outToFileStr + tempTime.AddSeconds(motoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(winTime).ToString("HH:mm:ss") + " non-fermo");
 					//printToServerConsoleProtected(motoStart + " " + winTime + " non-fermo\n");
 					action = null;
 					outToFileStr = "";
 				}
 				//Se ero fermo ne stampo comunque la fine.
 				if (action == "fermo") {
-					actionFile.WriteLine(outToFileStr + fermoStart + " " + winTime + " fermo");
+					actionFile.WriteLine(outToFileStr + tempTime.AddSeconds(fermoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(winTime).ToString("HH:mm:ss") + " fermo");
 					//printToServerConsoleProtected(fermoStart + " " + winTime + " fermo\n");
 					action = null;
 					outToFileStr = "";
@@ -676,6 +681,7 @@ namespace Sense {
 				stateStart = 0;
 				outToFileStr = "";
 				winTime = 0;
+				startTime = new DateTime(1900, 1, 1);
 				actionFile.Close();
 				printToServerConsoleProtected("Action log file created at" + csvPath + @"\actions_log_" + t + ".txt\n");
 			}
