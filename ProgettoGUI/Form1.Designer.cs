@@ -390,7 +390,7 @@
 			this.numericUpDownSmoothing.Size = new System.Drawing.Size(35, 20);
 			this.numericUpDownSmoothing.TabIndex = 11;
 			this.numericUpDownSmoothing.Value = new decimal(new int[] {
-            1,
+            10,
             0,
             0,
             0});
@@ -432,6 +432,8 @@
 			// checkBoxSmoothing
 			// 
 			this.checkBoxSmoothing.AutoSize = true;
+			this.checkBoxSmoothing.Checked = true;
+			this.checkBoxSmoothing.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkBoxSmoothing.Location = new System.Drawing.Point(240, 509);
 			this.checkBoxSmoothing.Name = "checkBoxSmoothing";
 			this.checkBoxSmoothing.Size = new System.Drawing.Size(76, 17);

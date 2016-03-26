@@ -42,7 +42,6 @@ namespace Sense {
 		string path;
 		int frequence;
 		int window;
-		private bool chartRefresh;
 		private bool sampwinIsFullIdle;
 
 		public TcpListener Server {
@@ -84,13 +83,7 @@ namespace Sense {
 				sampwinIsFullIdle = value;
 			}
 		}
-
-		public bool GetChartRefresh {
-			get {
-				return chartRefresh;
-			}
-		}
-
+		
 		///Delegate printToConsoleDel Declarations
 		public delegate void printToConsoleDel(string s);
 
@@ -121,11 +114,11 @@ namespace Sense {
 				MessageBox.Show("IP Addressing Error!\n" + ex.Message);
 			}
 			//Salviamo in locale le funzioni passate al Parser
+			sampwin = null;
 			printToServerConsole = printToConsoleFunc;
 			setButtonServerStart = setButtonServerStartFunc;
 			eatSampwinProtected = eatSampFunc;
 			serverIsActive = false;
-			chartRefresh = false;
 			sampwinIsFullIdle = false;
 			setButtonServerStart(serverIsActive); //< Setta il testo sul tasto "serverStart" a START
 		}
@@ -161,17 +154,7 @@ namespace Sense {
 			//printToServerConsole(server.ToString());
 			//printToServerConsole("Server Stopped.");
 		}
-
-		/// <summary>
-		/// Setta a true chartRefresh.
-		/// Indica la necessità di riplottare la sampwin.
-		/// </summary>
-		public void ChartRefresh() {
-			if (serverIsActive) {
-				chartRefresh = true;
-			}
-		}
-
+		
 		/// <summary>
 		/// Metodo che gestisce il funzionamento del Server. Da usare in un thread.
 		/// </summary>
@@ -360,10 +343,6 @@ namespace Sense {
 											//eatSampwinProtected(sampwin.GetRange(sampwin.Count - window * frequence, window * frequence));
 											eatSampwinProtected(sampwin);
 										}
-									} else if (chartRefresh) {
-										///Riplotta sampwin subito perché l'utente ha effettutato un cambio degli input che determinano un diverso output.
-										eatSampwinProtected(sampwin);
-										chartRefresh = false;
 									} else if (sampwin.Count % ((window * frequence) / 2) == 0 && sampwin.Count != 0) {
 										///Funzione che triggera la lettura della sampwin per la creazione dei grafici.
 										//eatSampwinProtected(sampwin.GetRange(sampwin.Count - 500, 500)); //(!)Valutare gli errori generati da questo metodo

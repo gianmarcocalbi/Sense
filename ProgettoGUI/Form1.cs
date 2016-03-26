@@ -26,11 +26,7 @@ namespace Sense {
 		string csvPath;
 		List<double[,]> mySampwin;
 		int smoothRange;
-		double motoLength = 0;
-		double fermoLength = 0;
-		double motoEnd = 0;
 		double motoStart = 0;
-		double fermoEnd = 0;
 		double fermoStart = 0;
 		double winTime = 0;
 		string action = null;
@@ -103,6 +99,7 @@ namespace Sense {
 				zedGraphControl1.GraphPane.YAxis.Title.Text = "y";
 				zedGraphControl1.AxisChange();
 				parser.DeactivateServer();
+				parser.sampwin = null; //(!) Mettere o non mettere questo è un dilemma conan.
 			} else {
 				///Se il server è fermo allora lo STARTiamo
 				frequence = Int32.Parse(comboBoxFrequenza.Text);
@@ -446,235 +443,241 @@ namespace Sense {
 			if (this.zedGraphControl1.InvokeRequired) {
 				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin });
 			} else {
+				//Quando il server ha finito di leggere la sampwin ce ne salviamo una copia il locale.
 				if (parser.SampwinIsFullIdle) {
 					mySampwin = sampwin;
 				}
+				DrawSampwin(sampwin);
+				ParseActions(sampwin);
+			}
+		}
 
-				List<Curve> myCurveList = new List<Curve>();
-				List<LineItem> myLineList = new List<LineItem>();
-				myPane.CurveList.Clear();
-				zedGraphControl1.Invalidate();
-				myPane.Title.Text = "Chart";
-				myPane.XAxis.Title.Text = "time (seconds)";
+		public void DrawSampwin(List<double[,]> sampwin) {
 
-				switch (selectedSensorType) {
-					case 0:
-						///acc
-						myPane.YAxis.Title.Text = "m²";
-						break;
-					case 1:
-						///gyr
-						myPane.YAxis.Title.Text = "y";
-						break;
-					case 2:
-						///mag
-						myPane.YAxis.Title.Text = "Tesla (?)";
-						break;
-					case 3:
-						///qua
-						myPane.YAxis.Title.Text = "roba di quaternioni";
-						break;
-					default:
-						///bohh
-						myPane.YAxis.Title.Text = "none";
-						break;
-				}
+			List<Curve> myCurveList = new List<Curve>();
+			List<LineItem> myLineList = new List<LineItem>();
+			myPane.CurveList.Clear();
+			zedGraphControl1.Invalidate();
+			myPane.Title.Text = "Chart";
+			myPane.XAxis.Title.Text = "time (seconds)";
 
-				switch (selectedChart) {
-					case 0:
-						myCurveList.Add(new Curve("Module", module(sampwin, 0, 1, 0), Color.Blue));
-						myPane.Title.Text = "Module";
-						break;
-					case 1:
-						myCurveList.Add(new Curve("Derivate", rapportoIncrementale(sampwin), Color.Blue));
-						myPane.Title.Text = "Derivate";
-						break;
-					case 2:
-						int length = sampwin.Count();
-						double[,] instant = angoliDiEulero(sampwin);
-						double[] Phi = new double[length];
-						double[] Theta = new double[length];
-						double[] Psi = new double[length];
-						for (int i = 0; i < length; i++) {
-							Phi[i] = instant[0, i];
-							Theta[i] = instant[1, i];
-							Psi[i] = instant[2, i];
-						}
-						myCurveList.Add(new Curve("Phi", Phi, Color.Cyan));
-						myCurveList.Add(new Curve("Theta", Theta, Color.Magenta));
-						myCurveList.Add(new Curve("Psi", Psi, Color.YellowGreen));
-						myPane.YAxis.Title.Text = "rad";
-						break;
-					case 3:
-						myCurveList.Add(new Curve("Standard Deviation", deviazioneStandard(module(sampwin), smoothRange), Color.Blue));
-						myPane.Title.Text = "Standard Deviation";
-						break;
-					default:
-						break;
-				}
+			switch (selectedSensorType) {
+				case 0:
+					///acc
+					myPane.YAxis.Title.Text = "m²";
+					break;
+				case 1:
+					///gyr
+					myPane.YAxis.Title.Text = "y";
+					break;
+				case 2:
+					///mag
+					myPane.YAxis.Title.Text = "Tesla (?)";
+					break;
+				case 3:
+					///qua
+					myPane.YAxis.Title.Text = "roba di quaternioni";
+					break;
+				default:
+					///bohh
+					myPane.YAxis.Title.Text = "none";
+					break;
+			}
 
-				if (checkBoxSmoothing.Checked) {
-					foreach (Curve c in myCurveList) {
-						c.PointsValue = smoothing(c.PointsValue, smoothRange);
-						c.Label += " smoothed";
+			switch (selectedChart) {
+				case 0:
+					myCurveList.Add(new Curve("Module", module(sampwin, 0, 1, 0), Color.Blue));
+					myPane.Title.Text = "Module";
+					break;
+				case 1:
+					myCurveList.Add(new Curve("Derivate", rapportoIncrementale(sampwin), Color.Blue));
+					myPane.Title.Text = "Derivate";
+					break;
+				case 2:
+					int length = sampwin.Count();
+					double[,] instant = angoliDiEulero(sampwin);
+					double[] Phi = new double[length];
+					double[] Theta = new double[length];
+					double[] Psi = new double[length];
+					for (int i = 0; i < length; i++) {
+						Phi[i] = instant[0, i];
+						Theta[i] = instant[1, i];
+						Psi[i] = instant[2, i];
 					}
-				}
-				if (checkBoxSegmentation.Checked) {
-					//myCurveList = segmentation(myCurveList);
-				}
-				if (checkBoxNoiseCanceling.Checked) {
-					List<Curve> myNewCurveList = new List<Curve>();
-					for (int i = 0; i < myCurveList.Count; i++) {
-						double[] instant1 = myCurveList[i].PointsValue;
-						double[] instant2 = deviazioneStandard(myCurveList[i].PointsValue, smoothRange);
-						for (int j = 0; j < myCurveList[i].PointsValue.Length; j++) {
-							instant1[j] += instant2[j];
-							instant2[j] = instant1[j] - 2 * instant2[j];
-						}
-						myNewCurveList.Add(new Curve("instant1", instant1, Color.Cyan));
-						myNewCurveList.Add(new Curve("instant2", instant2, Color.Cyan));
-						myNewCurveList.Add(new Curve(myCurveList[i].Label, myCurveList[i].PointsValue, Color.Blue));
-					}
-					myCurveList = myNewCurveList;
-				}
+					myCurveList.Add(new Curve("Phi", Phi, Color.Cyan));
+					myCurveList.Add(new Curve("Theta", Theta, Color.Magenta));
+					myCurveList.Add(new Curve("Psi", Psi, Color.YellowGreen));
+					myPane.YAxis.Title.Text = "rad";
+					break;
+				case 3:
+					myCurveList.Add(new Curve("Standard Deviation", deviazioneStandard(module(sampwin), smoothRange), Color.Blue));
+					myPane.Title.Text = "Standard Deviation";
+					break;
+				default:
+					break;
+			}
 
+			if (checkBoxSmoothing.Checked) {
 				foreach (Curve c in myCurveList) {
-					PointPairList ppl = new PointPairList();
-					if (checkBoxPlotDomain.Checked) {
-						ppl = populate(c.PointsValue, c.PointsValue.Length - window * frequence, c.PointsValue.Length);
-					} else {
-						ppl = populate(c.PointsValue);
-					}
-					LineItem myLine = myPane.AddCurve(c.Label, ppl, c.Color, c.SymbolType);
-					myLineList.Add(myLine);
-					//(!)printToServerConsoleProtected(c.Label + " chart drawn.\n");
+					c.PointsValue = smoothing(c.PointsValue, smoothRange);
+					c.Label += " smoothed";
 				}
+			}
+			if (checkBoxSegmentation.Checked) {
+				//myCurveList = segmentation(myCurveList);
+			}
+			if (checkBoxNoiseCanceling.Checked) {
+				List<Curve> myNewCurveList = new List<Curve>();
+				for (int i = 0; i < myCurveList.Count; i++) {
+					double[] instant1 = myCurveList[i].PointsValue;
+					double[] instant2 = deviazioneStandard(myCurveList[i].PointsValue, smoothRange);
+					for (int j = 0; j < myCurveList[i].PointsValue.Length; j++) {
+						instant1[j] += instant2[j];
+						instant2[j] = instant1[j] - 2 * instant2[j];
+					}
+					myNewCurveList.Add(new Curve("instant1", instant1, Color.Cyan));
+					myNewCurveList.Add(new Curve("instant2", instant2, Color.Cyan));
+					myNewCurveList.Add(new Curve(myCurveList[i].Label, myCurveList[i].PointsValue, Color.Blue));
+				}
+				myCurveList = myNewCurveList;
+			}
 
-				zedGraphControl1.AxisChange();
-				zedGraphControl1.Refresh();
-
-				///Parse Actions
-				List<double[,]> parsingMatrix = new List<double[,]>();
-
-				if (sampwin.Count > window * frequence) {
-					parsingMatrix = sampwin.GetRange(sampwin.Count - window * frequence, window * frequence);
+			foreach (Curve c in myCurveList) {
+				PointPairList ppl = new PointPairList();
+				if (checkBoxPlotDomain.Checked) {
+					ppl = populate(c.PointsValue, c.PointsValue.Length - window * frequence, c.PointsValue.Length);
 				} else {
-					parsingMatrix = sampwin;
+					ppl = populate(c.PointsValue);
+				}
+				LineItem myLine = myPane.AddCurve(c.Label, ppl, c.Color, c.SymbolType);
+				myLineList.Add(myLine);
+				//(!)printToServerConsoleProtected(c.Label + " chart drawn.\n");
+			}
+
+			zedGraphControl1.AxisChange();
+			zedGraphControl1.Refresh();
+		}
+
+		public void ParseActions(List<double[,]> sampwin) {
+
+			/************************************/
+			/****** Parse Actions ***************/
+			/************************************/
+			List<double[,]> parsingMatrix = new List<double[,]>();
+
+			if (sampwin.Count > window * frequence) {
+				parsingMatrix = sampwin.GetRange(sampwin.Count - window * frequence, window * frequence);
+			} else {
+				parsingMatrix = sampwin;
+			}
+
+			///MOTO-STAZIONAMENTO
+
+			///Modulo accelerometro sensore bacino
+			double[] parsingArray = module(parsingMatrix, 0, 0);
+
+			///Deviazione Standard modulo accelerometro
+			double[] stDevArray = smoothing(deviazioneStandard(parsingArray, 10), 10); //(!) Valutare la possibilità di settare una costante al posto di smoothRange (e.g. 10)
+			double[] accXArray = smoothing(module(parsingMatrix, 0, 0, 1, 0, 0), 10);
+			double time = 0;
+			for (int i = 0; i < stDevArray.Length; i++) {
+				time = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
+				if (time > winTime) {
+					if (stDevArray[i] < 0.01) {
+						//(!) 0.01 valore determinato in modo empirico altamente fallace
+						//possibile moto stazionario
+						//finisce il moto
+						//(!) sistemare tutta sta roba ci sono mille variabili inutili (length e end non servono)
+						if (action == "non-fermo" /*&& fermoEnd <= time*/) {
+							///Fine del moto.
+							///Stampa l'azione di moto appena terminata.
+							outToFileStr += motoStart + " " + time + " non-fermo\n";
+							//printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
+							//save start point moto stazionario
+							fermoStart = time; ///L'inizio del moto-stazionario coincide con la fine del moto.
+						}
+						///Viene impostata l'azione attuale. 
+						action = "fermo";
+					} else {
+						//possibile moto motoso
+						//finisce il moto stazionario
+						if (action == "fermo" /*&& motoEnd <= time*/) {
+							//il non moto è finito, mi salvo i dati che devo salvare
+							//save end point non moto
+							outToFileStr += fermoStart + " " + time + " fermo\n";
+							//printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
+							//save start point moto stazionario
+							motoStart = time;
+						}
+						action = "non-fermo";
+					}
+
+					if (accXArray[i] <= 2.7) {
+						if (state != "Lay" && state != null) {
+							outToFileStr += stateStart + " " + time + " " + state + "\n";
+							stateStart = time;
+						}
+						state = "Lay";
+					} else if (2.7 < accXArray[i] && accXArray[i] <= 3.7) {
+						if (state != "LaySit" && state != null) {
+							outToFileStr += stateStart + " " + time + " " + state + "\n";
+							stateStart = time;
+						}
+						state = "LaySit";
+					} else if (3.7 < accXArray[i] && accXArray[i] <= 7) {
+						if (state != "Sit" && state != null) {
+							outToFileStr += stateStart + " " + time + " " + state + "\n";
+							stateStart = time;
+						}
+						state = "Sit";
+					} else { //> 7
+						if (state != "Stand" && state != null) {
+							outToFileStr += stateStart + " " + time + " " + state + "\n";
+							stateStart = time;
+						}
+						state = "Stand";
+					}
+				}
+			}
+			winTime = time;
+
+			if (parser.SampwinIsFullIdle) {
+				//Quando il parser ha letto tutta la sampwin allora...
+				//Crea un nuovo file di log senza sovrascriverne.
+				int t = 0;
+				while (File.Exists(csvPath + @"\actions_log_" + t + ".txt")) {
+					t++;
+				}
+				StreamWriter actionFile = new StreamWriter(csvPath + @"\actions_log_" + t + ".txt", true);
+				//Se lo stato non è null allora stampo la sua fine.
+				if (state != null) {
+					actionFile.WriteLine(outToFileStr + stateStart + " " + time + " " + state);
+					outToFileStr = "";
+				}
+				//Se c'è moto allora ne stampo la fine.
+				if (action == "non-fermo") {
+					actionFile.WriteLine(outToFileStr + motoStart + " " + winTime + " non-fermo");
+					//printToServerConsoleProtected(motoStart + " " + winTime + " non-fermo\n");
+					action = null;
+					outToFileStr = "";
+				}
+				//Se ero fermo ne stampo comunque la fine.
+				if (action == "fermo") {
+					actionFile.WriteLine(outToFileStr + fermoStart + " " + winTime + " fermo");
+					//printToServerConsoleProtected(fermoStart + " " + winTime + " fermo\n");
+					action = null;
+					outToFileStr = "";
 				}
 				
-				///MOTO-STAZIONAMENTO
-
-				///Modulo accelerometro sensore bacino
-				double[] parsingArray = module(parsingMatrix, 0, 0);
-
-				///Deviazione Standard modulo accelerometro
-				double[] stDevArray = smoothing(deviazioneStandard(parsingArray, 10), 10); //(!) Valutare la possibilità di settare una costante al posto di smoothRange (e.g. 10)
-				double[] accXArray = smoothing(module(parsingMatrix, 0, 0, 1, 0, 0), 10);
-				double time = 0;
-				for (int i = 0; i < stDevArray.Length; i++) {
-					time = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
-					if (time > winTime) {
-						if (stDevArray[i] < 0.01) { //(!) 0.02 valore determinato in modo empirico altamente fallace
-													//possibile moto stazionario
-													//finisce il moto
-							if (action == "non-fermo" /*&& fermoEnd <= time*/) {
-								///Fine del moto.
-								//save end point moto
-								motoEnd = time;
-								///Stampa l'azione di moto appena terminata.
-								outToFileStr += motoStart + " " + motoEnd + " non-fermo\n";
-								//printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
-								//save start point moto stazionario
-								fermoStart = time; ///L'inizio del moto-stazionario coincide con la fine del moto.
-								motoLength = 0; ///La lunghezza del moto viene posta uguale a zero dato che il moto è terminato.
-							}
-							///Viene impostata l'azione attuale. 
-							action = "fermo";
-							//il moto stazionario continua
-							fermoLength += 1 / (double)frequence;
-						} else {
-							//possibile moto motoso
-							//finisce il moto stazionario
-							if (action == "fermo" /*&& motoEnd <= time*/) {
-								//il non moto è finito, mi salvo i dati che devo salvare
-								//save end point non moto
-								fermoEnd = time;
-								outToFileStr += fermoStart + " " + fermoEnd + " fermo\n";
-								//printToServerConsoleProtected(fermoStart + " " + fermoEnd + " fermo\n");
-								//save start point moto stazionario
-								motoStart = time;
-								fermoLength = 0;
-							}
-							action = "non-fermo";
-							motoLength += 1 / (double)frequence;
-						}
-
-						if (accXArray[i] <= 2.7) {
-							if (state != "Lay" && state != null) {
-								outToFileStr += stateStart + " " + time + " " + state + "\n";
-								stateStart = time;
-							}
-							state = "Lay";
-						} else if (2.7 < accXArray[i] && accXArray[i] <= 3.7) {
-							if (state != "LaySit" && state != null) {
-								outToFileStr += stateStart + " " + time + " " + state + "\n";
-								stateStart = time;
-							}
-							state = "LaySit";
-						} else if (3.7 < accXArray[i] && accXArray[i] <= 7) {
-							if (state != "Sit" && state != null) {
-								outToFileStr += stateStart + " " + time + " " + state + "\n";
-								stateStart = time;
-							}
-							state = "Sit";
-						} else { //> 7
-							if (state != "Stand" && state != null) {
-								outToFileStr += stateStart + " " + time + " " + state + "\n";
-								stateStart = time;
-							}
-							state = "Stand";
-						}
-					}
-				}
-				winTime = time;
-
-				if (parser.SampwinIsFullIdle) {
-					int t = 0;
-					while (File.Exists(csvPath + @"\actions_log_" + t + ".txt")) {
-						t++;
-					}
-					StreamWriter actionFile = new StreamWriter(csvPath + @"\actions_log_" + t + ".txt", true);
-					if (state != null) {
-						actionFile.WriteLine(outToFileStr + stateStart + " " + time + " " + state);
-						outToFileStr = "";
-					}
-					if (motoLength > 0 && action == "non-fermo") {
-						actionFile.WriteLine(outToFileStr + motoStart + " " + winTime + " non-fermo");
-						//printToServerConsoleProtected(motoStart + " " + winTime + " non-fermo\n");
-						printToServerConsoleProtected("RECOGNIZING END\n");
-						action = null;
-						outToFileStr = "";
-					}
-					if (fermoLength > 0 && action == "fermo") {
-						actionFile.WriteLine(outToFileStr + fermoStart + " " + winTime + " fermo");
-						//printToServerConsoleProtected(fermoStart + " " + winTime + " fermo\n");
-						printToServerConsoleProtected("RECOGNIZING END\n");
-						action = null;
-						outToFileStr = "";
-					}
-					motoLength = 0;
-					fermoLength = 0;
-					motoEnd = 0;
-					motoStart = 0;
-					fermoEnd = 0;
-					fermoStart = 0;
-					action = null;
-					state = null;
-					stateStart = 0;
-					outToFileStr = "";
-					actionFile.Close();
-				}
-
+				motoStart = 0;
+				fermoStart = 0;
+				action = null;
+				state = null;
+				stateStart = 0;
+				outToFileStr = "";
+				winTime = 0;
+				actionFile.Close();
+				printToServerConsoleProtected("Action log file created at" + csvPath + @"\actions_log_" + t + ".txt\n");
 			}
 		}
 		//Delegate functions END
@@ -697,28 +700,22 @@ namespace Sense {
 
 		private void comboBoxChart_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedChart = comboBoxChart.SelectedIndex;
-			if (parser.SampwinIsFullIdle) {
-				eatSampwinProtected(mySampwin);
-			} else {
-				parser.ChartRefresh();
+			if (parser.sampwin != null) {
+				DrawSampwin(parser.sampwin);
 			}
 		}
 
 		private void comboBoxTipoSensore_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedSensorType = comboBoxTipoSensore.SelectedIndex;
-			if (parser.SampwinIsFullIdle) {
-				eatSampwinProtected(mySampwin);
-			} else {
-				parser.ChartRefresh();
+			if (parser.sampwin != null) {
+				DrawSampwin(parser.sampwin);
 			}
 		}
 
 		private void comboBoxNumSensore_SelectedIndexChanged(object sender, EventArgs e) {
 			selectedSensor = comboBoxNumSensore.SelectedIndex;
-			if (parser.SampwinIsFullIdle) {
-				eatSampwinProtected(mySampwin);
-			} else {
-				parser.ChartRefresh();
+			if (parser.sampwin != null) {
+				DrawSampwin(parser.sampwin);
 			}
 		}
 
@@ -743,44 +740,34 @@ namespace Sense {
 		}
 
 		private void checkBoxSmoothing_CheckedChanged(object sender, EventArgs e) {
-			if (parser.SampwinIsFullIdle) {
-				eatSampwinProtected(mySampwin);
-			} else {
-				parser.ChartRefresh();
+			if (parser.sampwin != null) {
+				DrawSampwin(parser.sampwin);
 			}
 			//(!)numericUpDownSmoothing.Enabled = checkBoxSmoothing.Checked;
 		}
 
 		private void checkBoxSegmentation_CheckedChanged(object sender, EventArgs e) {
-			if (parser.SampwinIsFullIdle) {
-				eatSampwinProtected(mySampwin);
-			} else {
-				parser.ChartRefresh();
+			if (parser.sampwin != null) {
+				DrawSampwin(parser.sampwin);
 			}
 		}
 
 		private void checkBoxNoiseCanceling_CheckedChanged(object sender, EventArgs e) {
-			if (parser.SampwinIsFullIdle) {
-				eatSampwinProtected(mySampwin);
-			} else {
-				parser.ChartRefresh();
+			if (parser.sampwin != null) {
+				DrawSampwin(parser.sampwin);
 			}
 		}
 
 		private void checkBoxPlotDomain_CheckedChanged(object sender, EventArgs e) {
-			if (parser.SampwinIsFullIdle) {
-				eatSampwinProtected(mySampwin);
-			} else {
-				parser.ChartRefresh();
+			if (parser.sampwin != null) {
+				DrawSampwin(parser.sampwin);
 			}
 		}
 
 		private void numericUpDownSmoothing_ValueChanged(object sender, EventArgs e) {
 			smoothRange = (int)numericUpDownSmoothing.Value;
-			if (parser.SampwinIsFullIdle) {
-				eatSampwinProtected(mySampwin);
-			} else {
-				parser.ChartRefresh();
+			if (parser.sampwin != null) {
+				DrawSampwin(parser.sampwin);
 			}
 		}
 	}
