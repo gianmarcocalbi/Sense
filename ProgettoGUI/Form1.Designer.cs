@@ -523,7 +523,8 @@
             "Modulo",
             "Derivata",
             "Eulero",
-            "Deviazione"});
+            "Deviazione",
+            "ArcTan(magnY/magnZ)"});
 			this.comboBoxChart.Location = new System.Drawing.Point(73, 11);
 			this.comboBoxChart.Name = "comboBoxChart";
 			this.comboBoxChart.Size = new System.Drawing.Size(120, 21);

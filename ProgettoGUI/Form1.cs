@@ -292,6 +292,50 @@ namespace Sense {
 		}
 
 		/// <summary>
+		/// Operazione per il calcolo di arcotangente(magnY/magnZ).
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <returns>Array contenente i valori.</returns>
+		public double[] arctanMyMz(List<double[,]> sampwin) {
+			double[] arctan = new double[sampwin.Count];
+			for (int i = 0; i < sampwin.Count; i++) {
+				arctan[i] = Math.Atan(sampwin[i][selectedSensor, 7] / sampwin[i][selectedSensor, 8]);
+			}
+			return arctan;
+		}
+
+		/// <summary>
+		/// Operazione per il calcolo di arcotangente(magnY/magnZ) senza discontinuità.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <returns>Array contenente i valori.</returns>
+		public double[] arctanMyMzContinua(List<double[,]> sampwin) {
+			double[] arctan = arctanMyMz(sampwin);
+			int sfasamento = 0;
+			double[] thetaCorretto = new double[arctan.Length]; //da sistemare con la dimensione giusta una volta stabiliti nomi definitivi 
+			thetaCorretto[0] = arctan[0];
+			double instant = 0;
+			for (int i = 1; i < arctan.Length; i++) { //importante partenza da 1 //sistemare
+				instant = arctan[i] - arctan[i - 1]; // differenza di segni opposti sempre risultato distante da 0
+				if (Math.Abs(instant) > 2.5) {
+					//ha fatto il salto, il lato non ancora identificato
+					//2,5 per ora viene calibrato con un euristica grazie ad un dei primi casi stronzi di salto interno al range, modificabile ovviamente
+					//printToServerConsoleProtected("i : " + i + ", instant : " + instant + "\n");
+					if (instant < 0) {
+						//da -pi/2 (questo è i) a pi/2 (questo è i - 1) in quanto la loro differenza risulta negativa
+						//adesso finché non ne esco sono nella finestra -pi/2 -3/2pi (caso in cui sfasamento = 0)
+						sfasamento++;
+					} else { 
+						//da pi/2 (questo è i) a -pi/2 (questo è i - 1) in quanto la loro differenza risulta positiva
+						sfasamento--;
+					}
+				}
+				thetaCorretto[i] = arctan[i] + sfasamento * Math.PI;
+			}
+			return thetaCorretto;
+		}
+
+		/// <summary>
 		/// Overload di populate() che considera tutti i valori dell'array in input.
 		/// </summary>
 		/// <param name="array">Array contenente i valori di f(x).</param>
@@ -452,6 +496,7 @@ namespace Sense {
 				ParseActions(sampwin);
 			}
 		}
+		//Delegate functions END
 
 		public void DrawSampwin(List<double[,]> sampwin) {
 
@@ -513,6 +558,11 @@ namespace Sense {
 				case 3:
 					myCurveList.Add(new Curve("Standard Deviation", deviazioneStandard(module(sampwin), smoothRange), Color.Blue));
 					myPane.Title.Text = "Standard Deviation";
+					break;
+				case 4:
+					myCurveList.Add(new Curve("arcotangente(magnY/magnZ)", arctanMyMzContinua(sampwin), Color.Blue));
+					myPane.Title.Text = "arcotangente(magnY/magnZ)";
+					myPane.YAxis.Title.Text = "arcotangente(magnY/magnZ)";
 					break;
 				default:
 					break;
@@ -673,7 +723,7 @@ namespace Sense {
 					action = null;
 					outToFileStr = "";
 				}
-				
+
 				motoStart = 0;
 				fermoStart = 0;
 				action = null;
@@ -683,10 +733,9 @@ namespace Sense {
 				winTime = 0;
 				startTime = new DateTime(1900, 1, 1);
 				actionFile.Close();
-				printToServerConsoleProtected("Action log file created at" + csvPath + @"\actions_log_" + t + ".txt\n");
+				printToServerConsoleProtected("Action log file created " + csvPath + @"\actions_log_" + t + ".txt\n");
 			}
 		}
-		//Delegate functions END
 
 		/****************************************************/
 		/*** Eventi triggherati da input Utente sulla GUI ***/
