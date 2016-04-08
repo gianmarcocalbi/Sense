@@ -325,7 +325,7 @@ namespace Sense {
 						//da -pi/2 (questo è i) a pi/2 (questo è i - 1) in quanto la loro differenza risulta negativa
 						//adesso finché non ne esco sono nella finestra -pi/2 -3/2pi (caso in cui sfasamento = 0)
 						sfasamento++;
-					} else { 
+					} else {
 						//da pi/2 (questo è i) a -pi/2 (questo è i - 1) in quanto la loro differenza risulta positiva
 						sfasamento--;
 					}
@@ -333,6 +333,41 @@ namespace Sense {
 				thetaCorretto[i] = arctan[i] + sfasamento * Math.PI;
 			}
 			return thetaCorretto;
+		}
+
+		public PointPairList computeDeadReckoning(List<double[,]> sampwin) {
+			//sistemare theta e a con valori veri presi da sampwin
+			//appunto jack: abbiamo a disposizione thetaCorretto
+			double[] theta = arctanMyMzContinua(sampwin);
+
+			double[] acc = module(sampwin, 0, 0, 1, 0, 0);
+			PointPairList p = new PointPairList();
+			double[] x = new double[sampwin.Count];
+			double[] y = new double[sampwin.Count];
+			double ds = 0;
+			double t = 1 / (double)frequence;
+			double dx, dy, v0;
+			//printToServerConsoleProtected(String.Format("t = {0} - frequence : {1} \n", t, frequence));
+			//double[] theta;
+			x[0] = 0;
+			y[0] = 0;
+			p.Add(x[0], y[0]);
+			//printToServerConsoleProtected(String.Format("Punto {0}-esimo : ({1}, {2})\n", 0, x[0], y[0]));
+			//aggiunta cordinata partenza a pplist
+			//gia' dentro un ciclo
+			for (int i = 1; i < sampwin.Count; i++) {
+				v0 = ds / t; //prima iterazione velocita' nulla ovviamente
+				ds = v0 * t + 0.5 * acc[i] * t * t; //prima iterazione dx = 0 + (1/2)*a*t*t
+														//scomponimento dx lungo le sue componenti grazie all'angolo ecc
+				dx = ds * Math.Cos(theta[i - 1]);
+				dy = ds * Math.Sin(theta[i - 1]);
+				//printToServerConsoleProtected(String.Format("v0 : {4} - dx : {0} - dy : {1} - ds : {2} - acc : {3}\n", dx, dy, ds, acc[i], v0));
+				x[i] = x[i - 1] + dx; //sistemare x0, y0 con attuali valori dell-array 
+				y[i] = y[i - 1] + dy;
+				p.Add(x[i], y[i]);
+				//printToServerConsoleProtected(String.Format("Punto {0}-esimo : ({1}, {2})\n", i, x[i], y[i]));
+			}
+			return p;
 		}
 
 		/// <summary>
@@ -563,6 +598,13 @@ namespace Sense {
 					myCurveList.Add(new Curve("arcotangente(magnY/magnZ)", arctanMyMzContinua(sampwin), Color.Blue));
 					myPane.Title.Text = "arcotangente(magnY/magnZ)";
 					myPane.YAxis.Title.Text = "arcotangente(magnY/magnZ)";
+					break;
+				case 5:
+					myPane.Title.Text = "Path";
+					myPane.YAxis.Title.Text = "m";
+					myPane.XAxis.Title.Text = "m";
+					LineItem tmpLine = myPane.AddCurve("Path", computeDeadReckoning(sampwin), Color.BlueViolet, SymbolType.None);
+					//myLineList.Add(tmpLine);
 					break;
 				default:
 					break;

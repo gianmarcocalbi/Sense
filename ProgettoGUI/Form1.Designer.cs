@@ -524,7 +524,8 @@
             "Derivata",
             "Eulero",
             "Deviazione",
-            "ArcTan(magnY/magnZ)"});
+            "ArcTan(magnY/magnZ)",
+            "Dead Reckoning"});
 			this.comboBoxChart.Location = new System.Drawing.Point(73, 11);
 			this.comboBoxChart.Name = "comboBoxChart";
 			this.comboBoxChart.Size = new System.Drawing.Size(120, 21);
