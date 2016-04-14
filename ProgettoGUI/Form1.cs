@@ -31,8 +31,14 @@ namespace Sense {
 		double winTime = 0;
 		string action = null;
 		string state = null;
+		string turnAction = null;
+		double turnStart = 0;
+		string turnPossibleAction = null;
+		double turnPossibleStart = 0;
 		double stateStart = 0;
+		double degree = 10;
 		string outToFileStr = "";
+		double refAngolo = 0;
 		DateTime startTime = new DateTime(1900, 1, 1, 0, 0, 0, 0);
 
 		/// <summary>
@@ -134,27 +140,36 @@ namespace Sense {
 			this.CenterToScreen();
 		}
 
-		//Plotting Functions BEGIN
-		/// <summary>
-		/// Overload Modulo che considera tutte le tre dimensioni x,y,z.
-		/// </summary>
-		/// <param name="sampwin"></param>
-		/// <returns>Array di valori modulo.</returns>
-		public double[] module(List<double[,]> sampwin) {
-			return module(sampwin, 1, 1, 1);
+		public double[] extractDimension(List<double[,]> sampwin, int selSensor, int selSensorType, char xyz) {
+			int dim = sampwin.Count();
+			double[] extractedDimension = new double[dim];
+			for (int i = 0; i < dim; ++i) {
+				double[,] instant = sampwin[i];
+				if (xyz == 'x') {
+					extractedDimension[i] = instant[selSensor, selSensorType * 3];
+				} else if (xyz == 'y') {
+					extractedDimension[i] = instant[selSensor, selSensorType * 3 + 1];
+				} else if (xyz == 'z') {
+					extractedDimension[i] = instant[selSensor, selSensorType * 3 + 2];
+				} else {
+					extractedDimension[i] = 0;
+				}
+			}
+			return extractedDimension;
+		}
+
+		public double[] extractDimension(List<double[,]> sampwin, char xyz) {
+			return extractDimension(sampwin, selectedSensor, selectedSensorType, xyz);
 		}
 
 		/// <summary>
 		/// Modulo.
 		/// </summary>
 		/// <param name="sampwin"></param>
-		/// <param name="x">Coefficiente per il quale moltiplicare la componente X.</param>
-		/// <param name="y">Coefficiente per il quale moltiplicare la componente Y.</param>
-		/// <param name="z">Coefficiente per il quale moltiplicare la componente Z.</param>
 		/// <returns>Array di valori modulo.</returns>
-		public double[] module(List<double[,]> sampwin, int x, int y, int z)    //PRIMA OPERAZIONE: MODULO
+		public double[] module(List<double[,]> sampwin)    //PRIMA OPERAZIONE: MODULO
 		{
-			return module(sampwin, selectedSensor, selectedSensorType, x, y, z);
+			return module(sampwin, selectedSensor, selectedSensorType);
 		}
 
 		/// <summary>
@@ -163,31 +178,17 @@ namespace Sense {
 		/// <param name="sampwin">Sampwin.</param>
 		/// <param name="selSensor">Sensore da considerare.</param>
 		/// <param name="selSensorType">Tipo sensore da considerare.</param>
-		/// <param name="x">Coefficiente per il quale moltiplicare la componente X.</param>
-		/// <param name="y">Coefficiente per il quale moltiplicare la componente Y.</param>
-		/// <param name="z">Coefficiente per il quale moltiplicare la componente Z.</param>
 		/// <returns>Array di valori modulo.</returns>
-		public double[] module(List<double[,]> sampwin, int selSensor, int selSensorType, int x, int y, int z)    //PRIMA OPERAZIONE: MODULO
+		public double[] module(List<double[,]> sampwin, int selSensor, int selSensorType)    //PRIMA OPERAZIONE: MODULO
 		{
 			int dim = sampwin.Count();
 			double[] arrayModulo = new double[dim];
 			for (int i = 0; i < dim; ++i) {
 				double[,] instant = sampwin[i];
-				arrayModulo[i] = Math.Sqrt(Math.Pow(instant[selSensor, selSensorType * 3 + 0], 2) * x + Math.Pow(instant[selSensor, selSensorType * 3 + 1], 2) * y + Math.Pow(instant[selSensor, selSensorType * 3 + 2], 2) * z);
+				arrayModulo[i] = Math.Sqrt(Math.Pow(instant[selSensor, selSensorType * 3 + 0], 2) + Math.Pow(instant[selSensor, selSensorType * 3 + 1], 2) + Math.Pow(instant[selSensor, selSensorType * 3 + 2], 2));
 				//printToServerConsoleProtected(arrayModulo[i] + "\n");
 			}
 			return arrayModulo;
-		}
-
-		/// <summary>
-		/// Overload Modulo che consente impostazione manuale del sensore e tipo di sensore selezionati in tutte le dimensioni.
-		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
-		/// <param name="selSensor">Sensore da considerare.</param>
-		/// <param name="selSensorType">Tipo sensore da considerare.</param>
-		/// <returns></returns>
-		public double[] module(List<double[,]> sampwin, int selSensor, int selSensorType) {
-			return module(sampwin, selSensor, selSensorType, 1, 1, 1);
 		}
 
 		/// <summary>
@@ -264,23 +265,18 @@ namespace Sense {
 			return deviazioneStandard;
 		}
 
-		/// <summary>
-		/// Operazione per il calcolo degli Angoli di Eulero.
-		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
-		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
-		public double[,] angoliDiEulero(List<double[,]> sampwin)                //QUINTA OPERAZIONE: ANGOLI DI EULERO
-		{
+		public double[,] angoliDiEulero(List<double[,]> sampwin, int selSensor) {
 			double q0, q1, q2, q3;
 			int dim = sampwin.Count();
 			double[,] arrayAngoli = new double[3, dim];
 			for (int i = 0; i < dim; ++i) {
 				//estrazione della quadrupla del campione iesimo
 				double[,] instant = sampwin[i];
-				q0 = instant[selectedSensor, 9];
-				q1 = instant[selectedSensor, 10];
-				q2 = instant[selectedSensor, 11];
-				q3 = instant[selectedSensor, 12];
+				q0 = instant[selSensor, 9];
+				q1 = instant[selSensor, 10];
+				q2 = instant[selSensor, 11];
+				q3 = instant[selSensor, 12];
+				//Link per capire il significato degli angoli: https://goo.gl/jn8Dxg
 				//roll/phi
 				arrayAngoli[0, i] = Math.Atan((2 * q2 * q3 + 2 * q0 * q1) / (2 * Math.Pow(q0, 2) + 2 * Math.Pow(q3, 2) - 1));
 				//pitch/theta
@@ -289,6 +285,46 @@ namespace Sense {
 				arrayAngoli[2, i] = Math.Atan((2 * q1 * q2 + 2 * q0 * q3) / (2 * Math.Pow(q0, 2) + 2 * Math.Pow(q1, 2) - 1));
 			}
 			return arrayAngoli;
+		}
+
+		/// <summary>
+		/// Operazione per il calcolo degli Angoli di Eulero.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
+		public double[,] angoliDiEulero(List<double[,]> sampwin)                //QUINTA OPERAZIONE: ANGOLI DI EULERO
+		{
+			return angoliDiEulero(sampwin, selectedSensor);
+		}
+
+		public double[,] angoliDiEuleroContinua(List<double[,]> sampwin, int selSensor) {
+			double[,] arctan = angoliDiEulero(sampwin, selSensor); //con selected sensor
+			int sfasamento = 0;
+			double[,] thetaCorretto = new double[3, sampwin.Count]; //da sistemare con la dimensione giusta una volta stabiliti nomi definitivi 
+			thetaCorretto[0, 0] = arctan[0, 0];
+			thetaCorretto[1, 0] = arctan[1, 0];
+			thetaCorretto[2, 0] = arctan[2, 0];
+			double instant = 0;
+			for (int j = 0; j < 3; j++) {
+				for (int i = 1; i < sampwin.Count; i++) { //importante partenza da 1 //sistemare
+					instant = arctan[j, i] - arctan[j, i - 1]; // differenza di segni opposti sempre risultato distante da 0
+					if (Math.Abs(instant) > 2.5) {
+						//ha fatto il salto, il lato non ancora identificato
+						//2,5 per ora viene calibrato con un euristica grazie ad un dei primi casi stronzi di salto interno al range, modificabile ovviamente
+						//printToServerConsoleProtected("i : " + i + ", instant : " + instant + "\n");
+						if (instant < 0) {
+							//da -pi/2 (questo è i) a pi/2 (questo è i - 1) in quanto la loro differenza risulta negativa
+							//adesso finché non ne esco sono nella finestra -pi/2 -3/2pi (caso in cui sfasamento = 0)
+							sfasamento++;
+						} else {
+							//da pi/2 (questo è i) a -pi/2 (questo è i - 1) in quanto la loro differenza risulta positiva
+							sfasamento--;
+						}
+					}
+					thetaCorretto[j, i] = arctan[j, i] + sfasamento * Math.PI;
+				}
+			}
+			return thetaCorretto;
 		}
 
 		/// <summary>
@@ -338,39 +374,61 @@ namespace Sense {
 		public PointPairList computeDeadReckoning(List<double[,]> sampwin) {
 			//sistemare theta e a con valori veri presi da sampwin
 			//appunto jack: abbiamo a disposizione thetaCorretto
-			double[] theta = arctanMyMzContinua(sampwin);
-
-			double[] acc = module(sampwin, 0, 0, 1, 0, 0);
+			//double[] theta = arctanMyMzContinua(sampwin);
+			int fattoreRealismoGimConJak = 4;
+			double[,] eulero = angoliDiEuleroContinua(sampwin, 0);
+			double[] theta = new double[sampwin.Count];
+			for (int i = 0; i < sampwin.Count; i++) {
+				theta[i] = eulero[2, i];
+			}
+			double[] pitch = new double[sampwin.Count];
+			for (int i = 0; i < sampwin.Count; i++) {
+				pitch[i] = eulero[1, i];
+			}
+			double[] acc = extractDimension(sampwin, 0, 0, 'y');
 			PointPairList p = new PointPairList();
 			double[] x = new double[sampwin.Count];
 			double[] y = new double[sampwin.Count];
 			double ds = 0;
 			double t = 1 / (double)frequence;
-			double dx, dy, v0;
+			double dx, dy, v0 = 1;
 			//printToServerConsoleProtected(String.Format("t = {0} - frequence : {1} \n", t, frequence));
 			//double[] theta;
 			x[0] = 0;
 			y[0] = 0;
-			p.Add(x[0], y[0]);
+			//p.Add(x[0], y[0]);
 			//printToServerConsoleProtected(String.Format("Punto {0}-esimo : ({1}, {2})\n", 0, x[0], y[0]));
 			//aggiunta cordinata partenza a pplist
 			//gia' dentro un ciclo
-            double theta1 = theta[0];
-            double degree = 0;
+			double acc1;
+			double[] dev = deviazioneStandard(acc, 10);
+			double theta1 = theta[0];
 			for (int i = 1; i < sampwin.Count; i++) {
-				v0 = ds / t; //prima iterazione velocita' nulla ovviamente
-				ds = v0 * t + 0.5 * acc[i] * t * t; //prima iterazione dx = 0 + (1/2)*a*t*t
+				//acc1 = acc[i] * Math.Cos(pitch[i]);
+				//v0 = ds / t; //prima iterazione velocita' nulla ovviamente
+				v0 = dev[i];
+				if (action != "fermo") {
+					ds = v0 * t; //prima iterazione dx = 0 + (1/2)*a*t*t
+				} else {
+					ds = 0;
+				}
 				if (Math.Abs(theta1 - theta[i - 1]) > (Math.PI / 180 * degree))
-                    theta1 = theta[i -1];
-                    //scomponimento dx lungo le sue componenti grazie all'angolo ecc
-				dx = ds * Math.Cos(theta1);
-				dy = ds * Math.Sin(theta1);
+					theta1 = theta[i - 1];
+				//scomponimento dx lungo le sue componenti grazie all'angolo ecc
+				dx = ds * Math.Cos(theta1) * fattoreRealismoGimConJak;
+				dy = ds * Math.Sin(theta1) * fattoreRealismoGimConJak;
 				//printToServerConsoleProtected(String.Format("v0 : {4} - dx : {0} - dy : {1} - ds : {2} - acc : {3}\n", dx, dy, ds, acc[i], v0));
 				x[i] = x[i - 1] + dx; //sistemare x0, y0 con attuali valori dell-array 
 				y[i] = y[i - 1] + dy;
-				p.Add(x[i], y[i]);
+
 				//printToServerConsoleProtected(String.Format("Punto {0}-esimo : ({1}, {2})\n", i, x[i], y[i]));
+
+
 			}
+			x = smoothing(x, 50);
+			y = smoothing(y, 50);
+			for (int i = 0; i < sampwin.Count; i++)
+				p.Add(x[i], y[i]);
 			return p;
 		}
 
@@ -408,35 +466,35 @@ namespace Sense {
 
 		//Old Functions BEGIN
 		/*private void createGraph(ZedGraph.ZedGraphControl zedGraphControl, int drawX, int drawY, int sizeX, int sizeY, string titolo, string x, string y) {
-			zedGraphControl.Location = new Point(drawX, drawY);
-			zedGraphControl.Size = new Size(sizeX, sizeY);
-			myPane = zedGraphControl.GraphPane;
-			myPane.Title.Text = titolo;
-			myPane.XAxis.Title.Text = x;
-			myPane.YAxis.Title.Text = y;
-		}*/
+            zedGraphControl.Location = new Point(drawX, drawY);
+            zedGraphControl.Size = new Size(sizeX, sizeY);
+            myPane = zedGraphControl.GraphPane;
+            myPane.Title.Text = titolo;
+            myPane.XAxis.Title.Text = x;
+            myPane.YAxis.Title.Text = y;
+        }*/
 
 		/*public double[,] generateSampwin() //generazione simulata di un sampwin semplificato
-		{
-			int firstDimension = 13;
-			double[,] sampwin = new double[firstDimension, frequence * window];
-			for (int i = 0; i < firstDimension; ++i)
-				sampwin[i, 0] = random.Next(-100, 100);
-			for (int i = 0; i < firstDimension; ++i)
-				for (int j = 1; j < frequence * window; ++j)
-					sampwin[i, j] = sampwin[i, j - 1] + (random.Next(-100, 100));
-			return sampwin;
-		}*/
+        {
+            int firstDimension = 13;
+            double[,] sampwin = new double[firstDimension, frequence * window];
+            for (int i = 0; i < firstDimension; ++i)
+                sampwin[i, 0] = random.Next(-100, 100);
+            for (int i = 0; i < firstDimension; ++i)
+                for (int j = 1; j < frequence * window; ++j)
+                    sampwin[i, j] = sampwin[i, j - 1] + (random.Next(-100, 100));
+            return sampwin;
+        }*/
 
 		/*public double[] multiToSingleArray(double[,] multiArray, int firstDimension) {
-			//if 0 <= firstDimension <= 2 stiamo estraendo una delle coordinate per la simulazione di un primo generico sensore
-			//if 9 <= firstDimension <= 12 stiamo estraendo uno dei quaternioni
-			int dim = multiArray.GetLength(1);
-			double[] singleArray = new double[dim];
-			for (int i = 0; i < dim; ++i)
-				singleArray[i] = multiArray[firstDimension, i];
-			return singleArray;
-		}*/
+            //if 0 <= firstDimension <= 2 stiamo estraendo una delle coordinate per la simulazione di un primo generico sensore
+            //if 9 <= firstDimension <= 12 stiamo estraendo uno dei quaternioni
+            int dim = multiArray.GetLength(1);
+            double[] singleArray = new double[dim];
+            for (int i = 0; i < dim; ++i)
+                singleArray[i] = multiArray[firstDimension, i];
+            return singleArray;
+        }*/
 
 		protected override bool ProcessDialogKey(Keys keyData) //escape 
 		{
@@ -580,7 +638,7 @@ namespace Sense {
 					break;
 				case 2:
 					int length = sampwin.Count();
-					double[,] instant = angoliDiEulero(sampwin);
+					double[,] instant = angoliDiEuleroContinua(sampwin, selectedSensor); //(!) mettere angoliDiEulero
 					double[] Phi = new double[length];
 					double[] Theta = new double[length];
 					double[] Psi = new double[length];
@@ -604,10 +662,19 @@ namespace Sense {
 					myPane.YAxis.Title.Text = "arcotangente(magnY/magnZ)";
 					break;
 				case 5:
+					///Dead Reckoning
+					//(!)Usare Curve anche qua
 					myPane.Title.Text = "Path";
 					myPane.YAxis.Title.Text = "m";
 					myPane.XAxis.Title.Text = "m";
-					LineItem tmpLine = myPane.AddCurve("Path", computeDeadReckoning(sampwin), Color.BlueViolet, SymbolType.None);
+					PointPairList tempPPL = computeDeadReckoning(sampwin);
+					LineItem tmpLine1 = myPane.AddCurve("Path", tempPPL, Color.BlueViolet, SymbolType.None);
+					PointPairList templist1 = new PointPairList();
+					PointPairList templist2 = new PointPairList();
+					templist1.Add(tempPPL.First().X, tempPPL.First().Y);
+					LineItem tmpLine2 = myPane.AddCurve("Start", templist1, Color.Red, SymbolType.Triangle);
+					templist2.Add(tempPPL.Last().X, tempPPL.Last().Y);
+					LineItem tmpLine3 = myPane.AddCurve("End", templist2, Color.Red, SymbolType.Circle);
 					//myLineList.Add(tmpLine);
 					break;
 				default:
@@ -673,17 +740,18 @@ namespace Sense {
 				startTime = DateTime.Now;
 			}
 
-			///Modulo accelerometro sensore bacino
-			double[] parsingArray = module(parsingMatrix, 0, 0);
-
 			///Deviazione Standard modulo accelerometro
-			double[] stDevArray = smoothing(deviazioneStandard(parsingArray, 10), 10); //(!) Valutare la possibilità di settare una costante al posto di smoothRange (e.g. 10)
-			double[] accXArray = smoothing(module(parsingMatrix, 0, 0, 1, 0, 0), 10);
+			double[] stDevArray = smoothing(deviazioneStandard(module(parsingMatrix, 0, 0), 10), 10);
+			double[] accXArray = smoothing(extractDimension(sampwin, 0, 0, 'x'), 10);
+			double[] thetaMagnArray = smoothing(arctanMyMzContinua(sampwin), 10);
+			double[] thetaMagnStDevArray = smoothing(deviazioneStandard(thetaMagnArray, 10), 10);
 			double time = 0;
+			refAngolo = thetaMagnArray[0];
 			DateTime tempTime = startTime;
 			for (int i = 0; i < stDevArray.Length; i++) {
 				time = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
 				if (time > winTime) {
+					///Moto-stazionamento
 					if (stDevArray[i] < 0.01) {
 						//(!) 0.01 valore determinato in modo empirico altamente fallace
 						//possibile moto stazionario
@@ -713,6 +781,7 @@ namespace Sense {
 						action = "non-fermo";
 					}
 
+					///Lay-Stand-Sit
 					if (accXArray[i] <= 2.7) {
 						if (state != "Lay" && state != null) {
 							outToFileStr += tempTime.AddSeconds(stateStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + state + "\n";
@@ -731,13 +800,98 @@ namespace Sense {
 							stateStart = time;
 						}
 						state = "Sit";
-					} else { //> 7
+					} else { //> 7 
 						if (state != "Stand" && state != null) {
 							outToFileStr += tempTime.AddSeconds(stateStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + state + "\n";
 							stateStart = time;
 						}
 						state = "Stand";
 					}
+
+					///Girata
+					if (Math.Abs(thetaMagnArray[i] - refAngolo) < 0.15) { //più o meno (5 gradi == 0.087 radianti), 0.5 = 30 gradi, una volta sistemato il tempo potremmo mettere 0.15
+																		  //ci vuole un ulteriore if che dice che non può proseguire se è allo stesso tempo fermo e si sta sedendo, approfondire
+						if (turnAction != "prosegue") { //vuol dire che non può mai iniziare con una girata? concordare con gimmy
+							if (turnPossibleAction != "prosegue") {
+								turnPossibleStart = time;
+								turnPossibleAction = "prosegue";
+							}
+							if (time - turnPossibleStart > 0.3) {
+								//importante AddSeconds abbia time - timePossibleStart
+								outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - turnPossibleStart).ToString("HH:mm:ss") + " " + turnAction + "\n";
+								turnAction = turnPossibleAction;
+								turnStart = turnPossibleStart;
+							}
+						}
+					} else {
+						//segue if per determinare direzione della svolta
+						if (thetaMagnArray[i] - refAngolo < 0) {
+							//DX
+							//non mi è chiaro il discorso del null visto che viene applicato a tutte, non trovo l'inizializzazione forse è quello, np mi spiegherà gimmy
+							if (turnAction != "girata dx") {    //vuol dire che non può mai iniziare con una girata? concordare con gimmy
+								if (turnPossibleAction != "girata dx") {
+									turnPossibleStart = time;
+									turnPossibleAction = "girata dx";
+								} else if (time - turnPossibleStart > 0.3) {
+									//importante AddSeconds abbia time - timePossibleStart
+									outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - turnPossibleStart).ToString("HH:mm:ss") + " " + turnAction + "\n";
+									turnAction = turnPossibleAction;
+									turnStart = turnPossibleStart;
+								}
+							}
+						} else {
+							//SX
+							if (turnAction != "girata sx") {    //vuol dire che non può mai iniziare con una girata? concordare con gimmy
+								if (turnPossibleAction != "girata sx") {
+									turnPossibleStart = time;
+									turnPossibleAction = "girata sx";
+								} else if (time - turnPossibleStart > 0.3) {
+									//importante AddSeconds abbia time - timePossibleStart
+									outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - turnPossibleStart).ToString("HH:mm:ss") + " " + turnAction + "\n";
+									turnAction = turnPossibleAction;
+									turnStart = turnPossibleStart;
+								}
+							}
+						}
+						//variazione avvenuta
+						refAngolo = thetaMagnArray[i];
+					}
+					/* salvare questa parte metti che non funziona la ricostruiamo a partire da questa tanto erano praticamente simmetriche
+
+                    if (turnAction != "prosegue" && turnAction != null) {
+                                                    outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + turnAction + "\n";
+                                                    turnStart = time;//sto mantenendo la direzione
+                                                }
+                                                turnAction = "prosegue";
+
+                                                    //SX
+                                                    if (turnAction != "girata sx" && turnAction != null && time - turnStart > 0.5) {
+                                                        outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + turnAction + "\n";
+                                                        turnStart = time;//sto mantenendo la direzione
+                                                    }
+                                                    turnAction = "girata sx";
+                                                }
+                                                //variazione avvenuta
+                                                refAngolo = thetaMagnArray[i];
+                                            }
+                    */
+
+					/*
+                     double theta1 = theta[0];
+            for (int i = 1; i < sampwin.Count; i++) {
+                acc1 = acc[i] * Math.Cos(pitch[i]);
+                //v0 = ds / t; //prima iterazione velocita' nulla ovviamente
+                v0 = ds * t;
+                if (action != "fermo") {
+                    ds = v0 * t + 0.5 * acc1 * t * t; //prima iterazione dx = 0 + (1/2)*a*t*t
+                } else {
+                    ds = 0;
+                }
+                if (Math.Abs(theta1 - theta[i - 1]) > (Math.PI / 180 * degree))
+                    theta1 = theta[i -1];
+                    */
+
+
 				}
 			}
 			winTime = time;
@@ -756,17 +910,15 @@ namespace Sense {
 					outToFileStr = "";
 				}
 				//Se c'è moto allora ne stampo la fine.
-				if (action == "non-fermo") {
-					actionFile.WriteLine(outToFileStr + tempTime.AddSeconds(motoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(winTime).ToString("HH:mm:ss") + " non-fermo");
-					//printToServerConsoleProtected(motoStart + " " + winTime + " non-fermo\n");
+				if (action != null) {
+					actionFile.WriteLine(outToFileStr + tempTime.AddSeconds(motoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(winTime).ToString("HH:mm:ss") + " " + action);
 					action = null;
 					outToFileStr = "";
 				}
-				//Se ero fermo ne stampo comunque la fine.
-				if (action == "fermo") {
-					actionFile.WriteLine(outToFileStr + tempTime.AddSeconds(fermoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(winTime).ToString("HH:mm:ss") + " fermo");
-					//printToServerConsoleProtected(fermoStart + " " + winTime + " fermo\n");
-					action = null;
+
+				if (turnAction != null) {
+					actionFile.WriteLine(outToFileStr + tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(winTime).ToString("HH:mm:ss") + " " + turnAction);
+					turnAction = null;
 					outToFileStr = "";
 				}
 
@@ -775,6 +927,9 @@ namespace Sense {
 				action = null;
 				state = null;
 				stateStart = 0;
+				turnStart = 0;
+				turnPossibleStart = 0;
+				turnAction = null;
 				outToFileStr = "";
 				winTime = 0;
 				startTime = new DateTime(1900, 1, 1);
