@@ -65,6 +65,9 @@
 			this.comboBoxChart = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+			this.label10 = new System.Windows.Forms.Label();
+			this.numericUpDownClientsAmount = new System.Windows.Forms.NumericUpDown();
+			this.label14 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -73,6 +76,7 @@
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownSmoothing)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownClientsAmount)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// splitContainer1
@@ -84,6 +88,9 @@
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add(this.label14);
+			this.splitContainer1.Panel1.Controls.Add(this.numericUpDownClientsAmount);
+			this.splitContainer1.Panel1.Controls.Add(this.label10);
 			this.splitContainer1.Panel1.Controls.Add(this.buttonClearConsole);
 			this.splitContainer1.Panel1.Controls.Add(this.numericUpDownFinestra);
 			this.splitContainer1.Panel1.Controls.Add(this.buttonSelectFolder);
@@ -127,7 +134,7 @@
 			// 
 			// numericUpDownFinestra
 			// 
-			this.numericUpDownFinestra.Location = new System.Drawing.Point(70, 135);
+			this.numericUpDownFinestra.Location = new System.Drawing.Point(70, 134);
 			this.numericUpDownFinestra.Maximum = new decimal(new int[] {
             999,
             0,
@@ -150,7 +157,7 @@
 			// 
 			// buttonSelectFolder
 			// 
-			this.buttonSelectFolder.Location = new System.Drawing.Point(236, 163);
+			this.buttonSelectFolder.Location = new System.Drawing.Point(236, 193);
 			this.buttonSelectFolder.Name = "buttonSelectFolder";
 			this.buttonSelectFolder.Size = new System.Drawing.Size(24, 22);
 			this.buttonSelectFolder.TabIndex = 22;
@@ -160,7 +167,7 @@
 			// 
 			// textBoxCSVPath
 			// 
-			this.textBoxCSVPath.Location = new System.Drawing.Point(13, 164);
+			this.textBoxCSVPath.Location = new System.Drawing.Point(13, 194);
 			this.textBoxCSVPath.Name = "textBoxCSVPath";
 			this.textBoxCSVPath.Size = new System.Drawing.Size(223, 20);
 			this.textBoxCSVPath.TabIndex = 21;
@@ -181,7 +188,7 @@
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(122, 106);
+			this.label6.Location = new System.Drawing.Point(122, 107);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(20, 13);
 			this.label6.TabIndex = 19;
@@ -222,7 +229,7 @@
             "50",
             "100",
             "200"});
-			this.comboBoxFrequenza.Location = new System.Drawing.Point(70, 103);
+			this.comboBoxFrequenza.Location = new System.Drawing.Point(70, 104);
 			this.comboBoxFrequenza.Name = "comboBoxFrequenza";
 			this.comboBoxFrequenza.Size = new System.Drawing.Size(41, 21);
 			this.comboBoxFrequenza.TabIndex = 14;
@@ -241,7 +248,7 @@
 			// buttonServerStart
 			// 
 			this.buttonServerStart.ForeColor = System.Drawing.Color.Black;
-			this.buttonServerStart.Location = new System.Drawing.Point(75, 194);
+			this.buttonServerStart.Location = new System.Drawing.Point(75, 224);
 			this.buttonServerStart.Name = "buttonServerStart";
 			this.buttonServerStart.Size = new System.Drawing.Size(114, 23);
 			this.buttonServerStart.TabIndex = 12;
@@ -311,7 +318,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(10, 78);
+			this.label2.Location = new System.Drawing.Point(10, 77);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(17, 13);
 			this.label2.TabIndex = 4;
@@ -339,10 +346,10 @@
 			this.richTextConsole.BackColor = System.Drawing.Color.Black;
 			this.richTextConsole.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.richTextConsole.ForeColor = System.Drawing.Color.Lime;
-			this.richTextConsole.Location = new System.Drawing.Point(3, 224);
+			this.richTextConsole.Location = new System.Drawing.Point(3, 253);
 			this.richTextConsole.Name = "richTextConsole";
 			this.richTextConsole.ReadOnly = true;
-			this.richTextConsole.Size = new System.Drawing.Size(266, 306);
+			this.richTextConsole.Size = new System.Drawing.Size(266, 277);
 			this.richTextConsole.TabIndex = 1;
 			this.richTextConsole.Text = "";
 			// 
@@ -542,6 +549,47 @@
 			this.tabPage2.Text = "Help";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point(12, 167);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(44, 13);
+			this.label10.TabIndex = 25;
+			this.label10.Text = "Analyze";
+			// 
+			// numericUpDownClientsAmount
+			// 
+			this.numericUpDownClientsAmount.Location = new System.Drawing.Point(70, 164);
+			this.numericUpDownClientsAmount.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.numericUpDownClientsAmount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownClientsAmount.Name = "numericUpDownClientsAmount";
+			this.numericUpDownClientsAmount.Size = new System.Drawing.Size(41, 20);
+			this.numericUpDownClientsAmount.TabIndex = 26;
+			this.numericUpDownClientsAmount.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownClientsAmount.ValueChanged += new System.EventHandler(this.numericUpDownClientsAmount_ValueChanged);
+			// 
+			// label14
+			// 
+			this.label14.AutoSize = true;
+			this.label14.Location = new System.Drawing.Point(122, 167);
+			this.label14.Name = "label14";
+			this.label14.Size = new System.Drawing.Size(46, 13);
+			this.label14.TabIndex = 27;
+			this.label14.Text = "subjects";
+			// 
 			// Form1
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -564,6 +612,7 @@
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownSmoothing)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownClientsAmount)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -612,6 +661,9 @@
 		private System.Windows.Forms.CheckBox checkBoxSmoothing;
 		private System.Windows.Forms.CheckBox checkBoxPlotDomain;
 		private System.Windows.Forms.NumericUpDown numericUpDownSmoothing;
+		private System.Windows.Forms.Label label14;
+		private System.Windows.Forms.NumericUpDown numericUpDownClientsAmount;
+		private System.Windows.Forms.Label label10;
 	}
 }
 

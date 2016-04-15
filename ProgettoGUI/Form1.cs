@@ -39,6 +39,9 @@ namespace Sense {
 		double degree = 10;
 		string outToFileStr = "";
 		double refAngolo = 0;
+		int clientsAmount = 0;
+		bool multiClient = false;
+		Curve[] multiClientCurves = new Curve[10];
 		DateTime startTime = new DateTime(1900, 1, 1, 0, 0, 0, 0);
 
 		/// <summary>
@@ -62,6 +65,7 @@ namespace Sense {
 			///numericUpDownSmoothing maximum value
 			numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
 			smoothRange = (int)numericUpDownSmoothing.Value;
+			clientsAmount = (int)numericUpDownClientsAmount.Value;
 			///Creazione Parser (Server)
 			parser = new Parser(
 				Int32.Parse(textBoxPort.Text),
@@ -69,6 +73,7 @@ namespace Sense {
 				csvPath,
 				frequence,
 				window,
+				clientsAmount,
 				printToServerConsoleProtected,
 				setButtonServerStartProtected,
 				eatSampwinProtected
@@ -99,14 +104,18 @@ namespace Sense {
 		private void buttonServerStartClick(object sender, EventArgs e) {
 			if (parser.serverIsActive) {
 				///Se il server è attivo allora lo STOPpiamo
+				parser.DeactivateServer();
+				parser.sampwin = null; //(!) Mettere o non mettere questo è un dilemma conan.
+				if(clientsAmount > 1) {
+					mySampwin = null; ///Previene la stampa indesiderata di altri grafici una volta stoppato il server.
+				}
+				multiClientCurves = null;
 				zedGraphControl1.GraphPane.CurveList.Clear();
 				zedGraphControl1.Invalidate();
 				zedGraphControl1.GraphPane.Title.Text = "Chart";
 				zedGraphControl1.GraphPane.XAxis.Title.Text = "x";
 				zedGraphControl1.GraphPane.YAxis.Title.Text = "y";
 				zedGraphControl1.AxisChange();
-				parser.DeactivateServer();
-				parser.sampwin = null; //(!) Mettere o non mettere questo è un dilemma conan.
 			} else {
 				///Se il server è fermo allora lo STARTiamo
 				frequence = Int32.Parse(comboBoxFrequenza.Text);
@@ -117,7 +126,8 @@ namespace Sense {
 						String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
 						csvPath,
 						frequence,
-						window
+						window,
+						clientsAmount
 					);
 				} catch (SocketException exc) {
 					richTextConsole.AppendText(String.Format("{0}\n", exc));
@@ -552,11 +562,27 @@ namespace Sense {
 					textBoxIP4.Enabled = false;
 					comboBoxFrequenza.Enabled = false;
 					numericUpDownFinestra.Enabled = false;
+					numericUpDownClientsAmount.Enabled = false;
 					textBoxCSVPath.Enabled = false;
 					buttonSelectFolder.Enabled = false;
 					buttonServerStart.Text = "STOP";
+					///Se il server è multiclient allora.
+					if (clientsAmount > 1) {
+						///Disabilito tutti i tipi di input del chart.
+						comboBoxChart.Enabled = false;
+						comboBoxTipoSensore.Enabled = false;
+						comboBoxNumSensore.Enabled = false;
+						checkBoxNoiseCanceling.Enabled = false;
+						checkBoxPlotDomain.Enabled = false;
+						checkBoxSegmentation.Enabled = false;
+						checkBoxSmoothing.Enabled = false;
+						checkBoxSmoothing.Checked = false;
+						numericUpDownSmoothing.Enabled = false;
+						///Imposto come chart di stampa il dead reckoning.
+						comboBoxChart.SelectedItem = "Dead Reckoning";
+					}
 				} else {
-					///Riabilita input server quando server inattivo
+					///Riabilita input server quando server inattivo.
 					textBoxPort.Enabled = true;
 					textBoxIP1.Enabled = true;
 					textBoxIP2.Enabled = true;
@@ -564,9 +590,24 @@ namespace Sense {
 					textBoxIP4.Enabled = true;
 					comboBoxFrequenza.Enabled = true;
 					numericUpDownFinestra.Enabled = true;
+					numericUpDownClientsAmount.Enabled = true;
 					textBoxCSVPath.Enabled = true;
 					buttonSelectFolder.Enabled = true;
 					buttonServerStart.Text = "START";
+					///Se il server è multiclient allora..
+					if (clientsAmount > 1) {
+						///Riabilito tutti i tipi di input del chart disabilitati in precedenza.
+						comboBoxChart.Enabled = true;
+						comboBoxTipoSensore.Enabled = true;
+						comboBoxNumSensore.Enabled = true;
+						checkBoxNoiseCanceling.Enabled = true;
+						checkBoxPlotDomain.Enabled = true;
+						checkBoxSegmentation.Enabled = true;
+						checkBoxSmoothing.Enabled = true;
+						checkBoxSmoothing.Checked = true;
+						numericUpDownSmoothing.Enabled = true;
+						comboBoxChart.SelectedIndex = 0;
+					}
 				}
 			}
 		}
@@ -575,22 +616,27 @@ namespace Sense {
 		/// Delegato per plottare la sampwin.
 		/// </summary>
 		/// <param name="sampwin">Sampwin.</param>
-		public delegate void eatSampwinDelegate(List<double[,]> sampwin);
+		public delegate void eatSampwinDelegate(List<double[,]> sampwin, int client_index);
 
 		/// <summary>
 		/// Plotta la sampwin.
 		/// </summary>
 		/// <param name="sampwin">Sampwin.</param>
-		public void eatSampwinProtected(List<double[,]> sampwin) {
+		public void eatSampwinProtected(List<double[,]> sampwin, int client_index) {
 			if (this.zedGraphControl1.InvokeRequired) {
-				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin });
+				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin , client_index });
 			} else {
 				//Quando il server ha finito di leggere la sampwin ce ne salviamo una copia il locale.
-				if (parser.SampwinIsFullIdle) {
-					mySampwin = sampwin;
+				if (clientsAmount == 1) {
+					if (parser.SampwinIsFullIdle) {
+						mySampwin = sampwin;
+					}
+					DrawSampwin(sampwin);
+					ParseActions(sampwin);
+				} else {
+					//clients_amount > 1
+					DrawSampwinMultiClient(sampwin, client_index);
 				}
-				DrawSampwin(sampwin);
-				ParseActions(sampwin);
 			}
 		}
 		//Delegate functions END
@@ -938,6 +984,32 @@ namespace Sense {
 			}
 		}
 
+		public void DrawSampwinMultiClient(List<double[,]> sampwin, int client_index) {
+			myPane.CurveList.Clear();
+			zedGraphControl1.Invalidate();
+			myPane.Title.Text = "Dead Reckoning Multi Client";
+			myPane.YAxis.Title.Text = "m";
+			myPane.XAxis.Title.Text = "m";
+			Curve tmpLine1 = new Curve("Path subject #" + client_index, computeDeadReckoning(sampwin), Color.BlueViolet, SymbolType.None);
+			multiClientCurves[client_index] = tmpLine1;
+			Color[] colors = { Color.Blue, Color.Green, Color.Orange, Color.LightCyan, Color.Magenta, Color.Salmon, Color.Brown, Color.Beige, Color.LavenderBlush, Color.LightGoldenrodYellow };
+			for(int i = 0; i < clientsAmount; i++) {
+				if (multiClientCurves[i] != null) {
+					myPane.AddCurve(multiClientCurves[i].Label, multiClientCurves[i].PointsValueList, colors[i], multiClientCurves[i].SymbolType);
+					PointPairList tempPPL = multiClientCurves[i].PointsValueList;
+					PointPairList templist1 = new PointPairList();
+					PointPairList templist2 = new PointPairList();
+					templist1.Add(tempPPL.First().X, tempPPL.First().Y);
+					LineItem tmpLine2 = myPane.AddCurve("Start #" + i, templist1, colors[i], SymbolType.Triangle);
+					templist2.Add(tempPPL.Last().X, tempPPL.Last().Y);
+					LineItem tmpLine3 = myPane.AddCurve("End #" + i, templist2, colors[i], SymbolType.Circle);
+				}
+			}
+
+			zedGraphControl1.AxisChange();
+			zedGraphControl1.Refresh();
+		}
+
 		/****************************************************/
 		/*** Eventi triggherati da input Utente sulla GUI ***/
 		/****************************************************/
@@ -1025,6 +1097,10 @@ namespace Sense {
 			if (parser.sampwin != null) {
 				DrawSampwin(parser.sampwin);
 			}
+		}
+
+		private void numericUpDownClientsAmount_ValueChanged(object sender, EventArgs e) {
+			clientsAmount = (int)numericUpDownClientsAmount.Value;
 		}
 	}
 }
