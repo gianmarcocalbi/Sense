@@ -14,59 +14,83 @@ using ZedGraph;
 
 namespace Sense {
 	public partial class Form1 : Form {
+		/// Parser.
 		private Parser parser;
+		/// Thread che fa girare il parser.
 		Thread threadParser;
-		Random random = new Random();
+		/// Frequenza di campionamento.
 		int frequence = 50;
+		/// Dimensione della finestra in secondi.
 		int window = 10;
+		/// Pannello zedgraph.
 		GraphPane myPane;
+		/// Indice grafico selezionato.
 		int selectedChart;
+		/// Indice sensore selezionato.
 		int selectedSensor;
+		/// Indice tipo di sensore selezionato.
 		int selectedSensorType;
+		/// Path in cui salvare il file csv/actions_log.
 		string csvPath;
+		/// Sampwin salvata in locale dopo che il server viene stoppato.
 		List<double[,]> mySampwin;
+		/// Range per la smoothing.
 		int smoothRange;
+		/// Var riconoscimento azione : moto.
 		double motoStart = 0;
+		/// Var riconoscimento azione : moto.
 		double fermoStart = 0;
+		/// Var riconoscimento azioni.
 		double winTime = 0;
+		/// Var riconoscimento azione : moto.
 		string action = null;
+		/// Var riconoscimento azione : posizione.
 		string state = null;
-		string turnAction = null;
-		double turnStart = 0;
-		string turnPossibleAction = null;
-		double turnPossibleStart = 0;
+		/// Var riconoscimento azione : posizione.
 		double stateStart = 0;
+		/// Var riconoscimento azione : girata.
+		string turnAction = null;
+		/// Var riconoscimento azione : girata.
+		double turnStart = 0;
+		/// Var riconoscimento azione : girata.
+		string turnPossibleAction = null;
+		/// Var riconoscimento azione : girata.
+		double turnPossibleStart = 0;
+		/// Var riconoscimento azione : girata.
 		double degree = 10;
-		string outToFileStr = "";
+		/// Var riconoscimento azione : girata.
 		double refAngolo = 0;
+		/// Var riconoscimento azione : stringa da stampare su file.
+		string outToFileStr = "";
+		/// Numero di client che si vuole connettere.
 		int clientsAmount = 0;
-		bool multiClient = false;
+		/// Array di curve di supporto contenente il path di dead reckoning di ogni client (massimo 10).
 		Curve[] multiClientCurves = new Curve[10];
+		/// Data iniziale.
 		DateTime startTime = new DateTime(1900, 1, 1, 0, 0, 0, 0);
 
 		/// <summary>
 		/// Costruttore Primario
 		/// </summary>
 		public Form1() {
-			///Inizializza i componenti grafici
+			//Inizializza i componenti grafici
 			InitializeComponent();
-			///
 			myPane = zedGraphControl1.GraphPane;
-			///Finestra
+			//Finestra
 			window = (int)numericUpDownFinestra.Value;
-			///Frequenza
+			//Frequenza
 			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
-			///CSV Location
+			//CSV Location
 			csvPath = Directory.GetCurrentDirectory();
 			textBoxCSVPath.Text = csvPath;
-			///CSV Location hint EventHandler
+			//CSV Location hint EventHandler
 			this.textBoxCSVPath.MouseEnter += new System.EventHandler(this.textBoxCSVPath_Enter);
-			///numericUpDownSmoothing maximum value
+			//numericUpDownSmoothing maximum value
 			numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
 			smoothRange = (int)numericUpDownSmoothing.Value;
 			clientsAmount = (int)numericUpDownClientsAmount.Value;
-			///Creazione Parser (Server)
+			//Creazione Parser (Server)
 			parser = new Parser(
 				Int32.Parse(textBoxPort.Text),
 				String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
@@ -79,18 +103,18 @@ namespace Sense {
 				eatSampwinProtected
 			);
 
-			///I controlli su selectedChart, selectedSensorType, selectedSensor devono essere fatti dopo aver istanziato il parser perché chiamano una funzione di parser.
-			///Altrimenti ci sarebbe Eccezione del tipo "riferimento a null".
-			///selectedSensor
+			//I controlli su selectedChart, selectedSensorType, selectedSensor devono essere fatti dopo aver istanziato il parser perché chiamano una funzione di parser.
+			//Altrimenti ci sarebbe Eccezione del tipo "riferimento a null".
+			//selectedSensor
 			comboBoxNumSensore.SelectedIndex = comboBoxNumSensore.FindStringExact("1 (Bacino)");
 			selectedSensor = comboBoxNumSensore.SelectedIndex;
-			///selectedSensorType
+			//selectedSensorType
 			comboBoxTipoSensore.SelectedIndex = comboBoxTipoSensore.FindStringExact("Acc");
 			selectedSensorType = comboBoxTipoSensore.SelectedIndex;
-			///selectedChart
+			//selectedChart
 			comboBoxChart.SelectedIndex = comboBoxChart.FindStringExact("Modulo");
 			selectedChart = comboBoxChart.SelectedIndex;
-			///Server thread
+			//Server thread
 			threadParser = new Thread(parser.StartServer);
 			threadParser.IsBackground = true;
 			threadParser.Start();
@@ -103,11 +127,11 @@ namespace Sense {
 		/// <param name="e"></param>
 		private void buttonServerStartClick(object sender, EventArgs e) {
 			if (parser.serverIsActive) {
-				///Se il server è attivo allora lo STOPpiamo
+				//Se il server è attivo allora lo STOPpiamo
 				parser.DeactivateServer();
 				parser.sampwin = null; //(!) Mettere o non mettere questo è un dilemma conan.
-				if(clientsAmount > 1) {
-					mySampwin = null; ///Previene la stampa indesiderata di altri grafici una volta stoppato il server.
+				if (clientsAmount > 1) {
+					mySampwin = null; //Previene la stampa indesiderata di altri grafici una volta stoppato il server.
 				}
 				multiClientCurves = null;
 				zedGraphControl1.GraphPane.CurveList.Clear();
@@ -117,7 +141,7 @@ namespace Sense {
 				zedGraphControl1.GraphPane.YAxis.Title.Text = "y";
 				zedGraphControl1.AxisChange();
 			} else {
-				///Se il server è fermo allora lo STARTiamo
+				//Se il server è fermo allora lo STARTiamo
 				frequence = Int32.Parse(comboBoxFrequenza.Text);
 				numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
 				try {
@@ -140,16 +164,20 @@ namespace Sense {
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void Form1_Load(object sender, EventArgs e) {   //(!) Valutare l'utilità di questo metodo
-																//SAMPWIN ARRAY TRIDIMENSIONALE, SCRITTO CHIARAMENTE NELLA CONSEGNA, LA POSSIAMO SCRIVERE COME double[, ,] ANZICHE double[][][] SCRITTURA VAGAMENTE PIU BARBARICA
-																//SI FA RIFERIMENTO A DUE SAMPWIN UNA CON LE INIZIALI MAIUSCOLE TRIDIMENSIONALE ED UNA TUTTA IN MINUSCOLO CON 
-
+		private void Form1_Load(object sender, EventArgs e) {
 			this.Text = "Sense";
-			this.Opacity = 1; //assolutamente inutile, ma in se l'istruzione mi piaceva, magari riesco a fare i grafici meno trasparenti
-							  //this.Size = new Size(1280, 960); //non può essere utilizzato come una normale chiamata a metodo this.Size(x,y), verificato con errore a compilazione
+			this.Opacity = 1;
 			this.CenterToScreen();
 		}
 
+		/// <summary>
+		/// Estrae il valori selezionati dalla sampwin.
+		/// </summary>
+		/// <param name="sampwin">Sampwin campione.</param>
+		/// <param name="selSensor">Sensore.</param>
+		/// <param name="selSensorType">Tipo sensore.</param>
+		/// <param name="xyz">Dimensione.</param>
+		/// <returns>Array di valori.</returns>
 		public double[] extractDimension(List<double[,]> sampwin, int selSensor, int selSensorType, char xyz) {
 			int dim = sampwin.Count();
 			double[] extractedDimension = new double[dim];
@@ -168,6 +196,12 @@ namespace Sense {
 			return extractedDimension;
 		}
 
+		/// <summary>
+		/// Estrae i valori.
+		/// </summary>
+		/// <param name="sampwin">Sampwin campione.</param>
+		/// <param name="xyz">Dimensione.</param>
+		/// <returns>Array di valori</returns>
 		public double[] extractDimension(List<double[,]> sampwin, char xyz) {
 			return extractDimension(sampwin, selectedSensor, selectedSensorType, xyz);
 		}
@@ -275,6 +309,12 @@ namespace Sense {
 			return deviazioneStandard;
 		}
 
+		/// <summary>
+		/// Operazione per calcolare gli angoli di Eulero.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="selSensor">Sensore selezionato di cui calcolare gli angoli.</param>
+		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
 		public double[,] angoliDiEulero(List<double[,]> sampwin, int selSensor) {
 			double q0, q1, q2, q3;
 			int dim = sampwin.Count();
@@ -298,7 +338,7 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Operazione per il calcolo degli Angoli di Eulero.
+		/// Operazione per il calcolo degli Angoli di Eulero overload.
 		/// </summary>
 		/// <param name="sampwin">Sampwin.</param>
 		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
@@ -307,6 +347,12 @@ namespace Sense {
 			return angoliDiEulero(sampwin, selectedSensor);
 		}
 
+		/// <summary>
+		/// Operazione per l'eliminazione delle discontinuità dalla funzione degli angoli di Eulero.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="selSensor">Sensore selezionato.</param>
+		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
 		public double[,] angoliDiEuleroContinua(List<double[,]> sampwin, int selSensor) {
 			double[,] arctan = angoliDiEulero(sampwin, selSensor); //con selected sensor
 			int sfasamento = 0;
@@ -381,6 +427,11 @@ namespace Sense {
 			return thetaCorretto;
 		}
 
+		/// <summary>
+		/// Operazione per calcolare il path di un soggetto nel piano.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
+		/// <returns>Lista di punti da disegnare.</returns>
 		public PointPairList computeDeadReckoning(List<double[,]> sampwin) {
 			//sistemare theta e a con valori veri presi da sampwin
 			//appunto jack: abbiamo a disposizione thetaCorretto
@@ -410,7 +461,7 @@ namespace Sense {
 			//printToServerConsoleProtected(String.Format("Punto {0}-esimo : ({1}, {2})\n", 0, x[0], y[0]));
 			//aggiunta cordinata partenza a pplist
 			//gia' dentro un ciclo
-			double acc1;
+			//double acc1;
 			double[] dev = deviazioneStandard(acc, 10);
 			double theta1 = theta[0];
 			for (int i = 1; i < sampwin.Count; i++) {
@@ -472,40 +523,14 @@ namespace Sense {
 				list.Add((double)i / frequence, array[i]);
 			return list;
 		}
+
 		//Plotting Functions END
 
-		//Old Functions BEGIN
-		/*private void createGraph(ZedGraph.ZedGraphControl zedGraphControl, int drawX, int drawY, int sizeX, int sizeY, string titolo, string x, string y) {
-            zedGraphControl.Location = new Point(drawX, drawY);
-            zedGraphControl.Size = new Size(sizeX, sizeY);
-            myPane = zedGraphControl.GraphPane;
-            myPane.Title.Text = titolo;
-            myPane.XAxis.Title.Text = x;
-            myPane.YAxis.Title.Text = y;
-        }*/
-
-		/*public double[,] generateSampwin() //generazione simulata di un sampwin semplificato
-        {
-            int firstDimension = 13;
-            double[,] sampwin = new double[firstDimension, frequence * window];
-            for (int i = 0; i < firstDimension; ++i)
-                sampwin[i, 0] = random.Next(-100, 100);
-            for (int i = 0; i < firstDimension; ++i)
-                for (int j = 1; j < frequence * window; ++j)
-                    sampwin[i, j] = sampwin[i, j - 1] + (random.Next(-100, 100));
-            return sampwin;
-        }*/
-
-		/*public double[] multiToSingleArray(double[,] multiArray, int firstDimension) {
-            //if 0 <= firstDimension <= 2 stiamo estraendo una delle coordinate per la simulazione di un primo generico sensore
-            //if 9 <= firstDimension <= 12 stiamo estraendo uno dei quaternioni
-            int dim = multiArray.GetLength(1);
-            double[] singleArray = new double[dim];
-            for (int i = 0; i < dim; ++i)
-                singleArray[i] = multiArray[firstDimension, i];
-            return singleArray;
-        }*/
-
+		/// <summary>
+		/// Click esc to exit.
+		/// </summary>
+		/// <param name="keyData"></param>
+		/// <returns></returns>
 		protected override bool ProcessDialogKey(Keys keyData) //escape 
 		{
 			if (Form.ModifierKeys == Keys.None && keyData == Keys.Escape) {
@@ -514,9 +539,9 @@ namespace Sense {
 			}
 			return base.ProcessDialogKey(keyData);
 		}
-		//Old Functions END
 
 		//Delegate functions BEGIN
+
 		/// <summary>
 		/// Delegato per scrivere sulla console del Server.
 		/// </summary>
@@ -554,7 +579,7 @@ namespace Sense {
 				Invoke(new setButtonServerStartDelegate(setButtonServerStartProtected), new object[] { b });
 			} else {
 				if (b) {
-					///Disabilita input server quando server attivo
+					//Disabilita input server quando server attivo
 					textBoxPort.Enabled = false;
 					textBoxIP1.Enabled = false;
 					textBoxIP2.Enabled = false;
@@ -566,9 +591,9 @@ namespace Sense {
 					textBoxCSVPath.Enabled = false;
 					buttonSelectFolder.Enabled = false;
 					buttonServerStart.Text = "STOP";
-					///Se il server è multiclient allora.
+					//Se il server è multiclient allora.
 					if (clientsAmount > 1) {
-						///Disabilito tutti i tipi di input del chart.
+						//Disabilito tutti i tipi di input del chart.
 						comboBoxChart.Enabled = false;
 						comboBoxTipoSensore.Enabled = false;
 						comboBoxNumSensore.Enabled = false;
@@ -578,11 +603,11 @@ namespace Sense {
 						checkBoxSmoothing.Enabled = false;
 						checkBoxSmoothing.Checked = false;
 						numericUpDownSmoothing.Enabled = false;
-						///Imposto come chart di stampa il dead reckoning.
+						//Imposto come chart di stampa il dead reckoning.
 						comboBoxChart.SelectedItem = "Dead Reckoning";
 					}
 				} else {
-					///Riabilita input server quando server inattivo.
+					//Riabilita input server quando server inattivo.
 					textBoxPort.Enabled = true;
 					textBoxIP1.Enabled = true;
 					textBoxIP2.Enabled = true;
@@ -594,9 +619,9 @@ namespace Sense {
 					textBoxCSVPath.Enabled = true;
 					buttonSelectFolder.Enabled = true;
 					buttonServerStart.Text = "START";
-					///Se il server è multiclient allora..
+					//Se il server è multiclient allora..
 					if (clientsAmount > 1) {
-						///Riabilito tutti i tipi di input del chart disabilitati in precedenza.
+						//Riabilito tutti i tipi di input del chart disabilitati in precedenza.
 						comboBoxChart.Enabled = true;
 						comboBoxTipoSensore.Enabled = true;
 						comboBoxNumSensore.Enabled = true;
@@ -616,15 +641,17 @@ namespace Sense {
 		/// Delegato per plottare la sampwin.
 		/// </summary>
 		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="client_index">Indice client.</param>
 		public delegate void eatSampwinDelegate(List<double[,]> sampwin, int client_index);
 
 		/// <summary>
 		/// Plotta la sampwin.
 		/// </summary>
 		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="client_index">Indice client.</param>
 		public void eatSampwinProtected(List<double[,]> sampwin, int client_index) {
 			if (this.zedGraphControl1.InvokeRequired) {
-				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin , client_index });
+				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin, client_index });
 			} else {
 				//Quando il server ha finito di leggere la sampwin ce ne salviamo una copia il locale.
 				if (clientsAmount == 1) {
@@ -639,8 +666,13 @@ namespace Sense {
 				}
 			}
 		}
+
 		//Delegate functions END
 
+		/// <summary>
+		/// Operazione che plotta la sampwin su Zedgraph.
+		/// </summary>
+		/// <param name="sampwin">Sampwin.</param>
 		public void DrawSampwin(List<double[,]> sampwin) {
 
 			List<Curve> myCurveList = new List<Curve>();
@@ -652,23 +684,23 @@ namespace Sense {
 
 			switch (selectedSensorType) {
 				case 0:
-					///acc
+					//acc
 					myPane.YAxis.Title.Text = "m²";
 					break;
 				case 1:
-					///gyr
+					//gyr
 					myPane.YAxis.Title.Text = "y";
 					break;
 				case 2:
-					///mag
+					//mag
 					myPane.YAxis.Title.Text = "Tesla (?)";
 					break;
 				case 3:
-					///qua
+					//qua
 					myPane.YAxis.Title.Text = "roba di quaternioni";
 					break;
 				default:
-					///bohh
+					//bohh
 					myPane.YAxis.Title.Text = "none";
 					break;
 			}
@@ -708,7 +740,7 @@ namespace Sense {
 					myPane.YAxis.Title.Text = "arcotangente(magnY/magnZ)";
 					break;
 				case 5:
-					///Dead Reckoning
+					//Dead Reckoning
 					//(!)Usare Curve anche qua
 					myPane.Title.Text = "Path";
 					myPane.YAxis.Title.Text = "m";
@@ -768,6 +800,10 @@ namespace Sense {
 			zedGraphControl1.Refresh();
 		}
 
+		/// <summary>
+		/// Operazione per il riconoscimento delle azioni compiute dal soggetto.
+		/// </summary>
+		/// <param name="sampwin">Samwpin.</param>
 		public void ParseActions(List<double[,]> sampwin) {
 
 			/************************************/
@@ -781,12 +817,12 @@ namespace Sense {
 				parsingMatrix = sampwin;
 			}
 
-			///MOTO-STAZIONAMENTO
+			//MOTO-STAZIONAMENTO
 			if (startTime.Year == 1900) {
 				startTime = DateTime.Now;
 			}
 
-			///Deviazione Standard modulo accelerometro
+			//Deviazione Standard modulo accelerometro
 			double[] stDevArray = smoothing(deviazioneStandard(module(parsingMatrix, 0, 0), 10), 10);
 			double[] accXArray = smoothing(extractDimension(sampwin, 0, 0, 'x'), 10);
 			double[] thetaMagnArray = smoothing(arctanMyMzContinua(sampwin), 10);
@@ -797,26 +833,24 @@ namespace Sense {
 			for (int i = 0; i < stDevArray.Length; i++) {
 				time = (sampwin.Count - window * frequence > 0 ? (sampwin.Count - window * frequence + (double)i) / frequence : (double)i / frequence);
 				if (time > winTime) {
-					///Moto-stazionamento
+					//Moto-stazionamento
 					if (stDevArray[i] < 0.01) {
-						//(!) 0.01 valore determinato in modo empirico altamente fallace
 						//possibile moto stazionario
 						//finisce il moto
-						//(!) sistemare tutta sta roba ci sono mille variabili inutili (length e end non servono)
-						if (action == "non-fermo" /*&& fermoEnd <= time*/) {
-							///Fine del moto.
-							///Stampa l'azione di moto appena terminata.
+						if (action == "non-fermo") {
+							//Fine del moto.
+							//Stampa l'azione di moto appena terminata.
 							outToFileStr += tempTime.AddSeconds(motoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " non-fermo\n";
 							//printToServerConsoleProtected(motoStart + " " + motoEnd + " non-fermo\n");
 							//save start point moto stazionario
-							fermoStart = time; ///L'inizio del moto-stazionario coincide con la fine del moto.
+							fermoStart = time; //L'inizio del moto-stazionario coincide con la fine del moto.
 						}
-						///Viene impostata l'azione attuale. 
+						//Viene impostata l'azione attuale. 
 						action = "fermo";
 					} else {
-						//possibile moto motoso
+						//possibile moto
 						//finisce il moto stazionario
-						if (action == "fermo" /*&& motoEnd <= time*/) {
+						if (action == "fermo") {
 							//il non moto è finito, mi salvo i dati che devo salvare
 							//save end point non moto
 							outToFileStr += tempTime.AddSeconds(fermoStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " fermo\n";
@@ -827,7 +861,7 @@ namespace Sense {
 						action = "non-fermo";
 					}
 
-					///Lay-Stand-Sit
+					//Lay-Stand-Sit
 					if (accXArray[i] <= 2.7) {
 						if (state != "Lay" && state != null) {
 							outToFileStr += tempTime.AddSeconds(stateStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + state + "\n";
@@ -854,90 +888,55 @@ namespace Sense {
 						state = "Stand";
 					}
 
-					///Girata
-					if (Math.Abs(thetaMagnArray[i] - refAngolo) < 0.15) { //più o meno (5 gradi == 0.087 radianti), 0.5 = 30 gradi, una volta sistemato il tempo potremmo mettere 0.15
-																		  //ci vuole un ulteriore if che dice che non può proseguire se è allo stesso tempo fermo e si sta sedendo, approfondire
-						if (turnAction != "prosegue") { //vuol dire che non può mai iniziare con una girata? concordare con gimmy
+					//Girata
+					if (Math.Abs(thetaMagnArray[i] - refAngolo) < 0.15) { // 10 gradi = 0.15 radianti
+						if (turnAction != "prosegue") {
 							if (turnPossibleAction != "prosegue") {
 								turnPossibleStart = time;
 								turnPossibleAction = "prosegue";
 							}
 							if (time - turnPossibleStart > 0.3) {
-								//importante AddSeconds abbia time - timePossibleStart
-								outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - turnPossibleStart).ToString("HH:mm:ss") + " " + turnAction + "\n";
+								if (turnAction != null)
+									outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - 0.3).ToString("HH:mm:ss") + " " + turnAction + "\n";
 								turnAction = turnPossibleAction;
-								turnStart = turnPossibleStart;
+								turnStart = time - 0.3;
+								//turnStart = turnPossibleStart;
 							}
 						}
 					} else {
 						//segue if per determinare direzione della svolta
 						if (thetaMagnArray[i] - refAngolo < 0) {
 							//DX
-							//non mi è chiaro il discorso del null visto che viene applicato a tutte, non trovo l'inizializzazione forse è quello, np mi spiegherà gimmy
-							if (turnAction != "girata dx") {    //vuol dire che non può mai iniziare con una girata? concordare con gimmy
+							if (turnAction != "girata dx") {
 								if (turnPossibleAction != "girata dx") {
 									turnPossibleStart = time;
 									turnPossibleAction = "girata dx";
 								} else if (time - turnPossibleStart > 0.3) {
-									//importante AddSeconds abbia time - timePossibleStart
-									outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - turnPossibleStart).ToString("HH:mm:ss") + " " + turnAction + "\n";
+									if (turnAction != null)
+										outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - 0.3).ToString("HH:mm:ss") + " " + turnAction + "\n";
 									turnAction = turnPossibleAction;
-									turnStart = turnPossibleStart;
+									turnStart = time - 0.3;
+									//turnStart = turnPossibleStart;
 								}
 							}
 						} else {
 							//SX
-							if (turnAction != "girata sx") {    //vuol dire che non può mai iniziare con una girata? concordare con gimmy
+							if (turnAction != "girata sx") {
 								if (turnPossibleAction != "girata sx") {
 									turnPossibleStart = time;
 									turnPossibleAction = "girata sx";
 								} else if (time - turnPossibleStart > 0.3) {
-									//importante AddSeconds abbia time - timePossibleStart
-									outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - turnPossibleStart).ToString("HH:mm:ss") + " " + turnAction + "\n";
+									if (turnAction != null)
+										outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - 0.3).ToString("HH:mm:ss") + " " + turnAction + "\n";
 									turnAction = turnPossibleAction;
-									turnStart = turnPossibleStart;
+									turnStart = time - 0.3;
+									//turnStart = turnPossibleStart;
 								}
 							}
 						}
 						//variazione avvenuta
 						refAngolo = thetaMagnArray[i];
 					}
-					/* salvare questa parte metti che non funziona la ricostruiamo a partire da questa tanto erano praticamente simmetriche
-
-                    if (turnAction != "prosegue" && turnAction != null) {
-                                                    outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + turnAction + "\n";
-                                                    turnStart = time;//sto mantenendo la direzione
-                                                }
-                                                turnAction = "prosegue";
-
-                                                    //SX
-                                                    if (turnAction != "girata sx" && turnAction != null && time - turnStart > 0.5) {
-                                                        outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time).ToString("HH:mm:ss") + " " + turnAction + "\n";
-                                                        turnStart = time;//sto mantenendo la direzione
-                                                    }
-                                                    turnAction = "girata sx";
-                                                }
-                                                //variazione avvenuta
-                                                refAngolo = thetaMagnArray[i];
-                                            }
-                    */
-
-					/*
-                     double theta1 = theta[0];
-            for (int i = 1; i < sampwin.Count; i++) {
-                acc1 = acc[i] * Math.Cos(pitch[i]);
-                //v0 = ds / t; //prima iterazione velocita' nulla ovviamente
-                v0 = ds * t;
-                if (action != "fermo") {
-                    ds = v0 * t + 0.5 * acc1 * t * t; //prima iterazione dx = 0 + (1/2)*a*t*t
-                } else {
-                    ds = 0;
-                }
-                if (Math.Abs(theta1 - theta[i - 1]) > (Math.PI / 180 * degree))
-                    theta1 = theta[i -1];
-                    */
-
-
 				}
 			}
 			winTime = time;
@@ -984,6 +983,11 @@ namespace Sense {
 			}
 		}
 
+		/// <summary>
+		/// Operazione per il plotting del dead reckoning multi client.
+		/// </summary>
+		/// <param name="sampwin">Sampwin</param>
+		/// <param name="client_index">INdice del client che disegna il proprio path.</param>
 		public void DrawSampwinMultiClient(List<double[,]> sampwin, int client_index) {
 			myPane.CurveList.Clear();
 			zedGraphControl1.Invalidate();
@@ -993,7 +997,7 @@ namespace Sense {
 			Curve tmpLine1 = new Curve("Path subject #" + client_index, computeDeadReckoning(sampwin), Color.BlueViolet, SymbolType.None);
 			multiClientCurves[client_index] = tmpLine1;
 			Color[] colors = { Color.Blue, Color.Green, Color.Orange, Color.LightCyan, Color.Magenta, Color.Salmon, Color.Brown, Color.Beige, Color.LavenderBlush, Color.LightGoldenrodYellow };
-			for(int i = 0; i < clientsAmount; i++) {
+			for (int i = 0; i < clientsAmount; i++) {
 				if (multiClientCurves[i] != null) {
 					myPane.AddCurve(multiClientCurves[i].Label, multiClientCurves[i].PointsValueList, colors[i], multiClientCurves[i].SymbolType);
 					PointPairList tempPPL = multiClientCurves[i].PointsValueList;
