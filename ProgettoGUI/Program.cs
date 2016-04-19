@@ -29,22 +29,28 @@ namespace Sense {
 
 	/// <summary>
 	/// Classe Parser.
+	/// Esegue tutte le operazioni per la gestione delle connessioni con i client.
+	/// Gestisce anche il server dell'applicazione.
 	/// </summary>
 	class Parser {
-		public List<double[,]> sampwin;
-		int port;
-		TcpListener server;
-		IPAddress localAddr;
-		Form1.printToServerConsoleDelegate printToServerConsole;
-		Form1.setButtonServerStartDelegate setButtonServerStart;
-		Form1.eatSampwinDelegate eatSampwinProtected;
-		public bool serverIsActive;
-		string path;
-		int frequence;
-		int window;
-		private bool sampwinIsFullIdle;
-		int clients_amount;
+		public List<double[,]> sampwin;								//!< Lista di matrici di double che tiene in memoria il campione letto dal client.
+		int port;													//!< Porta sulla quale il server ascolta eventuali richieste di connessione dai client.
+		TcpListener server;                                         //!< Oggetto server.
+		IPAddress localAddr;                                        //!< Indirizzo IP del server.
+		Form1.printToServerConsoleDelegate printToServerConsole;    //!< Funzione delegata che consente di eseguire la stampa sulla console della form.
+		Form1.setButtonServerStartDelegate setButtonServerStart;    //!< Funzione delegata che consente di cambiare lo stato del tasto start della forma.
+		Form1.eatSampwinDelegate eatSampwinProtected;               //!< Funzione delegata che consente di far parsare la sampwin dalle apposite funzione della form.
+		public bool serverIsActive;                                 //!< Indica se il server è attivo.
+		string path;                                                //!< Percorso dove salvare il CSV.
+		int frequence;                                              //!< Frequenza di campionamento passata dalla form.
+		int window;                                                 //!< Dimensione finestra in secondi.
+		private bool sampwinIsFullIdle;                             //!< Indica se la lista sampwin è completa, ovvero se il client ha finito di streammare.
+		int clients_amount;                                         //!< Numero di client che vogliono connettersi al server.
+		bool printCsv;
 
+		/// <summary>
+		/// Proprietà pubblica server.
+		/// </summary>
 		public TcpListener Server {
 			get {
 				return server;
@@ -55,6 +61,9 @@ namespace Sense {
 			}
 		}
 
+		/// <summary>
+		/// Proprietà pubblica indirizzo IP.
+		/// </summary>
 		public IPAddress LocalAddr {
 			get {
 				return localAddr;
@@ -65,6 +74,9 @@ namespace Sense {
 			}
 		}
 
+		/// <summary>
+		/// Proprietà pubblica porta.
+		/// </summary>
 		public int Port {
 			get {
 				return port;
@@ -75,6 +87,9 @@ namespace Sense {
 			}
 		}
 
+		/// <summary>
+		/// Proprietà pubblica sampwin completa.
+		/// </summary>
 		public bool SampwinIsFullIdle {
 			get {
 				return sampwinIsFullIdle;
@@ -97,8 +112,9 @@ namespace Sense {
 		/// <param name="printToConsoleFunc">Funzione delegata per scrivere sulla console.</param>
 		/// <param name="setButtonServerStartFunc">Funzione delegata per cambiare il testo di un tasto.</param>
 		/// <param name="eatSampFunc">Funzione delegata per triggerare il parsing della sampwin.</param>
-		public Parser(int p, string ip, string csvPath, int freq, int wind, int clients_amou, Form1.printToServerConsoleDelegate printToConsoleFunc, Form1.setButtonServerStartDelegate setButtonServerStartFunc, Form1.eatSampwinDelegate eatSampFunc) {
+		public Parser(int p, string ip, string csvPath, bool printCsv, int freq, int wind, int clients_amou, Form1.printToServerConsoleDelegate printToConsoleFunc, Form1.setButtonServerStartDelegate setButtonServerStartFunc, Form1.eatSampwinDelegate eatSampFunc) {
 			path = csvPath;
+			this.printCsv = printCsv;
 			port = p;
 			frequence = freq;
 			window = wind;
@@ -121,6 +137,7 @@ namespace Sense {
 
 		/// <summary>
 		/// Attiva il Server aggiornando i parametri in base all'input del'utente.
+		/// Il passaggio di parametri è dettato dal fatto che l'utente può cambiare le impostazioni del server anche dopo che il server è stato istanziato nel costruttore.
 		/// </summary>
 		/// <param name="p">Porta sul quale aprire la Socket.</param>
 		/// <param name="ip">Indirizzo ip server.</param>
@@ -128,9 +145,10 @@ namespace Sense {
 		/// <param name="freq">Frequenza di campionamento.</param>
 		/// <param name="wind">Dimensione della finestra in secondi.</param>
 		/// <param name="clients_amou">Numero di client che si vogliono connettere al server.</param>
-		public void ActivateServer(int p, string ip, string csvPath, int freq, int wind, int clients_amou) {
+		public void ActivateServer(int p, string ip, string csvPath, bool printCsv, int freq, int wind, int clients_amou) {
 			port = p;
 			path = csvPath;
+			this.printCsv = printCsv;
 			frequence = freq;
 			window = wind;
 			clients_amount = clients_amou;
@@ -159,9 +177,10 @@ namespace Sense {
 		
 		/// <summary>
 		/// Metodo per gestire una connessione di un client in un nuovo thread.
+		/// Questo metodo è usato in un thread solo nel caso di multi-threaded multi-client server.
 		/// </summary>
-		/// <param name="client">Client.</param>
-		/// <param name="client_index">Numero del client in ordine di connessione.</param>
+		/// <param name="client">Client di cui gestire la connessione in entrata.</param>
+		/// <param name="client_index">Indice del client in ordine di connessione.</param>
 		public void RunClient(TcpClient client, int client_index) {
 			//Se supera la chiamata vuol dire che è avvenuta la connessione col Client.
 			printToServerConsole("Connected!\n");
@@ -302,17 +321,14 @@ namespace Sense {
 					}
 					_sampwin.Add(arr);
 
-					//Roba varia
-					//(!)Sistemare window
+					//Persing Sampwin
 
 					if (_sampwin.Count <= window * frequence) {
 						if (_sampwin.Count == window * frequence) {
-							//eatSampwinProtected(sampwin.GetRange(sampwin.Count - window * frequence, window * frequence));
 							eatSampwinProtected(_sampwin, client_index);
 						}
 					} else if (_sampwin.Count % ((window * frequence) / 2) == 0 && _sampwin.Count != 0) {
 						//Funzione che triggera la lettura della sampwin per la creazione dei grafici.
-						//eatSampwinProtected(sampwin.GetRange(sampwin.Count - 500, 500)); //(!)Valutare gli errori generati da questo metodo
 						eatSampwinProtected(_sampwin, client_index);
 					}
 					//Quando lo stream da leggere è terminato l'operazione ReadBytes ritornerà un array vuoto e quindi la lettura terminerà.
@@ -330,11 +346,11 @@ namespace Sense {
 					printToServerConsole("Stream finished.\n");
 					sampwinIsFullIdle = true;
 					//Funzione che triggera la lettura della sampwin per la creazione dei grafici.
-					eatSampwinProtected(_sampwin, client_index); //(!)Valutare gli errori generati da questo metodo
+					eatSampwinProtected(_sampwin, client_index); 
 					printToServerConsole("Creating file CSV in " + path + "...\n");
 
 					//Creazione CSV.
-					//(!)
+					//Non la lanciamo in caso di multi-client
 					/*if (!writeMatrixToCSV(sampwin, path + @"\sampwin.csv")) {
 						printToServerConsole("Csv File creation Error.\n");
 					} else {
@@ -348,7 +364,7 @@ namespace Sense {
 			} catch (ArgumentOutOfRangeException ex) {
 				printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");
 			} catch (Exception ex) {
-				throw new Exception("Exception in Client #" + client_index + " thread\n"  + ex.ToString() + "\n"); //(!)codice di cui verificare il corretto funzionamento
+				throw new Exception("Exception in Client #" + client_index + " thread\n"  + ex.ToString() + "\n");
 			} finally {
 				client.Close();
 				printToServerConsole("Client Disconnected.\n");
@@ -356,7 +372,8 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Metodo che gestisce il funzionamento del Server. Da usare in un thread.
+		/// Metodo che gestisce il funzionamento del Server.
+		/// Questo metodo è lanciato in un thread per permettere al server di girare in modo non concorrente ma parallelo al il Form.
 		/// </summary>
 		public void StartServer() {
 			//Implementazione SOCKET
@@ -397,16 +414,13 @@ namespace Sense {
 								}
 							}
 							
-							//Se supera la chiamata vuol dire che è avvenuta la connessione col Client.
+							//Se supera la chiamata vuol dire che è avvenuta la connessione col/coi Client.
 							printToServerConsole("All clients(n = " + clients_amount + ") connected.\n");
+
+							//Per ogni client oltre al primo creo un nuovo thread in cui parsarlo.
 							if (clients_amount > 1) { 
 								Thread[] clientThreads = new Thread[clients_amount - 1];
-
-								/*
-									clients_amount = 2;
-									client[2] = {mainClient, client2}; indici : [0,1]
-									clientThreads[1] = {client2Thread}; indici : [0]
-								*/
+								
 								for (int i = 0; i < (clients_amount-1); i++) {
 									clientThreads[i] = new Thread(() => RunClient(client[i+1], i+1));
 									clientThreads[i].IsBackground = true;
@@ -414,12 +428,11 @@ namespace Sense {
 									Thread.Sleep(100);
 								}
 							} 
-							//printToServerConsole("Connected!\n");
 
 							//Client principale.
 							TcpClient mainClient = client[0];
 
-							//Ottiene lo stream dal Client per leggere i dati inviati dallo stesso.
+							//Ottiene lo stream dal Client pricipale per leggere i dati inviati dallo stesso.
 							NetworkStream stream = null;
 							try {
 								stream = mainClient.GetStream();
@@ -430,10 +443,8 @@ namespace Sense {
 								//The TcpClient is not connected to a remote host.
 								throw new InvalidOperationException("Error while getting client stream.\n" + ex.Message);
 							}
-							//Console.WriteLine("Stream obtained.");
 
 							BinaryReader reader = new BinaryReader(stream);
-							//Console.WriteLine("Reading stream.");
 
 							//Comincia la lettura del pacchetto.
 
@@ -442,18 +453,14 @@ namespace Sense {
 								//10 byte per il client ID
 								byte[] client_id = reader.ReadBytes(10);
 								printToServerConsole(String.Format("CLIENT ID : {0}\n", System.Text.Encoding.UTF8.GetString(client_id)));
-								//Console.WriteLine("CLIENT ID : {0}", System.Text.Encoding.UTF8.GetString(client_id));
 
 								//4 byte per la frequenza 
 								byte[] frequency = reader.ReadBytes(4);
 								printToServerConsole(String.Format("Sending at {0}MHz\n", BitConverter.ToInt32(frequency, 0)));
-
-								//Console.WriteLine("Sending at {0}MHz", BitConverter.ToInt32(frequency, 0));
-
+								
 								//Lettura del campo DATA e dei suoi parametri ovvero i dati che arrivano dai Sensori (dati clue dello streaming).
 								byte[] temp = reader.ReadBytes(2);
-
-								//(!)Xbus_Simulator elimina il preambolo 0xFA (mi fido di questo commento fatto un mese fa, oggi è il 14/03/16)
+								
 								//Cerco l'inizio del pacchetto ovvero FF32.
 								while (temp[0] != 0xFF || temp[1] != 0x32) {
 									temp[0] = temp[1];
@@ -508,11 +515,9 @@ namespace Sense {
 									package[4] = ext_len_add;
 									data.CopyTo(package, 5);
 									printToServerConsole(String.Format("- BID : {0}\n- MID : {1}\n- LEN : {2}\n- EXT_LEN_MUL : {3}\n- EXT_LEN_ADD : {4}\n", package[0], package[1], package[2], package[3], package[4]));
-									//Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}\nEXT_LEN_MUL : {3}\nEXT_LEN_ADD : {4}", package[0], package[1], package[2], package[3], package[4]);
 								} else {
 									data.CopyTo(package, 3);
 									printToServerConsole(String.Format("- BID : {0}\n- MID : {1}\n- LEN : {2}\n", package[0], package[1], package[2]));
-									//Console.WriteLine("BID : {0}\nMID : {1}\nLEN : {2}", package[0], package[1], package[2]);
 								}
 
 								//Stato Array Package[]
@@ -551,23 +556,17 @@ namespace Sense {
 												package[i * 52 + j * 4 + beg]
 											}, 0);
 											arr[i, j] = field;
-											//printToServerConsole(String.Format("{0}; ", field));
 										}
-										//Console.WriteLine();
 									}
 									sampwin.Add(arr);
-
-									//Roba varia
-									//(!)Sistemare window
-
+									
+									//Parsing della sampwin.
 									if (sampwin.Count <= window * frequence) {
 										if (sampwin.Count == window * frequence) {
-											//eatSampwinProtected(sampwin.GetRange(sampwin.Count - window * frequence, window * frequence));
 											eatSampwinProtected(sampwin, 0);
 										}
 									} else if (sampwin.Count % ((window * frequence) / 2) == 0 && sampwin.Count != 0) {
 										//Funzione che triggera la lettura della sampwin per la creazione dei grafici.
-										//eatSampwinProtected(sampwin.GetRange(sampwin.Count - 500, 500)); //(!)Valutare gli errori generati da questo metodo
 										eatSampwinProtected(sampwin, 0);
 									}
 									//Quando lo stream da leggere è terminato l'operazione ReadBytes ritornerà un array vuoto e quindi la lettura terminerà.
@@ -585,21 +584,22 @@ namespace Sense {
 									printToServerConsole("Stream finished.\n");
 									sampwinIsFullIdle = true;
 									//Funzione che triggera la lettura della sampwin per la creazione dei grafici.
-									eatSampwinProtected(sampwin, 0); //(!)Valutare gli errori generati da questo metodo
-									printToServerConsole("Creating file CSV in " + path + "...\n");
+									eatSampwinProtected(sampwin, 0);
+									if (printCsv) {
+										printToServerConsole("Creating file CSV in " + path + "...\n");
 
-									//Creazione CSV.
-									//(!)
-									/*if (!writeMatrixToCSV(sampwin, path + @"\sampwin.csv")) {
-										printToServerConsole("Csv File creation Error.\n");
-									} else {
-										printToServerConsole("File CSV created in " + path + ".\n");
-									}*/
+										//Creazione CSV.
+										if (!writeMatrixToCSV(sampwin, path)) {
+											printToServerConsole("Csv File creation Error.\n");
+										} else {
+											printToServerConsole("File CSV created in " + path + ".\n");
+										}
+									}
 								}
 							} catch (IndexOutOfRangeException ex) {
 								printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");
 								//Eccezione che si verifica in seguito ad un'interruzione precoce della comunicazione Server-Client che causa un utilizzo scorretto di array all'interno del codice.
-								//La gestiamo consideranso la comunicazione interrotta e pertanto ignoriamo e stoppiamo la comunicazione col Client. 
+								//La gestiamo considerando la comunicazione interrotta e pertanto ignoriamo e stoppiamo la comunicazione col Client. 
 							} catch (ArgumentOutOfRangeException ex) {
 								printToServerConsole("Error Handler reveals Server-Client communication to be interrupted.\n");
 							} catch (Exception ex) {
@@ -645,6 +645,7 @@ namespace Sense {
 			//campione 3 -> accx;accy;..........qua3;qua4;;accx;accy;..........qua3;qua4;;
 			try {
 				string csv = "";
+				
 				foreach (double[,] d in matrix) {
 					for (int i = 0; i < d.GetLength(0); ++i) {
 						for (int j = 0; j < d.GetLength(1); ++j) {
@@ -654,11 +655,13 @@ namespace Sense {
 					}
 					csv += "\n";
 				}
+				
 				int t = 0;
-				while (File.Exists(csvPath + "_" + t)) {
+				while (File.Exists(csvPath + @"\sampwin" + "_" + t + ".csv")) {
 					t++;
 				}
-				File.WriteAllText(csvPath + "_" + t, csv.ToString());
+				File.WriteAllText(csvPath + @"\sampwin" + "_" + t + ".csv", csv.ToString());
+				//File.WriteAllText(@"C:\Users\Gianmarco\Documents\Visual Studio 2015\Projects\Sense\ProgettoGUI\bin\Release\.output\csv.csv", csv.ToString());
 			} catch (Exception ex) {
 				MessageBox.Show("Print stream to CSV Error\n" + ex.Message);
 				return false;
@@ -669,22 +672,21 @@ namespace Sense {
 
 	/// <summary>
 	/// Classe Curve.
-	/// Consiste in una curva da plottare sul zedGraphControl.
+	/// Consiste in una clase container per tener ei temporaneamente in memoria i dati di curva da plottare poi su zedGraphControl.
 	/// </summary>
 	public class Curve {
-		/// Etichetta curva.
+		/// Etichetta della curva da inserire nella legenda.
 		private string label;
 		/// Array di valori double della funzione.				
-		private double[] pointsValue;
-		/// Array di valori double della funzione.	
-		private PointPairList pointsValueList;
+		private double[] pointsValue = null;
+		/// Lista di punti che compongono la funzione.	
+		private PointPairList pointsValueList = null;
 		/// Colore curva.
-		private Color color;		
-		/// Tipo simbolo.			
-		private SymbolType symbolType;			
+		private Color color;
+		/// Simbolo dei punti della curva.
+		private SymbolType symbolType;		
 
 		//Properties Begin
-
 		/// <summary>
 		/// Property Label.
 		/// </summary>

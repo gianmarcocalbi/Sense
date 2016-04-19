@@ -17,69 +17,70 @@ namespace Sense {
 	/// Partial Class Form1
 	/// </summary>
 	public partial class Form1 : Form {
-		/// Parser.
+		/// Oggetto Parser.
 		private Parser parser;
-		/// Thread che fa girare il parser.
+		/// Thread nel quale gira il parser, o meglio la funzione che gestisce il Server.
 		Thread threadParser;
 		/// Frequenza di campionamento.
 		int frequence = 50;
 		/// Dimensione della finestra in secondi.
 		int window = 10;
-		/// Pannello zedgraph.
+		/// Pannello zedgraph sul quale disegnare i grafici.
 		GraphPane myPane;
 		/// Indice grafico selezionato.
 		int selectedChart;
-		/// Indice sensore selezionato.
+		/// Indice posizione sensore selezionato.
 		int selectedSensor;
 		/// Indice tipo di sensore selezionato.
 		int selectedSensorType;
 		/// Path in cui salvare il file csv/actions_log.
 		string csvPath;
-		/// Sampwin salvata in locale dopo che il server viene stoppato.
+		/// Sampwin salvata in locale dopo che il server viene stoppato per poter disegnare ancora i grafici relativi a quel campione.
 		List<double[,]> mySampwin;
-		/// Range per la smoothing.
+		/// Range per lo smoothing: anche raggio dell'intorno in cui guardare per fare la media per la deviazione standard.
 		int smoothRange;
-		/// Var riconoscimento azione : moto.
+		/// Var riconoscimento azione - moto : inizio del moto.
 		double motoStart = 0;
-		/// Var riconoscimento azione : moto.
+		/// Var riconoscimento azione - moto : inizio dello stato di fermo.
 		double fermoStart = 0;
-		/// Var riconoscimento azioni.
+		/// Var riconoscimento azioni : tempo fine finestra precedente.
 		double winTime = 0;
-		/// Var riconoscimento azione : moto.
+		/// Var riconoscimento azione - moto : nome azione in corso.
 		string action = null;
-		/// Var riconoscimento azione : posizione.
+		/// Var riconoscimento azione - posizione : nome posizione attuale.
 		string state = null;
-		/// Var riconoscimento azione : posizione.
+		/// Var riconoscimento azione - posizione : inizio stato in corso.
 		double stateStart = 0;
-		/// Var riconoscimento azione : girata.
+		/// Var riconoscimento azione - girata : tipo di girata.
 		string turnAction = null;
-		/// Var riconoscimento azione : girata.
+		/// Var riconoscimento azione - girata : inizio girata attuale.
 		double turnStart = 0;
-		/// Var riconoscimento azione : girata.
+		/// Var riconoscimento azione - girata : tipo di girata che potrebbe essere quella attuale.
 		string turnPossibleAction = null;
-		/// Var riconoscimento azione : girata.
+		/// Var riconoscimento azione - girata : possibile inizio per la girata possibile attuale.
 		double turnPossibleStart = 0;
-		/// Var riconoscimento azione : girata.
+		/// Var riconoscimento azione - girata : grado minimo per essere considerato significativo.
 		double degree = 10;
-		/// Var riconoscimento azione : girata.
+		/// Var riconoscimento azione - girata : ultimo angolo di riferimento.
 		double refAngolo = 0;
 
-		String segAction = null;
-		String segPossibleAction = null;
-		int segStart = 0;
-		int segPossibleStart = 0;
+		String segAction = null;					//!< Azione attuale rilevata nella segmentazione.
+		private String segPossibleAction = null;	//!< Azione possibile che potrebbe essere in atto nell'operazione di segmentazione.
+		int segStart = 0;							//!< Inizio dell'azione corrente nell'operazione di segmentazione.
+		int segPossibleStart = 0;                   //!< Inizio dell'azione plausibile nell'operazione di segmentazione.
 
-		/// Var riconoscimento azione : stringa da stampare su file.
+		/// Var riconoscimento azioni : stringa da stampare su file.
 		string outToFileStr = "";
-		/// Numero di client che si vuole connettere.
+		/// Numero di client che si vuole connettere al server.
 		int clientsAmount = 0;
 		/// Array di curve di supporto contenente il path di dead reckoning di ogni client (massimo 10).
 		Curve[] multiClientCurves = new Curve[10];
-		/// Data iniziale.
+		/// Data iniziale di default.
 		DateTime startTime = new DateTime(1900, 1, 1, 0, 0, 0, 0);
+		bool printCSV;
 
 		/// <summary>
-		/// Costruttore Primario
+		/// Costruttore Primario form.
 		/// </summary>
 		public Form1() {
 			//Inizializza i componenti grafici
@@ -91,7 +92,8 @@ namespace Sense {
 			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
 			//CSV Location
-			csvPath = Directory.GetCurrentDirectory() + @"\output";
+			csvPath = Directory.GetCurrentDirectory() + @"\_output";
+			printCSV = checkBoxSaveCsv.Checked;
 			try {
 				System.IO.Directory.CreateDirectory(csvPath);
 			} catch (Exception e) {
@@ -112,6 +114,7 @@ namespace Sense {
 				Int32.Parse(textBoxPort.Text),
 				String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
 				csvPath,
+				printCSV,
 				frequence,
 				window,
 				clientsAmount,
@@ -146,7 +149,7 @@ namespace Sense {
 			if (parser.serverIsActive) {
 				//Se il server è attivo allora lo STOPpiamo
 				parser.DeactivateServer();
-				parser.sampwin = null; //(!) Mettere o non mettere questo è un dilemma conan.
+				parser.sampwin = null;
 				if (clientsAmount > 1) {
 					mySampwin = null; //Previene la stampa indesiderata di altri grafici una volta stoppato il server.
 				}
@@ -166,6 +169,7 @@ namespace Sense {
 						Int32.Parse(textBoxPort.Text),
 						String.Format("{0}.{1}.{2}.{3}", textBoxIP1.Text, textBoxIP2.Text, textBoxIP3.Text, textBoxIP4.Text),
 						csvPath,
+						printCSV,
 						frequence,
 						window,
 						clientsAmount
@@ -191,10 +195,10 @@ namespace Sense {
 		/// Estrae il valori selezionati dalla sampwin.
 		/// </summary>
 		/// <param name="sampwin">Sampwin campione.</param>
-		/// <param name="selSensor">Sensore.</param>
-		/// <param name="selSensorType">Tipo sensore.</param>
-		/// <param name="xyz">Dimensione.</param>
-		/// <returns>Array di valori.</returns>
+		/// <param name="selSensor">Posizione sensore da estrarre.</param>
+		/// <param name="selSensorType">Tipo sensore da estrarre.</param>
+		/// <param name="xyz">Dimensione da estrarre tra x,y e z.</param>
+		/// <returns>Array di valori estratti dalla Sampwin.</returns>
 		public double[] extractDimension(List<double[,]> sampwin, int selSensor, int selSensorType, char xyz) {
 			int dim = sampwin.Count();
 			double[] extractedDimension = new double[dim];
@@ -214,20 +218,20 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Estrae i valori.
+		/// Estrae il valori selezionati dalla sampwin tenendo come sensori quelli selezionati dall'utente.
 		/// </summary>
 		/// <param name="sampwin">Sampwin campione.</param>
-		/// <param name="xyz">Dimensione.</param>
-		/// <returns>Array di valori</returns>
+		/// <param name="xyz">Dimensione da estrarre tra x,y e z.</param>
+		/// <returns>Array di valori estratti dalla Sampwin.</returns>
 		public double[] extractDimension(List<double[,]> sampwin, char xyz) {
 			return extractDimension(sampwin, selectedSensor, selectedSensorType, xyz);
 		}
 
 		/// <summary>
-		/// Modulo.
+		/// Operazione per il calcolo del modulo tenendo conto dei sensori selezionati dall'utente.
 		/// </summary>
-		/// <param name="sampwin"></param>
-		/// <returns>Array di valori modulo.</returns>
+		/// <param name="sampwin">Sampwin campione.</param>
+		/// <returns>Array di valori del modulo.</returns>
 		public double[] module(List<double[,]> sampwin)    //PRIMA OPERAZIONE: MODULO
 		{
 			return module(sampwin, selectedSensor, selectedSensorType);
@@ -236,7 +240,7 @@ namespace Sense {
 		/// <summary>
 		/// Overload Modulo che consente impostazione manuale del sensore e tipo di sensore selezionati.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="sampwin">Sampwin campione.</param>
 		/// <param name="selSensor">Sensore da considerare.</param>
 		/// <param name="selSensorType">Tipo sensore da considerare.</param>
 		/// <returns>Array di valori modulo.</returns>
@@ -253,7 +257,8 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Operazione di Smoothing.
+		/// Operazione di Smoothing dei valori di una certa popolazione.
+		/// La media viene calcolata nell'intorno di raggio = range.
 		/// </summary>
 		/// <param name="popolazione">Array di valori da Smoothare.</param>
 		/// <param name="range">Range di Smoothing.</param>
@@ -286,9 +291,9 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Operazione di Derivata.
+		/// Operazione per il calcolo della Derivata di un certo campione.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="sampwin">Sampwin campione.</param>
 		/// <returns>Array di valori della Derivata.</returns>
 		public double[] rapportoIncrementale(List<double[,]> sampwin)           //TERZA OPERAZIONE: DERIVATA
 		{
@@ -304,7 +309,8 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Operazione per calcolare la Deviazione Standard.
+		/// Operazione per calcolare la Deviazione Standard di una certa popolazione di valori.
+		/// Come media viene usato lo smoothing.
 		/// </summary>
 		/// <param name="popolazione">Popolazione sulla quale calcolare la D.S.</param>
 		/// <param name="range">Range entro il quale calcolare la media da usare per il calcolo della D.S.</param>
@@ -329,7 +335,7 @@ namespace Sense {
 		/// <summary>
 		/// Operazione per calcolare gli angoli di Eulero.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="sampwin">Sampwin campione.</param>
 		/// <param name="selSensor">Sensore selezionato di cui calcolare gli angoli.</param>
 		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
 		public double[,] angoliDiEulero(List<double[,]> sampwin, int selSensor) {
@@ -355,9 +361,9 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Operazione per il calcolo degli Angoli di Eulero overload.
+		/// Operazione per il calcolo degli Angoli di Eulero overload che tiene come sensori quelli già selezionati dall'utente.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="sampwin">Sampwin campione.</param>
 		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
 		public double[,] angoliDiEulero(List<double[,]> sampwin)                //QUINTA OPERAZIONE: ANGOLI DI EULERO
 		{
@@ -367,9 +373,9 @@ namespace Sense {
 		/// <summary>
 		/// Operazione per l'eliminazione delle discontinuità dalla funzione degli angoli di Eulero.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="sampwin">Sampwin campione.</param>
 		/// <param name="selSensor">Sensore selezionato.</param>
-		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione.</returns>
+		/// <returns>Matrice avente ad ogni colonna i 3 angoli di inclinazione con discontinuità eliminate.</returns>
 		public double[,] angoliDiEuleroContinua(List<double[,]> sampwin, int selSensor) {
 			double[,] arctan = angoliDiEulero(sampwin, selSensor); //con selected sensor
 			int sfasamento = 0;
@@ -401,10 +407,10 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Operazione per il calcolo di arcotangente(magnY/magnZ).
+		/// Operazione per il calcolo di arcotangente(magnY/magnZ) che esprime l'angolo rispetto al polo magnetico.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
-		/// <returns>Array contenente i valori.</returns>
+		/// <param name="sampwin">Sampwin campione.</param>
+		/// <returns>Array contenente i valori in radianti.</returns>
 		public double[] arctanMyMz(List<double[,]> sampwin) {
 			double[] arctan = new double[sampwin.Count];
 			for (int i = 0; i < sampwin.Count; i++) {
@@ -416,8 +422,8 @@ namespace Sense {
 		/// <summary>
 		/// Operazione per il calcolo di arcotangente(magnY/magnZ) senza discontinuità.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
-		/// <returns>Array contenente i valori.</returns>
+		/// <param name="sampwin">Sampwin campione.</param>
+		/// <returns>Array contenente i valori in radianti senza discontinuità.</returns>
 		public double[] arctanMyMzContinua(List<double[,]> sampwin) {
 			double[] arctan = arctanMyMz(sampwin);
 			int sfasamento = 0;
@@ -445,10 +451,10 @@ namespace Sense {
 		}
 
 		/// <summary>
-		/// Operazione per calcolare il path di un soggetto nel piano.
+		/// Operazione per calcolare il path di un soggetto nel piano ortogonale alla superficie terrestre.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
-		/// <returns>Lista di punti da disegnare.</returns>
+		/// <param name="sampwin">Sampwin campione.</param>
+		/// <returns>Lista di punti che compongono il path da disegnare.</returns>
 		public PointPairList computeDeadReckoning(List<double[,]> sampwin) {
 			//sistemare theta e a con valori veri presi da sampwin
 			//appunto jack: abbiamo a disposizione thetaCorretto
@@ -607,6 +613,7 @@ namespace Sense {
 					numericUpDownClientsAmount.Enabled = false;
 					textBoxCSVPath.Enabled = false;
 					buttonSelectFolder.Enabled = false;
+					checkBoxSaveCsv.Enabled = false;
 					buttonServerStart.Text = "STOP";
 					//Se il server è multiclient allora.
 					if (clientsAmount > 1) {
@@ -635,6 +642,7 @@ namespace Sense {
 					numericUpDownClientsAmount.Enabled = true;
 					textBoxCSVPath.Enabled = true;
 					buttonSelectFolder.Enabled = true;
+					checkBoxSaveCsv.Enabled = true;
 					buttonServerStart.Text = "START";
 					//Se il server è multiclient allora..
 					if (clientsAmount > 1) {
@@ -661,10 +669,10 @@ namespace Sense {
 		public delegate void eatSampwinDelegate(List<double[,]> sampwin, int client_index);
 
 		/// <summary>
-		/// Plotta la sampwin.
+		/// Operazione per il plot e l'analisi della sampwin.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
-		/// <param name="client_index">Indice client.</param>
+		/// <param name="sampwin">Sampwin campione.</param>
+		/// <param name="client_index">Indice client che chiama la funzione.</param>
 		public void eatSampwinProtected(List<double[,]> sampwin, int client_index) {
 			if (this.zedGraphControl1.InvokeRequired) {
 				Invoke(new eatSampwinDelegate(eatSampwinProtected), new object[] { sampwin, client_index });
@@ -688,7 +696,7 @@ namespace Sense {
 		/// <summary>
 		/// Operazione che plotta la sampwin su Zedgraph.
 		/// </summary>
-		/// <param name="sampwin">Sampwin.</param>
+		/// <param name="sampwin">Sampwin campione.</param>
 		public void DrawSampwin(List<double[,]> sampwin) {
 
 			List<Curve> myCurveList = new List<Curve>();
@@ -763,7 +771,6 @@ namespace Sense {
 					break;
 				case 5:
 					//Dead Reckoning
-					//(!)Usare Curve anche qua
 					myPane.Title.Text = "Path";
 					myPane.YAxis.Title.Text = "m";
 					myPane.XAxis.Title.Text = "m";
@@ -780,91 +787,24 @@ namespace Sense {
 					break;
 			}
 
-			if (checkBoxSmoothing.Checked) {
-				foreach (Curve c in myCurveList) {
-					c.PointsValue = smoothing(c.PointsValue, smoothRange);
-					c.Label += " smoothed";
-				}
-			}
 			if (checkBoxSegmentation.Checked && checkBoxSegmentation.Enabled) {
-				//myCurveList = segmentation(myCurveList);
-				/*
-				solo del modulo
-				quindi prende modulo in ingresso
-				analisi per finestra
-				
-				!!!tentare somiglianza con girata per verificare durata delle azioni
-				
-				case: tipo di sensore -> valore standard da cui discostarsi e di quanto discostarsi
-					assegnamento opportuni valori a due variabili, probabilmente globali
-				2 nomi temporanei: media, scostamento    
-				
-				if (Math.Abs(media - modulo[i]) < scostamento) { //possibile
-				   if (time - actionStart > 2 ) 
-				}
-				*/
-
-				//due tipi di action: 0 e 1
-				//0 quando sta piatta
-				//1 quando ci sono i picchi
-				// numero di punti per stabilire un cambiamento di azione
-
-				/*
-				procedura:
-				l'utente clicca sulla checkbox
-				viene chiamato un metodo che prende la curva che c'è sullo schermo
-				
-				modulo
-				
-				
-
-
-
-				segAction = null;
-
-				if (Math.Abs(valoreIesimo - standardValue) > soglia1) {
-					if (segAction != "Action") {
-						if (segPossibleAction != 0) {
-							segPossibleStart = i;
-							segPossibleAction = 0;
-						}
-						if (i - segPossibleStart > soglia2) {
-							if (segAction != null)
-								//new 
-								segAction = 1;
-							segStart = time - 0.3;
-							//turnStart = turnPossibleStart;
-						}
-					}
-				} else {
-					if (turnPossibleAction != "Calm") {
-						turnPossibleStart = i;
-						turnPossibleAction = 1;
-					}
-					if (time - turnPossibleStart > soglia) {
-						if (turnAction != null)
-							outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - 0.3).ToString("HH:mm:ss") + " " + turnAction + "\n";
-						turnAction = turnPossibleAction;
-						turnStart = time - 0.3;
-						//turnStart = turnPossibleStart;
-					}
-				}
-			}*/
-
 				double[] valore = module(sampwin);
-
-
-				//per le due soglie dovremo probabilmente fare un assegnamento pre for con un case per il tipo di sensore
+				
+				double max = 0;
+				for (int i = 0; i < valore.Length; i++) {
+					if (valore[i] > max)
+						max = valore[i];
+				}
 
 				double standardValue = 10;
 				double soglia1 = 0.3;
-				int soglia2 = 20;
+				int soglia2 = 30;
 
 				switch (selectedSensorType) {
 					case 0:
 						standardValue = 9.81;
-						soglia1 = 0.3;
-						soglia2 = 21;
+						soglia1 = max / 100;
+						soglia2 = 5;
 						break;
 					case 1:
 						standardValue = 9.81;
@@ -879,66 +819,86 @@ namespace Sense {
 					default:
 						break;
 				}
-				
-				printToServerConsoleProtected("" + soglia1 + soglia2);
+
+
 				for (int i = 0; i < sampwin.Count(); i++) {
-					//printToServerConsoleProtected("a" + i);
 					if (Math.Abs(valore[i] - standardValue) > soglia1) {
-						printToServerConsoleProtected("(1 - " + valore[i] + " " + i + ")");
-						if (segAction != "Action") {
+						if (segAction != "Action" || segPossibleAction != "Action") {
 							if (segPossibleAction != "Action") {
 								segPossibleStart = i;
 								segPossibleAction = "Action";
-							}
-							if (i - segPossibleStart > soglia2) {
+							} else if (i - segPossibleStart > soglia2) {
 								if (segAction != null) {
-									PointPairList tempSegPPL = new PointPairList();
-									for (int j = segStart; j < i - segPossibleStart; ++j) {
-										tempSegPPL.Add((double)j / frequence, valore[i]);
+									//stampa calm
+
+									PointPairList tempSegPPL1 = new PointPairList();
+									for (int j = segStart; j < segPossibleStart - 1; ++j) {
+										tempSegPPL1.Add((double)j / frequence, valore[j]);
 									}
-									myCurveList.Add(new Curve(null, tempSegPPL, Color.Yellow, SymbolType.None));
-									//aggiungi qualcosa puo darsi che sia una curva
-									//ovviamente qui avra' il colore BLUE perchè stiamo considerando la FINE della parte senza i picchi e senza LABEL (ne sono abbastanza sicuro)
-									//l'inserimento si appoggia ai precedenti valori di 
-									segAction = "Action";
-									segStart = segPossibleStart; //oppure i??? si debugga in fretta ad ogni modo, molto visuale
+									myPane.AddCurve(null, tempSegPPL1, (segAction == "Calm") ? Color.Blue : Color.Red, SymbolType.None);
+
 								}
+								//aggiungi qualcosa puo darsi che sia una curva
+								//ovviamente qui avra' il colore BLUE perchè stiamo considerando la FINE della parte senza i picchi e senza LABEL (ne sono abbastanza sicuro)
+								//l'inserimento si appoggia ai precedenti valori di 
+								segAction = "Action";
+								segStart = segPossibleStart;
 							}
 						}
 					} else {
-						printToServerConsoleProtected("(0 - " + valore[i] + " " + i + ")");
-						if (segPossibleAction != "Calm") {
-							segPossibleStart = i;
-							segPossibleAction = "Calm";
-						}
-						if (i - segPossibleStart > soglia2) {
-							if (segAction != null) {
-								PointPairList tempSegPPL = new PointPairList();
-								for (int j = segStart; j < i - segPossibleStart; ++j) {
-									tempSegPPL.Add((double)j / frequence, valore[i]);
+						if (segAction != "Calm" || segPossibleAction != "Calm") {
+							if (segPossibleAction != "Calm") {
+								segPossibleStart = i;
+								segPossibleAction = "Calm";
+							} else if (i - segPossibleStart > soglia2) {
+								//stampa action
+								if (segAction != null) {
+
+									PointPairList tempSegPPL2 = new PointPairList();
+									for (int j = segStart; j < segPossibleStart - 1; ++j) {
+										tempSegPPL2.Add((double)j / frequence, valore[j]);
+									}
+									myPane.AddCurve(null, tempSegPPL2, (segAction == "Calm") ? Color.Blue : Color.Red, SymbolType.None);
+
 								}
-								myCurveList.Add(new Curve(null, tempSegPPL, Color.Red, SymbolType.None));
 								//aggiungi qualcosa puo darsi che sia una curva
 								//ovviamente qui avra' il colore BLUE perchè stiamo considerando la FINE della parte senza i picchi e senza LABEL (ne sono abbastanza sicuro)
 								//l'inserimento si appoggia ai precedenti valori di 
 								segAction = "Calm";
-								segStart = segPossibleStart; //oppure i??? si debugga in fretta ad ogni modo, molto visuale
+								segStart = segPossibleStart; 
 							}
 						}
 					}
+				}
+				PointPairList tempSegPPL = new PointPairList();
+				for (int j = segStart; j < segPossibleStart - 1; ++j) {
+					tempSegPPL.Add((double)j / frequence, valore[j]);
+				}
+				myPane.AddCurve(null, tempSegPPL, (segAction == "Calm") ? Color.Blue : Color.Red, SymbolType.None);
+				segPossibleStart = 0;
+				segStart = 0;
+				segAction = null;
+				segPossibleAction = null;
+			} else if (checkBoxSmoothing.Checked) {
+				foreach (Curve c in myCurveList) {
+					c.PointsValue = smoothing(c.PointsValue, smoothRange);
+					c.Label += " smoothed";
 				}
 			}
 
 			foreach (Curve c in myCurveList) {
 				PointPairList ppl = new PointPairList();
-				if (checkBoxPlotDomain.Checked) {
-					ppl = populate(c.PointsValue, c.PointsValue.Length - window * frequence, c.PointsValue.Length);
+				if (c.PointsValue != null) {
+					if (checkBoxPlotDomain.Checked) {
+						ppl = populate(c.PointsValue, c.PointsValue.Length - window * frequence, c.PointsValue.Length);
+					} else {
+						ppl = populate(c.PointsValue);
+					}
 				} else {
-					ppl = populate(c.PointsValue);
+					ppl = c.PointsValueList;
 				}
 				LineItem myLine = myPane.AddCurve(c.Label, ppl, c.Color, c.SymbolType);
 				myLineList.Add(myLine);
-				//(!)printToServerConsoleProtected(c.Label + " chart drawn.\n");
 			}
 
 			zedGraphControl1.AxisChange();
@@ -948,7 +908,7 @@ namespace Sense {
 		/// <summary>
 		/// Operazione per il riconoscimento delle azioni compiute dal soggetto.
 		/// </summary>
-		/// <param name="sampwin">Samwpin.</param>
+		/// <param name="sampwin">Samwpin campione.</param>
 		public void ParseActions(List<double[,]> sampwin) {
 
 			/************************************/
@@ -1131,8 +1091,8 @@ namespace Sense {
 		/// <summary>
 		/// Operazione per il plotting del dead reckoning multi client.
 		/// </summary>
-		/// <param name="sampwin">Sampwin</param>
-		/// <param name="client_index">INdice del client che disegna il proprio path.</param>
+		/// <param name="sampwin">Sampwin campione.</param>
+		/// <param name="client_index">Indice del client che disegna il proprio path.</param>
 		public void DrawSampwinMultiClient(List<double[,]> sampwin, int client_index) {
 			myPane.CurveList.Clear();
 			zedGraphControl1.Invalidate();
@@ -1181,6 +1141,7 @@ namespace Sense {
 				DrawSampwin(parser.sampwin);
 			}
 			checkBoxSegmentation.Enabled = (selectedChart == 0 ? true : false);
+			checkBoxSegmentation.Checked = false;
 		}
 
 		private void comboBoxTipoSensore_SelectedIndexChanged(object sender, EventArgs e) {
@@ -1221,12 +1182,19 @@ namespace Sense {
 			if (parser.sampwin != null) {
 				DrawSampwin(parser.sampwin);
 			}
-			//(!)numericUpDownSmoothing.Enabled = checkBoxSmoothing.Checked;
+			if (checkBoxSmoothing.Checked == true) {
+				checkBoxSegmentation.Checked = false;
+			}
 		}
 
 		private void checkBoxSegmentation_CheckedChanged(object sender, EventArgs e) {
-			if (parser.sampwin != null) {
-				DrawSampwin(parser.sampwin);
+			if (parser.sampwin != null && parser.sampwin.Count > 0) {
+				try {
+					DrawSampwin(parser.sampwin);
+				} catch (Exception ex) { }
+			}
+			if (checkBoxSegmentation.Checked == true) {
+				checkBoxSmoothing.Checked = false;
 			}
 		}
 
@@ -1245,6 +1213,10 @@ namespace Sense {
 
 		private void numericUpDownClientsAmount_ValueChanged(object sender, EventArgs e) {
 			clientsAmount = (int)numericUpDownClientsAmount.Value;
+		}
+
+		private void checkBoxSaveCsv_CheckedChanged(object sender, EventArgs e) {
+			printCSV = checkBoxSaveCsv.Checked;
 		}
 	}
 }

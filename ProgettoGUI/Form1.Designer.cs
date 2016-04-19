@@ -67,6 +67,7 @@
 			this.comboBoxChart = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+			this.checkBoxSaveCsv = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -87,6 +88,7 @@
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add(this.checkBoxSaveCsv);
 			this.splitContainer1.Panel1.Controls.Add(this.label14);
 			this.splitContainer1.Panel1.Controls.Add(this.numericUpDownClientsAmount);
 			this.splitContainer1.Panel1.Controls.Add(this.label10);
@@ -207,9 +209,9 @@
 			// 
 			// textBoxCSVPath
 			// 
-			this.textBoxCSVPath.Location = new System.Drawing.Point(13, 194);
+			this.textBoxCSVPath.Location = new System.Drawing.Point(24, 194);
 			this.textBoxCSVPath.Name = "textBoxCSVPath";
-			this.textBoxCSVPath.Size = new System.Drawing.Size(223, 20);
+			this.textBoxCSVPath.Size = new System.Drawing.Size(212, 20);
 			this.textBoxCSVPath.TabIndex = 21;
 			this.textBoxCSVPath.Text = "CSV Location";
 			// 
@@ -515,7 +517,7 @@
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(80, 13);
 			this.label13.TabIndex = 4;
-			this.label13.Text = "Sensor Number";
+			this.label13.Text = "Sensor Position";
 			// 
 			// label12
 			// 
@@ -577,6 +579,16 @@
 			this.tabPage2.Text = "Help";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
+			// checkBoxSaveCsv
+			// 
+			this.checkBoxSaveCsv.AutoSize = true;
+			this.checkBoxSaveCsv.Location = new System.Drawing.Point(7, 198);
+			this.checkBoxSaveCsv.Name = "checkBoxSaveCsv";
+			this.checkBoxSaveCsv.Size = new System.Drawing.Size(15, 14);
+			this.checkBoxSaveCsv.TabIndex = 28;
+			this.checkBoxSaveCsv.UseVisualStyleBackColor = true;
+			this.checkBoxSaveCsv.CheckedChanged += new System.EventHandler(this.checkBoxSaveCsv_CheckedChanged);
+			// 
 			// Form1
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -606,7 +618,7 @@
 
 		#endregion
 
-		
+
 
 		private System.Windows.Forms.SplitContainer splitContainer1;
 		private System.Windows.Forms.TextBox textBoxPort;
@@ -650,6 +662,7 @@
 		private System.Windows.Forms.Label label14;
 		private System.Windows.Forms.NumericUpDown numericUpDownClientsAmount;
 		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.CheckBox checkBoxSaveCsv;
 	}
 }
 
