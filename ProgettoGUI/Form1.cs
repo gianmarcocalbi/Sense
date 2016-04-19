@@ -13,6 +13,9 @@ using System.Windows.Forms;
 using ZedGraph;
 
 namespace Sense {
+	/// <summary>
+	/// Partial Class Form1
+	/// </summary>
 	public partial class Form1 : Form {
 		/// Parser.
 		private Parser parser;
@@ -60,6 +63,12 @@ namespace Sense {
 		double degree = 10;
 		/// Var riconoscimento azione : girata.
 		double refAngolo = 0;
+
+		String segAction = null;
+		String segPossibleAction = null;
+		int segStart = 0;
+		int segPossibleStart = 0;
+
 		/// Var riconoscimento azione : stringa da stampare su file.
 		string outToFileStr = "";
 		/// Numero di client che si vuole connettere.
@@ -82,7 +91,7 @@ namespace Sense {
 			this.comboBoxFrequenza.SelectedIndex = comboBoxFrequenza.FindStringExact("50");
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
 			//CSV Location
-			csvPath = Directory.GetCurrentDirectory();
+			csvPath = Directory.GetCurrentDirectory() + @"\output";
 			textBoxCSVPath.Text = csvPath;
 			//CSV Location hint EventHandler
 			this.textBoxCSVPath.MouseEnter += new System.EventHandler(this.textBoxCSVPath_Enter);
@@ -90,6 +99,9 @@ namespace Sense {
 			numericUpDownSmoothing.Maximum = Math.Floor((decimal)(window * frequence / 2));
 			smoothRange = (int)numericUpDownSmoothing.Value;
 			clientsAmount = (int)numericUpDownClientsAmount.Value;
+			selectedChart = comboBoxChart.SelectedIndex;
+			checkBoxSegmentation.Checked = false;
+			checkBoxSegmentation.Enabled = (selectedChart == 0 ? true : false);
 			//Creazione Parser (Server)
 			parser = new Parser(
 				Int32.Parse(textBoxPort.Text),
@@ -597,9 +609,9 @@ namespace Sense {
 						comboBoxChart.Enabled = false;
 						comboBoxTipoSensore.Enabled = false;
 						comboBoxNumSensore.Enabled = false;
-						checkBoxNoiseCanceling.Enabled = false;
 						checkBoxPlotDomain.Enabled = false;
 						checkBoxSegmentation.Enabled = false;
+						checkBoxSegmentation.Checked = false;
 						checkBoxSmoothing.Enabled = false;
 						checkBoxSmoothing.Checked = false;
 						numericUpDownSmoothing.Enabled = false;
@@ -625,12 +637,11 @@ namespace Sense {
 						comboBoxChart.Enabled = true;
 						comboBoxTipoSensore.Enabled = true;
 						comboBoxNumSensore.Enabled = true;
-						checkBoxNoiseCanceling.Enabled = true;
 						checkBoxPlotDomain.Enabled = true;
-						checkBoxSegmentation.Enabled = true;
 						checkBoxSmoothing.Enabled = true;
 						checkBoxSmoothing.Checked = true;
 						numericUpDownSmoothing.Enabled = true;
+						checkBoxSegmentation.Enabled = (selectedChart == 0 ? true : false);
 						comboBoxChart.SelectedIndex = 0;
 					}
 				}
@@ -685,19 +696,19 @@ namespace Sense {
 			switch (selectedSensorType) {
 				case 0:
 					//acc
-					myPane.YAxis.Title.Text = "m²";
+					myPane.YAxis.Title.Text = "m/s²";
 					break;
 				case 1:
 					//gyr
-					myPane.YAxis.Title.Text = "y";
+					myPane.YAxis.Title.Text = "Rad/s²";
 					break;
 				case 2:
 					//mag
-					myPane.YAxis.Title.Text = "Tesla (?)";
+					myPane.YAxis.Title.Text = "Tesla";
 					break;
 				case 3:
 					//qua
-					myPane.YAxis.Title.Text = "roba di quaternioni";
+					myPane.YAxis.Title.Text = "y";
 					break;
 				default:
 					//bohh
@@ -707,16 +718,20 @@ namespace Sense {
 
 			switch (selectedChart) {
 				case 0:
+					//Modulo
 					myCurveList.Add(new Curve("Module", module(sampwin), Color.Blue));
 					myPane.Title.Text = "Module";
 					break;
 				case 1:
+					//Derivata
 					myCurveList.Add(new Curve("Derivate", rapportoIncrementale(sampwin), Color.Blue));
 					myPane.Title.Text = "Derivate";
+					myPane.YAxis.Title.Text = "";
 					break;
 				case 2:
+					//Angoli di eulero
 					int length = sampwin.Count();
-					double[,] instant = angoliDiEuleroContinua(sampwin, selectedSensor); //(!) mettere angoliDiEulero
+					double[,] instant = angoliDiEuleroContinua(sampwin, selectedSensor);
 					double[] Phi = new double[length];
 					double[] Theta = new double[length];
 					double[] Psi = new double[length];
@@ -731,13 +746,15 @@ namespace Sense {
 					myPane.YAxis.Title.Text = "rad";
 					break;
 				case 3:
+					//Deviazione standard
 					myCurveList.Add(new Curve("Standard Deviation", deviazioneStandard(module(sampwin), smoothRange), Color.Blue));
 					myPane.Title.Text = "Standard Deviation";
 					break;
 				case 4:
+					//arcotangente(magnY/magnZ)
 					myCurveList.Add(new Curve("arcotangente(magnY/magnZ)", arctanMyMzContinua(sampwin), Color.Blue));
 					myPane.Title.Text = "arcotangente(magnY/magnZ)";
-					myPane.YAxis.Title.Text = "arcotangente(magnY/magnZ)";
+					myPane.YAxis.Title.Text = "Rad";
 					break;
 				case 5:
 					//Dead Reckoning
@@ -753,7 +770,6 @@ namespace Sense {
 					LineItem tmpLine2 = myPane.AddCurve("Start", templist1, Color.Red, SymbolType.Triangle);
 					templist2.Add(tempPPL.Last().X, tempPPL.Last().Y);
 					LineItem tmpLine3 = myPane.AddCurve("End", templist2, Color.Red, SymbolType.Circle);
-					//myLineList.Add(tmpLine);
 					break;
 				default:
 					break;
@@ -765,23 +781,144 @@ namespace Sense {
 					c.Label += " smoothed";
 				}
 			}
-			if (checkBoxSegmentation.Checked) {
+			if (checkBoxSegmentation.Checked && checkBoxSegmentation.Enabled) {
 				//myCurveList = segmentation(myCurveList);
-			}
-			if (checkBoxNoiseCanceling.Checked) {
-				List<Curve> myNewCurveList = new List<Curve>();
-				for (int i = 0; i < myCurveList.Count; i++) {
-					double[] instant1 = myCurveList[i].PointsValue;
-					double[] instant2 = deviazioneStandard(myCurveList[i].PointsValue, smoothRange);
-					for (int j = 0; j < myCurveList[i].PointsValue.Length; j++) {
-						instant1[j] += instant2[j];
-						instant2[j] = instant1[j] - 2 * instant2[j];
-					}
-					myNewCurveList.Add(new Curve("instant1", instant1, Color.Cyan));
-					myNewCurveList.Add(new Curve("instant2", instant2, Color.Cyan));
-					myNewCurveList.Add(new Curve(myCurveList[i].Label, myCurveList[i].PointsValue, Color.Blue));
+				/*
+				solo del modulo
+				quindi prende modulo in ingresso
+				analisi per finestra
+				
+				!!!tentare somiglianza con girata per verificare durata delle azioni
+				
+				case: tipo di sensore -> valore standard da cui discostarsi e di quanto discostarsi
+					assegnamento opportuni valori a due variabili, probabilmente globali
+				2 nomi temporanei: media, scostamento    
+				
+				if (Math.Abs(media - modulo[i]) < scostamento) { //possibile
+				   if (time - actionStart > 2 ) 
 				}
-				myCurveList = myNewCurveList;
+				*/
+
+				//due tipi di action: 0 e 1
+				//0 quando sta piatta
+				//1 quando ci sono i picchi
+				// numero di punti per stabilire un cambiamento di azione
+
+				/*
+				procedura:
+				l'utente clicca sulla checkbox
+				viene chiamato un metodo che prende la curva che c'è sullo schermo
+				
+				modulo
+				
+				
+
+
+
+				segAction = null;
+
+				if (Math.Abs(valoreIesimo - standardValue) > soglia1) {
+					if (segAction != "Action") {
+						if (segPossibleAction != 0) {
+							segPossibleStart = i;
+							segPossibleAction = 0;
+						}
+						if (i - segPossibleStart > soglia2) {
+							if (segAction != null)
+								//new 
+								segAction = 1;
+							segStart = time - 0.3;
+							//turnStart = turnPossibleStart;
+						}
+					}
+				} else {
+					if (turnPossibleAction != "Calm") {
+						turnPossibleStart = i;
+						turnPossibleAction = 1;
+					}
+					if (time - turnPossibleStart > soglia) {
+						if (turnAction != null)
+							outToFileStr += tempTime.AddSeconds(turnStart).ToString("HH:mm:ss") + " " + tempTime.AddSeconds(time - 0.3).ToString("HH:mm:ss") + " " + turnAction + "\n";
+						turnAction = turnPossibleAction;
+						turnStart = time - 0.3;
+						//turnStart = turnPossibleStart;
+					}
+				}
+			}*/
+
+				double[] valore = module(sampwin);
+
+
+				//per le due soglie dovremo probabilmente fare un assegnamento pre for con un case per il tipo di sensore
+
+				double standardValue = 10;
+				double soglia1 = 0.3;
+				int soglia2 = 20;
+
+				switch (selectedSensorType) {
+					case 0:
+						standardValue = 9.81;
+						soglia1 = 0.3;
+						soglia2 = 21;
+						break;
+					case 1:
+						standardValue = 9.81;
+						soglia1 = 0.3;
+						soglia2 = 21;
+						break;
+					case 2:
+						standardValue = 9.81;
+						soglia1 = 0.3;
+						soglia2 = 21;
+						break;
+					default:
+						break;
+				}
+
+
+				for (int i = 0; i < sampwin.Count(); i++) {
+					if (Math.Abs(valore[i] - standardValue) > soglia1) {
+						if (segAction != "Action") {
+							if (segPossibleAction != "Action") {
+								segPossibleStart = i;
+								segPossibleAction = "Action";
+							}
+							if (i - segPossibleStart > soglia2) {
+								if (segAction != null) {
+									PointPairList tempSegPPL = new PointPairList();
+									for (int j = segStart; j < i - segPossibleStart; ++j) {
+										tempSegPPL.Add((double)j / frequence, valore[i]);
+									}
+									myCurveList.Add(new Curve(null, tempSegPPL, Color.Yellow, SymbolType.None));
+									//aggiungi qualcosa puo darsi che sia una curva
+									//ovviamente qui avra' il colore BLUE perchè stiamo considerando la FINE della parte senza i picchi e senza LABEL (ne sono abbastanza sicuro)
+									//l'inserimento si appoggia ai precedenti valori di 
+									segAction = "Action";
+									segStart = segPossibleStart; //oppure i??? si debugga in fretta ad ogni modo, molto visuale
+								}
+							}
+						}
+					} else {
+						if (segPossibleAction != "Calm") {
+							segPossibleStart = i;
+							segPossibleAction = "Calm";
+						}
+						if (i - segPossibleStart > soglia2) {
+							if (segAction != null) {
+								PointPairList tempSegPPL = new PointPairList();
+								for (int j = segStart; j < i - segPossibleStart; ++j) {
+									tempSegPPL.Add((double)j / frequence, valore[i]);
+								}
+								myCurveList.Add(new Curve(null, tempSegPPL, Color.Red, SymbolType.None));
+								//aggiungi qualcosa puo darsi che sia una curva
+								//ovviamente qui avra' il colore BLUE perchè stiamo considerando la FINE della parte senza i picchi e senza LABEL (ne sono abbastanza sicuro)
+								//l'inserimento si appoggia ai precedenti valori di 
+								segAction = "Calm";
+								segStart = segPossibleStart; //oppure i??? si debugga in fretta ad ogni modo, molto visuale
+							}
+						}
+					}
+				}
 			}
 
 			foreach (Curve c in myCurveList) {
@@ -1035,6 +1172,7 @@ namespace Sense {
 			if (parser.sampwin != null) {
 				DrawSampwin(parser.sampwin);
 			}
+			checkBoxSegmentation.Enabled = (selectedChart == 0 ? true : false);
 		}
 
 		private void comboBoxTipoSensore_SelectedIndexChanged(object sender, EventArgs e) {
@@ -1079,12 +1217,6 @@ namespace Sense {
 		}
 
 		private void checkBoxSegmentation_CheckedChanged(object sender, EventArgs e) {
-			if (parser.sampwin != null) {
-				DrawSampwin(parser.sampwin);
-			}
-		}
-
-		private void checkBoxNoiseCanceling_CheckedChanged(object sender, EventArgs e) {
 			if (parser.sampwin != null) {
 				DrawSampwin(parser.sampwin);
 			}

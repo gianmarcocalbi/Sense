@@ -614,7 +614,7 @@ namespace Sense {
 					} catch (InvalidOperationException ex) {
 						MessageBox.Show(ex.Message);
 					} catch (SocketException ex) {
-						//Ingora questa eccezione: vuol dire che è stata effettuata una chiamata bloccante da parte dell'utente.
+						//Ignora questa eccezione: vuol dire che è stata effettuata una chiamata bloccante da parte dell'utente.
 					} catch (Exception ex) {
 						MessageBox.Show("Generic error caught! (This error shouldn't occur)\n"
 							+ "Exception thrown in " + ex.TargetSite + "\n"
@@ -801,7 +801,7 @@ namespace Sense {
 		/// Overload Costruttore Primario.
 		/// </summary>
 		/// <param name="pointsValue">Array di valori double della funzione.</param>
-		public Curve(double[] pointsValue) : this("", pointsValue, Color.Blue, SymbolType.None) { }
+		public Curve(double[] pointsValue) : this(null, pointsValue, Color.Blue, SymbolType.None) { }
 
 		/// <summary>
 		/// Overload Costruttore Primario.
@@ -832,7 +832,7 @@ namespace Sense {
 		/// <summary>
 		/// Overload Costruttore Primario senza argomenti.
 		/// </summary>
-		public Curve() : this("", (double[])null, Color.Blue, SymbolType.None) { }
+		public Curve() : this(null, (double[])null, Color.Blue, SymbolType.None) { }
 
 		/// <summary>
 		/// Copy Constructor.

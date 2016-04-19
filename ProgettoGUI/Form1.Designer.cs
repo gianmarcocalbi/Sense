@@ -26,6 +26,9 @@
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.label14 = new System.Windows.Forms.Label();
+			this.numericUpDownClientsAmount = new System.Windows.Forms.NumericUpDown();
+			this.label10 = new System.Windows.Forms.Label();
 			this.buttonClearConsole = new System.Windows.Forms.Button();
 			this.numericUpDownFinestra = new System.Windows.Forms.NumericUpDown();
 			this.buttonSelectFolder = new System.Windows.Forms.Button();
@@ -53,7 +56,6 @@
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.numericUpDownSmoothing = new System.Windows.Forms.NumericUpDown();
 			this.checkBoxPlotDomain = new System.Windows.Forms.CheckBox();
-			this.checkBoxNoiseCanceling = new System.Windows.Forms.CheckBox();
 			this.checkBoxSegmentation = new System.Windows.Forms.CheckBox();
 			this.checkBoxSmoothing = new System.Windows.Forms.CheckBox();
 			this.comboBoxNumSensore = new System.Windows.Forms.ComboBox();
@@ -65,18 +67,15 @@
 			this.comboBoxChart = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-			this.label10 = new System.Windows.Forms.Label();
-			this.numericUpDownClientsAmount = new System.Windows.Forms.NumericUpDown();
-			this.label14 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownClientsAmount)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).BeginInit();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownSmoothing)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.numericUpDownClientsAmount)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// splitContainer1
@@ -121,6 +120,47 @@
 			this.splitContainer1.Size = new System.Drawing.Size(1006, 564);
 			this.splitContainer1.SplitterDistance = 263;
 			this.splitContainer1.TabIndex = 0;
+			// 
+			// label14
+			// 
+			this.label14.AutoSize = true;
+			this.label14.Location = new System.Drawing.Point(122, 167);
+			this.label14.Name = "label14";
+			this.label14.Size = new System.Drawing.Size(46, 13);
+			this.label14.TabIndex = 27;
+			this.label14.Text = "subjects";
+			// 
+			// numericUpDownClientsAmount
+			// 
+			this.numericUpDownClientsAmount.Location = new System.Drawing.Point(70, 164);
+			this.numericUpDownClientsAmount.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.numericUpDownClientsAmount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownClientsAmount.Name = "numericUpDownClientsAmount";
+			this.numericUpDownClientsAmount.Size = new System.Drawing.Size(41, 20);
+			this.numericUpDownClientsAmount.TabIndex = 26;
+			this.numericUpDownClientsAmount.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownClientsAmount.ValueChanged += new System.EventHandler(this.numericUpDownClientsAmount_ValueChanged);
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point(12, 167);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(44, 13);
+			this.label10.TabIndex = 25;
+			this.label10.Text = "Analyze";
 			// 
 			// buttonClearConsole
 			// 
@@ -367,7 +407,6 @@
 			// 
 			this.tabPage1.Controls.Add(this.numericUpDownSmoothing);
 			this.tabPage1.Controls.Add(this.checkBoxPlotDomain);
-			this.tabPage1.Controls.Add(this.checkBoxNoiseCanceling);
 			this.tabPage1.Controls.Add(this.checkBoxSegmentation);
 			this.tabPage1.Controls.Add(this.checkBoxSmoothing);
 			this.tabPage1.Controls.Add(this.comboBoxNumSensore);
@@ -387,7 +426,7 @@
 			// 
 			// numericUpDownSmoothing
 			// 
-			this.numericUpDownSmoothing.Location = new System.Drawing.Point(318, 508);
+			this.numericUpDownSmoothing.Location = new System.Drawing.Point(398, 508);
 			this.numericUpDownSmoothing.Minimum = new decimal(new int[] {
             1,
             0,
@@ -406,7 +445,7 @@
 			// checkBoxPlotDomain
 			// 
 			this.checkBoxPlotDomain.AutoSize = true;
-			this.checkBoxPlotDomain.Location = new System.Drawing.Point(62, 509);
+			this.checkBoxPlotDomain.Location = new System.Drawing.Point(92, 509);
 			this.checkBoxPlotDomain.Name = "checkBoxPlotDomain";
 			this.checkBoxPlotDomain.Size = new System.Drawing.Size(124, 17);
 			this.checkBoxPlotDomain.TabIndex = 10;
@@ -414,21 +453,10 @@
 			this.checkBoxPlotDomain.UseVisualStyleBackColor = true;
 			this.checkBoxPlotDomain.CheckedChanged += new System.EventHandler(this.checkBoxPlotDomain_CheckedChanged);
 			// 
-			// checkBoxNoiseCanceling
-			// 
-			this.checkBoxNoiseCanceling.AutoSize = true;
-			this.checkBoxNoiseCanceling.Location = new System.Drawing.Point(558, 509);
-			this.checkBoxNoiseCanceling.Name = "checkBoxNoiseCanceling";
-			this.checkBoxNoiseCanceling.Size = new System.Drawing.Size(48, 17);
-			this.checkBoxNoiseCanceling.TabIndex = 9;
-			this.checkBoxNoiseCanceling.Text = "STD";
-			this.checkBoxNoiseCanceling.UseVisualStyleBackColor = true;
-			this.checkBoxNoiseCanceling.CheckedChanged += new System.EventHandler(this.checkBoxNoiseCanceling_CheckedChanged);
-			// 
 			// checkBoxSegmentation
 			// 
 			this.checkBoxSegmentation.AutoSize = true;
-			this.checkBoxSegmentation.Location = new System.Drawing.Point(417, 509);
+			this.checkBoxSegmentation.Location = new System.Drawing.Point(536, 509);
 			this.checkBoxSegmentation.Name = "checkBoxSegmentation";
 			this.checkBoxSegmentation.Size = new System.Drawing.Size(91, 17);
 			this.checkBoxSegmentation.TabIndex = 8;
@@ -441,7 +469,7 @@
 			this.checkBoxSmoothing.AutoSize = true;
 			this.checkBoxSmoothing.Checked = true;
 			this.checkBoxSmoothing.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkBoxSmoothing.Location = new System.Drawing.Point(240, 509);
+			this.checkBoxSmoothing.Location = new System.Drawing.Point(320, 509);
 			this.checkBoxSmoothing.Name = "checkBoxSmoothing";
 			this.checkBoxSmoothing.Size = new System.Drawing.Size(76, 17);
 			this.checkBoxSmoothing.TabIndex = 7;
@@ -549,47 +577,6 @@
 			this.tabPage2.Text = "Help";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
-			// label10
-			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(12, 167);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(44, 13);
-			this.label10.TabIndex = 25;
-			this.label10.Text = "Analyze";
-			// 
-			// numericUpDownClientsAmount
-			// 
-			this.numericUpDownClientsAmount.Location = new System.Drawing.Point(70, 164);
-			this.numericUpDownClientsAmount.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-			this.numericUpDownClientsAmount.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.numericUpDownClientsAmount.Name = "numericUpDownClientsAmount";
-			this.numericUpDownClientsAmount.Size = new System.Drawing.Size(41, 20);
-			this.numericUpDownClientsAmount.TabIndex = 26;
-			this.numericUpDownClientsAmount.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.numericUpDownClientsAmount.ValueChanged += new System.EventHandler(this.numericUpDownClientsAmount_ValueChanged);
-			// 
-			// label14
-			// 
-			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(122, 167);
-			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(46, 13);
-			this.label14.TabIndex = 27;
-			this.label14.Text = "subjects";
-			// 
 			// Form1
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -607,12 +594,12 @@
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
 			this.splitContainer1.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownClientsAmount)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownFinestra)).EndInit();
 			this.tabControl1.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownSmoothing)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.numericUpDownClientsAmount)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -656,7 +643,6 @@
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
 		private System.Windows.Forms.NumericUpDown numericUpDownFinestra;
 		private System.Windows.Forms.Button buttonClearConsole;
-		private System.Windows.Forms.CheckBox checkBoxNoiseCanceling;
 		private System.Windows.Forms.CheckBox checkBoxSegmentation;
 		private System.Windows.Forms.CheckBox checkBoxSmoothing;
 		private System.Windows.Forms.CheckBox checkBoxPlotDomain;
