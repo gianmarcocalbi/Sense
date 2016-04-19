@@ -92,6 +92,11 @@ namespace Sense {
 			frequence = Int32.Parse(comboBoxFrequenza.Text);
 			//CSV Location
 			csvPath = Directory.GetCurrentDirectory() + @"\output";
+			try {
+				System.IO.Directory.CreateDirectory(csvPath);
+			} catch (Exception e) {
+				printToServerConsoleProtected("Impossibile creare la cartella " + csvPath + "\n");
+			}
 			textBoxCSVPath.Text = csvPath;
 			//CSV Location hint EventHandler
 			this.textBoxCSVPath.MouseEnter += new System.EventHandler(this.textBoxCSVPath_Enter);
@@ -874,10 +879,12 @@ namespace Sense {
 					default:
 						break;
 				}
-
-
+				
+				printToServerConsoleProtected("" + soglia1 + soglia2);
 				for (int i = 0; i < sampwin.Count(); i++) {
+					//printToServerConsoleProtected("a" + i);
 					if (Math.Abs(valore[i] - standardValue) > soglia1) {
+						printToServerConsoleProtected("(1 - " + valore[i] + " " + i + ")");
 						if (segAction != "Action") {
 							if (segPossibleAction != "Action") {
 								segPossibleStart = i;
@@ -899,6 +906,7 @@ namespace Sense {
 							}
 						}
 					} else {
+						printToServerConsoleProtected("(0 - " + valore[i] + " " + i + ")");
 						if (segPossibleAction != "Calm") {
 							segPossibleStart = i;
 							segPossibleAction = "Calm";
