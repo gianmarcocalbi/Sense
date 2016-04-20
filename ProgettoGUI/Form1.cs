@@ -108,7 +108,7 @@ namespace Sense {
 			clientsAmount = (int)numericUpDownClientsAmount.Value;
 			selectedChart = comboBoxChart.SelectedIndex;
 			checkBoxSegmentation.Checked = false;
-			checkBoxSegmentation.Enabled = (selectedChart == 0 ? true : false);
+			checkBoxSegmentation.Enabled = ((selectedChart == 0 && selectedSensorType == 0) ? true : false);
 			//Creazione Parser (Server)
 			parser = new Parser(
 				Int32.Parse(textBoxPort.Text),
@@ -654,7 +654,7 @@ namespace Sense {
 						checkBoxSmoothing.Enabled = true;
 						checkBoxSmoothing.Checked = true;
 						numericUpDownSmoothing.Enabled = true;
-						checkBoxSegmentation.Enabled = (selectedChart == 0 ? true : false);
+						checkBoxSegmentation.Enabled = ((selectedChart == 0 && selectedSensorType == 0) ? true : false);
 						comboBoxChart.SelectedIndex = 0;
 					}
 				}
@@ -1140,7 +1140,7 @@ namespace Sense {
 			if (parser.sampwin != null) {
 				DrawSampwin(parser.sampwin);
 			}
-			checkBoxSegmentation.Enabled = (selectedChart == 0 ? true : false);
+			checkBoxSegmentation.Enabled = ((selectedChart == 0 && selectedSensorType == 0) ? true : false);
 			checkBoxSegmentation.Checked = false;
 		}
 
@@ -1149,6 +1149,8 @@ namespace Sense {
 			if (parser.sampwin != null) {
 				DrawSampwin(parser.sampwin);
 			}
+			checkBoxSegmentation.Enabled = ((selectedChart == 0 && selectedSensorType == 0) ? true : false);
+			checkBoxSegmentation.Checked = false;
 		}
 
 		private void comboBoxNumSensore_SelectedIndexChanged(object sender, EventArgs e) {
@@ -1217,6 +1219,14 @@ namespace Sense {
 
 		private void checkBoxSaveCsv_CheckedChanged(object sender, EventArgs e) {
 			printCSV = checkBoxSaveCsv.Checked;
+		}
+
+		private void checkBoxSaveCsv_MouseEnter(object sender, EventArgs e) {
+			CheckBox TB = (CheckBox)sender;
+			int VisibleTime = 800;  //in milliseconds
+
+			ToolTip tt = new ToolTip();
+			tt.Show("Enable saving CSV file.", TB, 0, 20, VisibleTime);
 		}
 	}
 }

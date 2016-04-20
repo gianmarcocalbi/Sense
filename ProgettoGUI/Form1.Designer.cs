@@ -26,6 +26,7 @@
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.checkBoxSaveCsv = new System.Windows.Forms.CheckBox();
 			this.label14 = new System.Windows.Forms.Label();
 			this.numericUpDownClientsAmount = new System.Windows.Forms.NumericUpDown();
 			this.label10 = new System.Windows.Forms.Label();
@@ -67,7 +68,6 @@
 			this.comboBoxChart = new System.Windows.Forms.ComboBox();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-			this.checkBoxSaveCsv = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -122,6 +122,17 @@
 			this.splitContainer1.Size = new System.Drawing.Size(1006, 564);
 			this.splitContainer1.SplitterDistance = 263;
 			this.splitContainer1.TabIndex = 0;
+			// 
+			// checkBoxSaveCsv
+			// 
+			this.checkBoxSaveCsv.AutoSize = true;
+			this.checkBoxSaveCsv.Location = new System.Drawing.Point(7, 197);
+			this.checkBoxSaveCsv.Name = "checkBoxSaveCsv";
+			this.checkBoxSaveCsv.Size = new System.Drawing.Size(15, 14);
+			this.checkBoxSaveCsv.TabIndex = 28;
+			this.checkBoxSaveCsv.UseVisualStyleBackColor = true;
+			this.checkBoxSaveCsv.CheckedChanged += new System.EventHandler(this.checkBoxSaveCsv_CheckedChanged);
+			this.checkBoxSaveCsv.MouseEnter += new System.EventHandler(this.checkBoxSaveCsv_MouseEnter);
 			// 
 			// label14
 			// 
@@ -578,16 +589,6 @@
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "Help";
 			this.tabPage2.UseVisualStyleBackColor = true;
-			// 
-			// checkBoxSaveCsv
-			// 
-			this.checkBoxSaveCsv.AutoSize = true;
-			this.checkBoxSaveCsv.Location = new System.Drawing.Point(7, 198);
-			this.checkBoxSaveCsv.Name = "checkBoxSaveCsv";
-			this.checkBoxSaveCsv.Size = new System.Drawing.Size(15, 14);
-			this.checkBoxSaveCsv.TabIndex = 28;
-			this.checkBoxSaveCsv.UseVisualStyleBackColor = true;
-			this.checkBoxSaveCsv.CheckedChanged += new System.EventHandler(this.checkBoxSaveCsv_CheckedChanged);
 			// 
 			// Form1
 			// 
